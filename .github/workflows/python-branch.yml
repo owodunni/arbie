@@ -26,3 +26,8 @@ jobs:
     - name: Lint with flake8
       run: |
         doit lint
+    - name: Upload coverage to Codecov
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      run: |
+        doit codecov
