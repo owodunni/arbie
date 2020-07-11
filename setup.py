@@ -1,15 +1,15 @@
 """Packaging logic for arbie."""
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
-with open('pip/requirements.txt') as f:
-    requirements = f.read().splitlines()
 
-with open('pip/requirements-dev.txt') as f:
-    test_requirements = f.read().splitlines()
+def read(path):
+    with open(path) as req:
+        return req.read().splitlines()
+
 
 setup(
     packages=find_packages(),
-    package_data={'': ["resources/*"]},
-    install_requires=requirements,
-    tests_require=test_requirements
+    package_data={"": ["resources/*"]},
+    install_requires=read("pip/requirements.txt"),
+    tests_require=read("pip/requirements-dev.txt"),
 )

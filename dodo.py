@@ -1,26 +1,48 @@
-buildDir = "build"
+"""Doit file for defining tasks."""
+
+import os
+
+project_dir = os.getcwd()
+
+build_dir = f"{project_dir}/build"
+project_name = "Arbie"
+sorce_dir = f"{project_dir}/{project_name}"
+test_dir = f"{sorce_dir}/tests"
+
+pip = "pip"
+pip_dir = f"{project_dir}/{pip}"
+
+actions = "actions"
 
 
 def task_test():
-    outDir = "build/coverage"
+    test_result_dir = f"{build_dir}/tests"
+
     return {
-        'actions': ['pytest -v --pyargs Arbie '
-                    f"--cov-report html:{outDir} "
-                    f"--cov=Arbie Arbie/tests/ "
-                    f"--junit-xml={buildDir}/test_results.xml"]}
+        actions:
+            [f"pytest -v --pyargs {project_name} "  # noqa: WPS221
+             f"--cov-report html:{test_result_dir}/cov "
+             f"--cov={sorce_dir} {test_dir} "
+             f"--junit-xml={test_result_dir}/test_results.xml",
+             ],
+    }
 
 
 def task_lint():
-    return {'actions': ['flake8 . ']}
+    return {actions: ["flake8 . "]}
+
+
+def task_isort():
+    return {actions: ["isort **/*.py "]}
 
 
 def task_stylefix():
-    return {'actions': ['autopep8 --in-place --recursive .']}
+    return {actions: ["autopep8 --in-place --recursive ."]}
 
 
-def task_pip_install():
-    return {'actions': ['pip install -r pip/requirements.txt']}
+def task_pip():
+    return {actions: [f"{pip} install -r {pip_dir}/requirements.txt"]}
 
 
-def task_pip_install_dev():
-    return {'actions': ['pip install -r pip/requirements-dev.txt']}
+def task_pip_dev():
+    return {actions: [f"{pip} install -r {pip_dir}/requirements-dev.txt"]}
