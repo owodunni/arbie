@@ -3,6 +3,7 @@ venv
 arbie.egg-info
 arbie/__init__.pyc
 __pycache__/
-build/
+build
 .doit.db
 .coverage
+.gradle

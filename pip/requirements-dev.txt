@@ -2,6 +2,5 @@ pytest
 pytest-cov
 flake8
 autopep8
-doit
 wemake-python-styleguide
 isort < 5.0.0
