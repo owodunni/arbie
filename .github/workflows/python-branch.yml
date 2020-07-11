@@ -1,6 +1,5 @@
-name: Python package
-
-on: [push, pull_request]
+name: Python Branch Workflow
+on: [push]
 
 jobs:
   build:
@@ -8,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [3.8]
 
     steps:
     - uses: actions/checkout@v2
@@ -21,9 +20,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install doit
         doit pip pip_dev
-    - name: Lint with flake8
-      run: |
-        doit lint
     - name: Test with pytest
       run: |
         doit test
+    - name: Lint with flake8
+      run: |
+        doit lint
