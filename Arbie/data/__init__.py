@@ -1,3 +1,2 @@
-from .fileReader import read_resource
-
-__all__ = ['read_resource']
+"""Package for data handling."""
+from Arbie.data.file_reader import read_resource  # noqa: F401
