@@ -45,10 +45,10 @@ class Uniswap:
         transaction = function.buildTransaction(tx_params)
         if self.private_key is None:
             return self.w3.eth.sendTransaction(transaction)
-        else:
-            signed_txn = self.w3.eth.account.signTransaction(
-                transaction, private_key=self.private_key)
-            return self.w3.eth.sendRawTransaction(signed_txn.rawTransaction)
+
+        signed_txn = self.w3.eth.account.signTransaction(
+            transaction, private_key=self.private_key)
+        return self.w3.eth.sendRawTransaction(signed_txn.rawTransaction)
 
     def _get_tx_params(self, value=0, gas=150000):
         """Get generic transaction parameters."""
