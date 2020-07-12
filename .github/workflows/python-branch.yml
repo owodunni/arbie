@@ -1,5 +1,5 @@
 name: Python Branch Workflow
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -15,17 +15,49 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Cache pip
+      id: cache-pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/pip/requirements*') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Cache gradle
+      id: cache-gradle
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.gradle/wrapper
+          ~/.gradle/caches
+        key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-caches-
     - name: Install dependencies
       run: |
         ./gradlew pip
     - name: Test with pytest
       run: |
         ./gradlew test
+    - name: Publish Test Report
+      if: always()
+      uses: scacap/action-surefire-report@v1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: build/tests/cov/coverage.xml
     - name: Lint with flake8
       run: |
         ./gradlew lint
-    - name: Upload coverage to Codecov
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      run: |
-        ./gradlew uploadCodecov
+    # The Wemake serive is currently broken.
+    # https://github.com/wemake-services/wemake-python-styleguide/issues/1500
+    # - name: Wemake Python Stylguide
+    #  uses: wemake-services/wemake-python-styleguide@0.14.0
+    #  continue-on-error: true
+    #  with:
+    #    reporter: 'github-pr-review'
+    #  env:
+    #    GITHUB_TOKEN: ${{ secrets.WEMAKE_TOKEN }}
