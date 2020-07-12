@@ -35,6 +35,7 @@ task test(type:Exec) {
   commandLine "pytest", "-v", "--pyargs", "${project.name}",
               "--cov-report", "html:$testResultDir/cov/html",
               "--cov-report", "xml:$testResultDir/cov/coverage.xml",
+              "--junitxml=$testResultDir/surefire-reports/TEST-report.xml",
               "--cov=$sorceDir", "$testDir"
 }
 
@@ -67,9 +68,15 @@ class MyDownload extends DefaultTask {
 task downloadCodecov(type: MyDownload) {
   sourceUrl = 'https://codecov.io/bash'
   target = new File(codecov)
+  doLast{
+    exec{
+      commandLine "chmod", "+x", target
+    }
+  }
 }
 
 task uploadCodecov(type:Exec) {
   dependsOn downloadCodecov
+
   commandLine "$codecov", "-f", "$testResultDir/cov/coverage.xml"
 }
