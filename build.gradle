@@ -29,7 +29,6 @@ task pip(type:Exec) {
 }
 
 task test(type:Exec) {
-  dependsOn pip
   workingDir projectDir
 
   commandLine "pytest", "-v", "--pyargs", "${project.name}",
@@ -40,13 +39,11 @@ task test(type:Exec) {
 }
 
 task lint(type:Exec) {
-  dependsOn pip
 
   commandLine "flake8", "."
 }
 
 task stylefix(type:Exec) {
-  dependsOn pip
 
   commandLine "autopep8", "--in-place", "--recursive", "."
   commandLine "bash", "-c", "isort **/*.py"
