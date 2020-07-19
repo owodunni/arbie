@@ -8,29 +8,29 @@ from Arbie.data.file_reader import read_resource
 class Uniswap(object):
     """Utility functions for trading tokens from Uniswap."""
 
-    def __init__(self, w3, address, network="kovan", private_key=None):  # noqa: WPS211
+    def __init__(self, w3, address, network='kovan', private_key=None):  # noqa: WPS211
         self.w3 = w3
         self.address = address
         self.private_key = private_key
         self.exchange_abi = read_resource(
-            "exchange_abi.json", "contracts.uniswap",
+            'exchange_abi.json', 'contracts.uniswap',
         )
         self.factory_abi = read_resource(
-            "factory_abi.json", "contracts.uniswap",
+            'factory_abi.json', 'contracts.uniswap',
         )
-        networks = json.loads(read_resource("contract_addresses.json"))
+        networks = json.loads(read_resource('contract_addresses.json'))
         self.tokens = networks[network]
 
     def token_address(self, token):
-        factory_address = self.tokens["factory"]
-        token_address = self.tokens[token]["token"]
+        factory_address = self.tokens['factory']
+        token_address = self.tokens[token]['token']
         factory_contract = self.w3.eth.contract(
             address=factory_address, abi=self.factory_abi,
         )
         return factory_contract.functions.getExchange(token_address).call()
 
     def buy_token(self, token, amount):  # noqa: WPS210
-        exchange_address = self.tokens[token]["exchange"]
+        exchange_address = self.tokens[token]['exchange']
 
         exchange_contract = self.w3.eth.contract(
             address=exchange_address, abi=self.exchange_abi,
@@ -62,8 +62,8 @@ class Uniswap(object):
     def _get_tx_params(self, amount=0, gas=150000):
         """Get generic transaction parameters."""
         return {
-            "from": self.address,
-            "value": amount,
-            "gas": gas,
-            "nonce": self.w3.eth.getTransactionCount(self.address),
+            'from': self.address,
+            'value': amount,
+            'gas': gas,
+            'nonce': self.w3.eth.getTransactionCount(self.address),
         }

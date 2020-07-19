@@ -9,7 +9,7 @@ def read(path):
 
 setup(
     packages=find_packages(),
-    package_data={"": ["resources/*"]},
-    install_requires=read("pip/requirements.txt"),
-    tests_require=read("pip/requirements-dev.txt"),
+    package_data={'': ['resources/*']},
+    install_requires=read('pip/requirements.txt'),
+    tests_require=read('pip/requirements-dev.txt'),
 )
