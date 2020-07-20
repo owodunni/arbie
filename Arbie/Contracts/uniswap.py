@@ -3,4 +3,3 @@
 
 class Uniswap(object):
     """Utility functions for trading tokens from Uniswap."""
-

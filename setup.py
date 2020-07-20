@@ -1,5 +1,5 @@
 """Packaging logic for arbie."""
-from setuptools import find_packages, setup
+from setuptools import setup
 
 
 def read(path):
@@ -8,7 +8,7 @@ def read(path):
 
 
 setup(
-    packages=find_packages(),
+    packages=['Arbie'],
     package_data={'': ['resources/*']},
     install_requires=read('pip/requirements.txt'),
     tests_require=read('pip/requirements-dev.txt'),

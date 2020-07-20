@@ -1,6 +1,7 @@
 def sorceDir = "$projectDir/${project.name}"
 
-def testDir = "$sorceDir/tests"
+def testDir = "$projectDir/tests"
+def unitDir = "$testDir/unit"
 def testResultDir = "$buildDir/tests"
 
 def pipDir = "$projectDir/pip"
@@ -38,11 +39,11 @@ task test(type:Exec) {
   dependsOn install
   workingDir projectDir
 
-  commandLine "pytest", "-v", "--pyargs", "${project.name}", "tests/unit",
+  commandLine "pytest", "-v", "--pyargs", "${project.name}", "$unitDir",
               "--cov-report", "html:$testResultDir/cov/html",
               "--cov-report", "xml:$testResultDir/cov/coverage.xml",
               "--junitxml=$testResultDir/surefire-reports/TEST-report.xml",
-              "--cov=$sorceDir", "$testDir"
+              "--cov=$sorceDir", "$unitDir"
 }
 
 task lint(type:Exec) {
