@@ -1,2 +1,2 @@
 """Main init."""
-from Arbie.uniswap import Uniswap  # noqa: F401
+from Arbie.Contracts.uniswap import Uniswap  # noqa: F401
