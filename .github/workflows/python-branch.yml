@@ -8,11 +8,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: satackey/action-docker-layer-caching@v0.0.3
-    - name: Build docker
+    - name: Build and push docker
       id: build-docker
       run: |
-        docker build . -t arbie
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com -u $GITHUB_ACTOR --password-stdin
+        docker pull docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit || true
+        docker build . -t arbie --cache-from=docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit
+        docker tag arbie docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit && docker push docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit || true
     - name: Test with pytest
       run: |
         docker run -v $(pwd):/arbie arbie ./gradlew test
