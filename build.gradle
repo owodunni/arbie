@@ -39,7 +39,7 @@ task test(type:Exec) {
   dependsOn install
   workingDir projectDir
 
-  commandLine "pytest", "-v", "--pyargs", "${project.name}", "$unitDir",
+  commandLine "pytest", "-v", "--pyargs", "${project.name}",
               "--cov-report", "html:$testResultDir/cov/html",
               "--cov-report", "xml:$testResultDir/cov/coverage.xml",
               "--junitxml=$testResultDir/surefire-reports/TEST-report.xml",

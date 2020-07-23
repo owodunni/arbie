@@ -1,12 +1,13 @@
-"""Some tests."""
+"""Unittest of the uniswap contract."""
 
 import unittest
+
 from Arbie.Contracts.uniswap import Uniswap
 
 
-class TestReadResources(unittest.TestCase):
-    """Test file reader."""
+class TestUniswap(unittest.TestCase):
+    """Test Uniswap."""
 
-    def test_make_trade(self):
+    def test_uniswap_init(self):
         uni = Uniswap()
-        self.assertFalse(False)
+        self.assertTrue(uni is not None)
