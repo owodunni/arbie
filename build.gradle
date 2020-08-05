@@ -48,7 +48,7 @@ task test(type:Exec) {
 
 task lint(type:Exec) {
 
-  commandLine "flake8", "."
+  commandLine "flake8", "Arbie", "tests"
 }
 
 task stylefix(type:Exec) {
