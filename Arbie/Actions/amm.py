@@ -1,6 +1,10 @@
 """Test class for setting up AMMs."""
 from typing import List, NewType, Tuple
 
+from sympy import symbols
+
+x = symbols('x')
+
 
 class Token(object):
     """Token can be used to identify a ERC20 token."""
@@ -63,7 +67,7 @@ Variables = NewType('Variables', List[Variable])
 def get_value(values: Variables, token: Token) -> Variable:
     for v in values:
         if v.token == token:
-            return v
+            return v.value
     raise ValueError('Token \"{0}\" not found'.format(token.name))
 
 
@@ -94,14 +98,22 @@ class Amm(object):
         wi, wo = self.get_weights(token_in, token_out)
         return (bi / wi) / (bo / wo)
 
-    def in_given_out(self, token_in: Token, token_out: Token, amount: float) -> float:
+    def in_given_out_expr(self, token_in: Token, token_out: Token):
         bi, bo = self.get_balances(token_in, token_out)
         wi, wo = self.get_weights(token_in, token_out)
-        fee = self.fee
-        return bi * ((bo / (bo - amount * (1 - fee)))**(wo / wi) - 1)  # noqa: WPS221
+
+        return bi * ((bo / (bo - x * (1 - self.fee)))**(wo / wi) - 1)  # noqa: WPS221'
+
+    def out_given_in_expr(self, token_in: Token, token_out: Token) -> float:
+        bi, bo = self.get_balances(token_in, token_out)
+        wi, wo = self.get_weights(token_in, token_out)
+
+        return bo * (1 - (bi / (bi + x * (1 - self.fee)))**(wi / wo))  # noqa: WPS221
+
+    def in_given_out(self, token_in: Token, token_out: Token, amount: float) -> float:
+        expr = self.in_given_out_expr(token_in, token_out)
+        return expr.subs(x, amount)
 
     def out_given_in(self, token_in: Token, token_out: Token, amount: float) -> float:
-        bi, bo = self.get_balances(token_in, token_out)
-        wi, wo = self.get_weights(token_in, token_out)
-        fee = self.fee
-        return bo * (1 - (bi / (bi + amount * (1 - fee)))**(wi / wo))  # noqa: WPS221
+        expr = self.out_given_in_expr(token_in, token_out)
+        return expr.subs(x, amount)
