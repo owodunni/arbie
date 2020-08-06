@@ -16,6 +16,16 @@ class Variable(object):
         self.token = token
         self.value = value
 
+    @classmethod
+    def create(cls, tokens: List[Token], values: List[float]) -> List[object]:
+        if len(tokens) != len(values):
+            raise ValueError('All inputs must be of same length.')
+
+        variables = []
+        for token, value in zip(tokens, values):
+            variables.append(cls(token, value))
+        return variables
+
     def __add__(self, other):
         if self._is_number(other):
             return self.value + other
@@ -63,9 +73,11 @@ class Amm(object):
     The math can be found here https://balancer.finance/whitepaper/
     """
 
-    def __init__(self, balances: Variables, weights: Variables, fee: float = 0):
-        self.balances = balances
-        self.weights = weights
+    def __init__(self, tokens: List[Token], balances: List[float], weights: List[float], fee: float = 0):  # noqa: WPS221
+
+        self.tokens = tokens
+        self.balances = Variable.create(tokens, balances)
+        self.weights = Variable.create(tokens, weights)
         self.fee = fee
 
         if sum(weights) != 1:
