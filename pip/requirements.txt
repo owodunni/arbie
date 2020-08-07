@@ -1,2 +1,3 @@
+wheel
 web3
 sympy
