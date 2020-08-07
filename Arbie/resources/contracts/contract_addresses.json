@@ -1,0 +1,27 @@
+{
+  "token":{
+    "dai":{"mainnet":"0x6b175474e89094c44da98b954eedeac495271d0f"},
+    "usdc":{"mainnet":"0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"},
+    "weth":{"mainnet":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"}
+  },
+  "balancer":{
+    "bacations":{
+      "mainnet":"0xde4A25A0b9589689945d842c5ba0CF4f0D4eB3ac",
+      "kovan":"0x02EFDB542B9390ae7C1620B29674e02F9c0d86CC",
+      "rinkeby":"0xA492414f528175f7F5D7881eC01434eF62779502"},
+    "exchange_proxy":{
+      "mainnet":"0x6317C5e82A06E1d8bf200d21F4510Ac2c038AC81",
+      "kovan":"0x3208a3E3d5b0074D69E0888B8618295B9D6B13d3",
+      "rinkeby":"0xeF5f222c49c89a231F3aBE30114c77EE904e1e44"},
+    "pool_factory":{
+      "mainnet":"0x9424B1412450D0f8Fc2255FAf6046b98213B76Bd",
+      "kovan":"0x8f7F78080219d4066A8036ccD30D588B416a40DB",
+      "rinkeby":"0x9C84391B443ea3a48788079a5f98e2EaD55c9309"}
+  },
+  "uniswap":{
+    "factory_v2":{
+      "mainnet":"0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
+      "kovan":"0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
+      "rinkeby":"0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"}
+  }
+}
