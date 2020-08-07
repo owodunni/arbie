@@ -2,15 +2,26 @@
 
 import unittest
 
-from Arbie.Actions.amm import Amm, Token
+from Arbie.Actions.amm import Amm, Token, Variable
 
 dai = Token('dai')
 eth = Token('eth')
 tokens = [dai, eth]
 
 
+class TestVariable(unittest.TestCase):
+
+    def test_create(self):
+        Variable.create(tokens, [1, 2])
+
+    def test_create_wrong_len(self):
+        with self.assertRaises(ValueError):
+            Variable.create(tokens, [1, 2, 3])
+        with self.assertRaises(ValueError):
+            Variable.create(tokens, [1])
+
+
 class TestAmm(unittest.TestCase):
-    """Test Amm."""
 
     def test_init(self):
         Amm(tokens, [400, 1], [0.75, 0.25])

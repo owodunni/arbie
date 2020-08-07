@@ -30,36 +30,6 @@ class Variable(object):
             variables.append(cls(token, value))
         return variables
 
-    def __add__(self, other):
-        if self._is_number(other):
-            return self.value + other
-        return self.value + other.value
-
-    def __radd__(self, other):
-        return self.__add__(other)
-
-    def __sub__(self, other):
-        return self.__add__(-other)
-
-    def __rsub__(self, other):
-        return self.__sub__(other)
-
-    def __mul__(self, other):
-        if self._is_number(other):
-            return self.value * other
-        return self.value * other.value
-
-    def __rmul__(self, other):
-        return self.__mul__(other)
-
-    def __truediv__(self, other):
-        if self._is_number(other):
-            return self.value / other
-        return self.value / other.value
-
-    def _is_number(self, number):
-        return isinstance(number, (int, float))
-
 
 Variables = NewType('Variables', List[Variable])
 
@@ -68,7 +38,6 @@ def get_value(values: Variables, token: Token) -> Variable:
     for v in values:
         if v.token == token:
             return v.value
-    raise ValueError('Token \"{0}\" not found'.format(token.name))
 
 
 class Amm(object):
