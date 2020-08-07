@@ -54,8 +54,8 @@ task lint(type:Exec) {
 task stylefix(type:Exec) {
 
   commandLine "bash", "-c", "autopep8 --in-place --recursive ."
-  commandLine "bash", "-c", "isort Arbie/**/*.py"
-  commandLine "bash", "-c", "isort tests/unit/**/*.py"
+  commandLine "bash", "-c", "isort --recursive Arbie"
+  commandLine "bash", "-c", "isort --recursive tests"
 }
 
 class MyDownload extends DefaultTask {
