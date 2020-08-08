@@ -1,6 +1,6 @@
 """Unittest of arbitrage."""
 
-import unittest
+import pytest
 
 from Arbie.Actions.amm import Amm, Token
 from Arbie.Actions.arbitrage import (TradeOpertunity,
@@ -10,7 +10,7 @@ from Arbie.Actions.arbitrage import (TradeOpertunity,
 from .amm_test import dai, eth, tokens  # noqa: WPS300
 
 
-class TestArbitrage(unittest.TestCase):
+class TestArbitrage:
     """Test Arbitrage."""
 
     def test_find_arbitrage(self):
@@ -18,21 +18,21 @@ class TestArbitrage(unittest.TestCase):
         pool2 = Amm(tokens, [410, 1], [0.5, 0.5])
         trade = TradeOpertunity([pool1, pool2], dai, eth)
 
-        self.assertAlmostEqual(find_arbitrage(trade), 2.48456731316587)  # noqa: WPS432
+        assert find_arbitrage(trade) == pytest.approx(2.48456731316587)  # noqa: WPS432
 
     def test_find_arbitrage_unbalanced(self):
         pool1 = Amm(tokens, [400, 1], [0.9, 0.1])
         pool2 = Amm(tokens, [410, 1], [0.1, 0.9])
         trade = TradeOpertunity([pool1, pool2], dai, eth)
 
-        self.assertAlmostEqual(find_arbitrage(trade), 27.8547574719045)  # noqa: WPS432
+        assert find_arbitrage(trade) == pytest.approx(27.8547574719045)  # noqa: WPS432
 
     def test_find_arbitrage_no_opertunity(self):
         pool1 = Amm(tokens, [400, 1], [0.9, 0.1])
         pool2 = Amm(tokens, [410, 1], [0.1, 0.9])
         trade = TradeOpertunity([pool1, pool2], eth, dai)
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             find_arbitrage(trade)
 
     def test_calc_optimal_arbitrage_no_opertunity(self):
@@ -40,16 +40,16 @@ class TestArbitrage(unittest.TestCase):
         pool2 = Amm(tokens, [410, 1], [0.1, 0.9])
         trade = TradeOpertunity([pool1, pool2], eth, dai)
 
-        with self.assertRaises(ValueError) as e:
+        with pytest.raises(ValueError) as e:
             calculate_optimal_arbitrage(trade)
-            self.assertEqual('No arbitrage opertunity found.', e.message)
+            assert 'No arbitrage opertunity found.' == e.message
 
     def test_find_arbitrage_wrong_len(self):
         pool1 = Amm(tokens, [400, 1], [0.9, 0.1])
         pool2 = Amm(tokens, [410, 1], [0.1, 0.9])
         trade = TradeOpertunity([pool1, pool2, pool1], dai, eth)
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             find_arbitrage(trade)
 
     def test_find_arbitrage_wrong_token(self):
@@ -57,5 +57,5 @@ class TestArbitrage(unittest.TestCase):
         pool2 = Amm(tokens, [410, 1], [0.1, 0.9])
         trade = TradeOpertunity([pool1, pool2], dai, Token('sai'))
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             find_arbitrage(trade)

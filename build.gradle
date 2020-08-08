@@ -58,6 +58,10 @@ task stylefix(type:Exec) {
   commandLine "bash", "-c", "isort --recursive tests"
 }
 
+task venv(type:Exec){
+  commandLine "python3", "-m", "venv", ".venv"
+}
+
 class MyDownload extends DefaultTask {
   @Input
   String sourceUrl

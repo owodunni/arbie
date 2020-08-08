@@ -7,3 +7,5 @@ build
 .doit.db
 .coverage
 .gradle
+.ipynb_checkpoints/
+.venv/
