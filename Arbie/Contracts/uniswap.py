@@ -1,33 +1,36 @@
 """Utility functions for interacting with Uniswap."""
 
-from web3 import Web3
-
 from typing import List
 
-from Arbie.Contracts.contract import Address, Contract, Network
+from Arbie.Contracts.contract import Address, Contract, Id, Network, load_contract, read_address, deploy_contract
 
 
 class Pair(Contract):
-
-    def __init__(self, w3: Web3, address: Address):
-        abi = self._read_resource('uniswap', 'pair_abi.json')
-        self.contract = w3.eth.contract(address=address.value, abi=abi)
+    id = Id('uniswap', 'pair')
+    def __init__(self, w3, address: Address):
+        super().__init__(w3=w3, id=id, address = address)
 
 
 class Factory(Contract):
+    id = Id('uniswap', 'factory_v2')
+    def __init__(self, w3, **kwargs):
+        super().__init__(w3=w3, id=Factory.id, **kwargs)
 
-    def __init__(self, w3: Web3, network=Network.mainnet):
-        abi = self._read_resource('uniswap', 'factory_v2_abi.json')
-        self.w3 = w3
-        self.address = self._get_address('uniswap', 'factory_v2', network)
-        self.contract = w3.eth.contract(address=self.address.value, abi=abi)
-    
+    @classmethod
+    def create(cls, w3, deploy_address: Address):
+        contract_address = deploy_contract(w3, Factory.id, deploy_address, deploy_address.value)
+        return cls(w3, address=contract_address)
+
+
     def all_pairs_length(self) -> int:
         return self.contract.functions.allPairsLength().call()
 
     def all_pairs(self) -> List[Pair]:
         pairs = []
-        for i in range(0, self.all_pairs_length()-1):
+        for i in range(0, self.all_pairs_length() - 1):
             address = self.contract.functions.allPairs(i).call()
             pairs.append(Pair(self.w3, Address(address)))
         return pairs
+
+    #def createPair(self, token_a: Token, token_b: Token) -> Pair:
+#        return
