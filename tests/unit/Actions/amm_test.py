@@ -9,7 +9,7 @@ eth = Token('eth')
 tokens = [dai, eth]
 
 
-class TestVariable:
+class TestVariable(object):
 
     def test_create(self):
         Variable.create(tokens, [1, 2])
@@ -21,7 +21,7 @@ class TestVariable:
             Variable.create(tokens, [1])
 
 
-class TestAmm:
+class TestAmm(object):
 
     def test_init(self):
         Amm(tokens, [400, 1], [0.75, 0.25])

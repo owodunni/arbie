@@ -10,7 +10,7 @@ from Arbie.Actions.arbitrage import (TradeOpertunity,
 from .amm_test import dai, eth, tokens  # noqa: WPS300
 
 
-class TestArbitrage:
+class TestArbitrage(object):
     """Test Arbitrage."""
 
     def test_find_arbitrage(self):
@@ -42,7 +42,7 @@ class TestArbitrage:
 
         with pytest.raises(ValueError) as e:
             calculate_optimal_arbitrage(trade)
-            assert 'No arbitrage opertunity found.' == e.message
+            assert e.message == 'No arbitrage opertunity found.'
 
     def test_find_arbitrage_wrong_len(self):
         pool1 = Amm(tokens, [400, 1], [0.9, 0.1])
