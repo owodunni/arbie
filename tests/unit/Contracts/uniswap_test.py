@@ -1,34 +1,11 @@
 """Test uniswap contracts."""
-
 import pytest
-from eth_tester import PyEVMBackend
-from web3 import EthereumTesterProvider, Web3
 
-from Arbie.Contracts import Address
 from Arbie.Contracts.contract import ContractFactory
 from Arbie.Contracts.tokens import GenericToken
 from Arbie.Contracts.uniswap import Factory
 
-
-@pytest.fixture
-def tester_provider():
-    return EthereumTesterProvider(PyEVMBackend())
-
-
-@pytest.fixture
-def eth_tester(tester_provider):
-    return tester_provider.ethereum_tester
-
-
-@pytest.fixture
-def w3(tester_provider):
-    return Web3(tester_provider)
-
-
-@pytest.fixture
-def deploy_address(eth_tester) -> Address:
-    deploy_address = eth_tester.get_accounts()[0]
-    return Address(deploy_address)
+from .web3_helper_test import *  # noqa: F403, WPS300, WPS347, F401
 
 
 @pytest.fixture
