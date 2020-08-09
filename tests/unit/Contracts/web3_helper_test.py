@@ -8,7 +8,11 @@ from Arbie.Contracts import Address
 
 @pytest.fixture
 def tester_provider():
-    return EthereumTesterProvider(PyEVMBackend())
+    genesis_overrides = {'gas_limit': 4881400}
+    custom_genesis_params = PyEVMBackend._generate_genesis_params(overrides=genesis_overrides)  # noqa: WPS437
+    pyevm_backend = PyEVMBackend(genesis_parameters=custom_genesis_params)
+
+    return EthereumTesterProvider(pyevm_backend)
 
 
 @pytest.fixture

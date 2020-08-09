@@ -54,6 +54,7 @@ class ContractFactory(object):
         # issue a transaction to deploy the contract.
         tx_hash = contract.constructor(*args).transact({
             'from': deploy_address.value,
+            'gas': 4881400,
         })
         # wait for the transaction to be mined
         tx_receipt = self.w3.eth.waitForTransactionReceipt(tx_hash, 180)  # noqa: WPS432

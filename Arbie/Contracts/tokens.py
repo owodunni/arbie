@@ -1,6 +1,6 @@
 """Utility functions for interacting with Tokens."""
 
-from Arbie.Contracts.contract import Contract
+from Arbie.Contracts import Contract
 
 
 class GenericToken(Contract):
