@@ -2,7 +2,7 @@
 
 from typing import List
 
-from Arbie.Contracts.contract import Address, Contract, ContractFactory, Name
+from Arbie.Contracts.contract import Address, Contract, ContractFactory
 from Arbie.Contracts.tokens import GenericToken
 
 
