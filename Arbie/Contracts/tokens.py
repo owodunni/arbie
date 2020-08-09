@@ -4,5 +4,5 @@ from Arbie.Contracts.contract import Contract, Name
 
 
 class GenericToken(Contract):
-
-    name = Name('tokens', 'bnb')
+    name = 'bnb'
+    protocol = 'tokens'

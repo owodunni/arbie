@@ -33,12 +33,12 @@ def deploy_address(eth_tester) -> Address:
 
 @pytest.fixture
 def factory(deploy_address, w3) -> Factory:
-    return ContractFactory(w3, Factory, Factory.name).deploy_contract(deploy_address, deploy_address.value)
+    return ContractFactory(w3, Factory).deploy_contract(deploy_address, deploy_address.value)
 
 
 @pytest.fixture
 def token_factory(w3) -> ContractFactory:
-    return ContractFactory(w3, GenericToken, GenericToken.name)
+    return ContractFactory(w3, GenericToken)
 
 
 @pytest.fixture

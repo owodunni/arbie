@@ -8,18 +8,20 @@ from Arbie.Contracts.tokens import GenericToken
 
 class Pair(Contract):
 
-    name = Name('uniswap', 'pair')
+    name = 'pair'
+    protocol = 'uniswap'
 
 
 class Factory(Contract):
 
-    name = Name('uniswap', 'factory_v2')
+    name = 'factory_v2'
+    protocol = 'uniswap'
 
     def all_pairs_length(self) -> int:
         return self.contract.functions.allPairsLength().call()
 
     def all_pairs(self) -> List[Pair]:
-        cf = ContractFactory(self.w3, Pair, Pair.name)
+        cf = ContractFactory(self.w3, Pair)
         pairs = []
         for i in range(0, self.all_pairs_length()):
             address = self.contract.functions.allPairs(i).call()
