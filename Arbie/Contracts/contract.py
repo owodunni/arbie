@@ -12,14 +12,6 @@ class Address(object):
         self.value = address
 
 
-class Name(object):
-    """Contract Name."""
-
-    def __init__(self, protocol: str, name: str):
-        self.protocol = protocol
-        self.name = name
-
-
 class Network(Enum):
     mainnet = 0
     kovan = 1
@@ -76,7 +68,8 @@ class ContractFactory(object):
     def _get_address(self, network: Network):
         json_data = self._read_resource(None, 'contract_addresses.json')
 
-        return Address(json.loads(json_data)[self.factory_class.protocol][self.factory_class.name][network.name])  # noqa: WPS221
+        return Address(
+            json.loads(json_data)[self.factory_class.protocol][self.factory_class.name][network.name])  # noqa: WPS221
 
     def _read_abi(self):
         return self._read_resource(self.factory_class.protocol, '{0}_abi.json'.format(self.factory_class.name))
