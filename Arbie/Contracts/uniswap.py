@@ -2,7 +2,8 @@
 
 from typing import List
 
-from Arbie.Contracts.contract import Address, Contract, Id, Network, load_contract, read_address, deploy_contract
+from Arbie.Contracts.contract import Address, Contract, Id, Network, deploy_contract
+from Arbie.Contracts.tokens import GenericToken
 
 
 class Pair(Contract):
@@ -21,7 +22,6 @@ class Factory(Contract):
         contract_address = deploy_contract(w3, Factory.id, deploy_address, deploy_address.value)
         return cls(w3, address=contract_address)
 
-
     def all_pairs_length(self) -> int:
         return self.contract.functions.allPairsLength().call()
 
@@ -32,5 +32,8 @@ class Factory(Contract):
             pairs.append(Pair(self.w3, Address(address)))
         return pairs
 
-    #def createPair(self, token_a: Token, token_b: Token) -> Pair:
-#        return
+    def create_pair(self, token_a: GenericToken, token_b: GenericToken):
+        tx_hash = self.contract.functions.createPair(token_a.address.value, token_b.address.value).transact({
+        'from': self.w3.eth.accounts[0],
+        })
+        self.w3.eth.waitForTransactionReceipt(tx_hash, 180)

@@ -5,16 +5,19 @@ import pytest
 from Arbie.Contracts import Address, Network
 from Arbie.Contracts.uniswap import Factory, Pair
 from Arbie.Contracts.contract import read_abi, read_bytecode, Id
+from Arbie.Contracts.tokens import GenericToken
 
 from web3 import (
     EthereumTesterProvider,
     Web3,
 )
 
+from eth_tester import PyEVMBackend
+
 
 @pytest.fixture
 def tester_provider():
-    return EthereumTesterProvider()
+    return EthereumTesterProvider(PyEVMBackend())
 
 
 @pytest.fixture
@@ -31,11 +34,28 @@ def deploy_address(eth_tester) -> Address:
     deploy_address = eth_tester.get_accounts()[0]
     return Address(deploy_address)
 
-def test_get_all_pairs_length(deploy_address, w3):
-    fac = Factory.create(w3, deploy_address)
-    assert fac.all_pairs_length() == 0
-    #fac.create_pair()
-    #assert fac.all_pairs_length() == 1
+@pytest.fixture
+def factory(deploy_address, w3) -> Factory:
+    return Factory.create(w3, deploy_address)
+
+@pytest.fixture
+def dai(deploy_address, w3) -> GenericToken:
+    return GenericToken.create(w3, deploy_address, 100, 'Dai', 18, 'DAI')
+
+@pytest.fixture
+def weth(deploy_address, w3) -> GenericToken:
+    return GenericToken.create(w3, deploy_address, 100, 'Weth', 18, 'WETH')
+
+def test_get_all_pairs_length(factory):
+    assert factory.all_pairs_length() == 0
+
+def test_create_pair(factory, dai, weth):
+    factory.create_pair(dai, weth)
+    assert factory.all_pairs_length() == 1
+
+#def test_get_all_pairs(factory, dai, weth):
+#    factory.create_pair(dai, weth)
+#    assert len(factory.all_pairs()) == 1
 
 #class TestFactory:
 
