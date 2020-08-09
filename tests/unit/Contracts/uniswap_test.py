@@ -1,7 +1,7 @@
 """Test uniswap contracts."""
 import pytest
 
-from Arbie.Contracts.contract import ContractFactory
+from Arbie.Contracts import ContractFactory
 from Arbie.Contracts.tokens import GenericToken
 from Arbie.Contracts.uniswap import Factory
 
