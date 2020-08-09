@@ -1,18 +1,13 @@
 """Test uniswap contracts."""
 
 import pytest
+from eth_tester import PyEVMBackend
+from web3 import EthereumTesterProvider, Web3
 
 from Arbie.Contracts import Address, Network
-from Arbie.Contracts.uniswap import Factory, Pair
-from Arbie.Contracts.contract import read_abi, read_bytecode, Id
+from Arbie.Contracts.contract import Id, read_abi, read_bytecode
 from Arbie.Contracts.tokens import GenericToken
-
-from web3 import (
-    EthereumTesterProvider,
-    Web3,
-)
-
-from eth_tester import PyEVMBackend
+from Arbie.Contracts.uniswap import Factory, Pair
 
 
 @pytest.fixture
@@ -53,9 +48,9 @@ def test_create_pair(factory, dai, weth):
     factory.create_pair(dai, weth)
     assert factory.all_pairs_length() == 1
 
-#def test_get_all_pairs(factory, dai, weth):
-#    factory.create_pair(dai, weth)
-#    assert len(factory.all_pairs()) == 1
+def test_get_all_pairs(factory, dai, weth):
+    factory.create_pair(dai, weth)
+    assert len(factory.all_pairs()) == 1
 
 #class TestFactory:
 

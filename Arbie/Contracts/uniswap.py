@@ -9,7 +9,7 @@ from Arbie.Contracts.tokens import GenericToken
 class Pair(Contract):
     id = Id('uniswap', 'pair')
     def __init__(self, w3, address: Address):
-        super().__init__(w3=w3, id=id, address = address)
+        super().__init__(w3=w3, id=Pair.id, address = address)
 
 
 class Factory(Contract):
@@ -27,7 +27,7 @@ class Factory(Contract):
 
     def all_pairs(self) -> List[Pair]:
         pairs = []
-        for i in range(0, self.all_pairs_length() - 1):
+        for i in range(0, self.all_pairs_length()):
             address = self.contract.functions.allPairs(i).call()
             pairs.append(Pair(self.w3, Address(address)))
         return pairs
