@@ -6,3 +6,29 @@
 Arbie is a greedy crypto pirate!
 
 ![Arbie](./assets/icon/arbie-icon-192x192.png)
+
+## Develop
+
+Instructions for developing arbie using docker or virual-env.
+
+### Docker
+
+The arbie repository can be built using docker. This is probably the simplest approach if you just want to get things building.
+
+```
+docker build . -t arbie
+```
+
+You can now use the newly created docker image to build and test with.
+
+test:
+
+```
+docker run -v $(pwd):/arbie arbie ./gradlew test
+```
+
+lint:
+
+```
+docker run -v $(pwd):/arbie arbie ./gradlew lint
+```
