@@ -62,6 +62,20 @@ task venv(type:Exec){
   commandLine "python3", "-m", "venv", ".venv"
 }
 
+
+task startJupyter {
+  doFirst{
+
+    def command = "docker run --rm -p 8888:8888 -e " +
+	    "JUPYTER_ENABLE_LAB=yes -v $projectDir:/home/jovyan/work " +
+	    "jupyter/datascience-notebook:latest"
+    ext.process = new ProcessBuilder()
+      .directory(projectDir)
+      .command('konsole', '--noclose', '-e', command)
+      .start()
+  }
+}
+
 class MyDownload extends DefaultTask {
   @Input
   String sourceUrl
