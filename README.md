@@ -13,7 +13,8 @@ Instructions for developing arbie using docker or virual-env.
 
 ### Docker
 
-The arbie repository can be built using docker. This is probably the simplest approach if you just want to get things building.
+The arbie repository can be built using docker. This is probably the simplest
+approach if you just want to get things building.
 
 ```
 docker build . -t arbie
@@ -32,3 +33,15 @@ lint:
 ```
 docker run -v $(pwd):/arbie arbie ./gradlew lint
 ```
+
+### Jupyter notebook
+
+It is possible to test arbie in a Jupyter notebook. It is even encoraged for
+gettign a hang of what Arbie can do!
+
+Run Jupyter:
+```
+./gradlew startJupyter
+```
+
+Now go ahead and open one of the notebooks under examples.
