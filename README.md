@@ -7,6 +7,20 @@ Arbie is a greedy crypto pirate!
 
 ![Arbie](./assets/icon/arbie-icon-192x192.png)
 
+## Getting started
+
+### Jupyter notebook
+
+It is possible to test arbie in a Jupyter notebook. It is even encoraged for
+gettign a hang of what Arbie can do!
+
+Run Jupyter:
+```
+./gradlew startJupyter
+```
+
+Now go ahead and open one of the notebooks under examples.
+
 ## Develop
 
 Instructions for developing arbie using docker or virual-env.
@@ -23,25 +37,33 @@ docker build . -t arbie
 You can now use the newly created docker image to build and test with.
 
 test:
-
 ```
 docker run -v $(pwd):/arbie arbie ./gradlew test
 ```
 
 lint:
-
 ```
 docker run -v $(pwd):/arbie arbie ./gradlew lint
 ```
 
-### Jupyter notebook
+### Virtual-env
 
-It is possible to test arbie in a Jupyter notebook. It is even encoraged for
-gettign a hang of what Arbie can do!
-
-Run Jupyter:
+Create a virtual env:
 ```
-./gradlew startJupyter
+./gradlew venv
 ```
 
-Now go ahead and open one of the notebooks under examples.
+Install requirment:
+```
+:/gradlew pip
+```
+
+test:
+```
+./gradlew test
+```
+
+lint:
+```
+./gradlew lint
+```
