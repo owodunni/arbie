@@ -1,7 +1,7 @@
 venv
 .vscode
-arbie.egg-info
-arbie/__init__.pyc
+Arbie.egg-info
+Arbie/__init__.pyc
 __pycache__/
 build
 .doit.db
