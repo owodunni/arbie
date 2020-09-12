@@ -55,7 +55,7 @@ Create a virtual env:
 
 Install requirment:
 ```
-:/gradlew pip
+./gradlew pip
 ```
 
 test:
