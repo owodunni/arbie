@@ -6,101 +6,113 @@ def testResultDir = "$buildDir/tests"
 
 def pipDir = "$projectDir/pip"
 
-def isCI = System.getenv('CI')?: false
+def isCI = System.getenv('CI') ?: false
 def homeDir = System.getenv("HOME")
 
 def codecov = "$buildDir/tools/codecov.sh"
 
 ext {
-  charset = 'UTF-8'
+    charset = 'UTF-8'
 }
 
-task pip(type:Exec) {
-  workingDir projectDir
-  def reqs = [ file("$pipDir/requirements.txt"), file("$pipDir/requirements-dev.txt")]
+task pip(type: Exec) {
+    workingDir projectDir
+    def reqs = [file("$pipDir/requirements.txt"), file("$pipDir/requirements-dev.txt")]
 
-  inputs.files reqs
+    inputs.files reqs
 
-  def args = ["pip", "install"]
+    def args = ["pip", "install"]
 
-  reqs.each{req ->
-    args += ["-r", req]
-  }
-  commandLine args
+    reqs.each { req ->
+        args += ["-r", req]
+    }
+    commandLine args
 }
 
-task install(type:Exec){
-  workingDir projectDir
+task install(type: Exec) {
+    workingDir projectDir
 
-  commandLine "pip", "install", "."
+    commandLine "pip", "install", "."
 }
 
-task test(type:Exec) {
-  dependsOn install
-  workingDir projectDir
+task test(type: Exec) {
+    dependsOn install
+    workingDir projectDir
 
-  commandLine "pytest", "-v", "--pyargs", "${project.name}",
-              "--cov-report", "html:$testResultDir/cov/html",
-              "--cov-report", "xml:$testResultDir/cov/coverage.xml",
-              "--junitxml=$testResultDir/surefire-reports/TEST-report.xml",
-              "--cov=$sorceDir", "$unitDir"
+    commandLine "pytest", "-v", "--pyargs", "${project.name}",
+            "--cov-report", "html:$testResultDir/cov/html",
+            "--cov-report", "xml:$testResultDir/cov/coverage.xml",
+            "--junitxml=$testResultDir/surefire-reports/TEST-report.xml",
+            "--cov=$sorceDir", "$unitDir"
 }
 
-task lint(type:Exec) {
+task lint(type: Exec) {
 
-  commandLine "flake8", "Arbie", "tests"
+    commandLine "flake8", "Arbie", "tests"
 }
 
-task stylefix(type:Exec) {
+task stylefix(type: Exec) {
 
-  commandLine "bash", "-c", "autopep8 --in-place --recursive ."
-  commandLine "bash", "-c", "isort --recursive Arbie"
-  commandLine "bash", "-c", "isort --recursive tests"
+    commandLine "bash", "-c", "autopep8 --in-place --recursive ."
+    commandLine "bash", "-c", "isort --recursive Arbie"
+    commandLine "bash", "-c", "isort --recursive tests"
 }
 
-task venv(type:Exec){
-  commandLine "python3", "-m", "venv", ".venv"
+task venv(type: Exec) {
+    commandLine "python3", "-m", "venv", ".venv"
 }
 
 
-task startJupyter {
-  doFirst{
+class KonsoleTask extends DefaultTask {
+    @Input
+    String command
 
-    def command = "docker run --rm -p 8888:8888 -e " +
-	    "JUPYTER_ENABLE_LAB=yes -v $projectDir:/home/jovyan/work " +
-	    "jupyter/datascience-notebook:latest"
-    ext.process = new ProcessBuilder()
-      .directory(projectDir)
-      .command('konsole', '--noclose', '-e', command)
-      .start()
-  }
+    @TaskAction
+    void download() {
+        ext.process = new ProcessBuilder()
+                .directory(project.projectDir)
+                .command('konsole', '--noclose', '-e', command)
+                .start()
+    }
 }
 
 class MyDownload extends DefaultTask {
-  @Input
-  String sourceUrl
+    @Input
+    String sourceUrl
 
-  @OutputFile
-  File target
+    @OutputFile
+    File target
 
-  @TaskAction
-  void download() {
-    ant.get(src: sourceUrl, dest: target)
-  }
+    @TaskAction
+    void download() {
+        ant.get(src: sourceUrl, dest: target)
+    }
 }
 
 task downloadCodecov(type: MyDownload) {
-  sourceUrl = 'https://codecov.io/bash'
-  target = new File(codecov)
-  doLast{
-    exec{
-      commandLine "chmod", "+x", target
+    sourceUrl = 'https://codecov.io/bash'
+    target = new File(codecov)
+    doLast {
+        exec {
+            commandLine "chmod", "+x", target
+        }
     }
-  }
 }
 
-task uploadCodecov(type:Exec) {
-  dependsOn downloadCodecov
+task uploadCodecov(type: Exec) {
+    dependsOn downloadCodecov
 
-  commandLine "$codecov", "-f", "$testResultDir/cov/coverage.xml"
+    commandLine "$codecov", "-f", "$testResultDir/cov/coverage.xml"
+}
+
+task startJupyter(type: KonsoleTask) {
+    command = "docker run --rm -p 8888:8888 -e " +
+            "JUPYTER_ENABLE_LAB=yes -v $projectDir:/home/jovyan/work " +
+            "jupyter/datascience-notebook:latest"
+}
+
+task startGanache(type: KonsoleTask) {
+    command = "docker run -p 7545:7545 trufflesuite/ganache-cli " +
+            "--gasLimit 0xfffffffffff " +
+            "--callGasLimit 0xfffffffffff -p 7545"
 }

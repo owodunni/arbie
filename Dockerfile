@@ -19,3 +19,5 @@ RUN ./gradlew
 ADD pip pip
 RUN pip install -r pip/requirements.txt
 RUN pip install -r pip/requirements-dev.txt
+
+ENV RUNNING_IN_DOCKER True

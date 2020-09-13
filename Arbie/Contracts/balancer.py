@@ -14,3 +14,7 @@ class PoolFactory(Contract):
             'from': self.w3.eth.accounts[0],
         })
         self.w3.eth.waitForTransactionReceipt(tx_hash, 180)  # noqa: WPS432
+
+    def all_pools(self):
+        event_filter = self.contract.events.LOG_NEW_POOL.createFilter(fromBlock=0)
+        return event_filter.get_all_entries()

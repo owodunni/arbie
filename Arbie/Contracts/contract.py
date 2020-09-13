@@ -35,11 +35,7 @@ class ContractFactory(object):
 
     def load_contract(self, **kwargs) -> Contract:
         """Load contract require address or network to be passed in kwargs."""
-        address = None
-        if 'address' in kwargs:
-           address = kwargs.get('address')
-        else:
-            address = self._read_address(**kwargs)
+        address = self._read_address(**kwargs)
         contract = self._load_contract(address)
         return self.factory_class(self.w3, address, contract)
 
@@ -54,7 +50,7 @@ class ContractFactory(object):
         # issue a transaction to deploy the contract.
         tx_hash = contract.constructor(*args).transact({
             'from': deploy_address.value,
-            'gas': 4881400,
+            'gas': 48814000,
         })
         # wait for the transaction to be mined
         tx_receipt = self.w3.eth.waitForTransactionReceipt(tx_hash, 180)  # noqa: WPS432
