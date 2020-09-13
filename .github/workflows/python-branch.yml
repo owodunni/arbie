@@ -17,7 +17,8 @@ jobs:
         docker tag arbie docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit && docker push docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit || true
     - name: Test with pytest
       run: |
-        docker run -v $(pwd):/arbie arbie ./gradlew test
+        docker-compose up -d ganache
+        docker-compose up arbie
     - name: Publish Test Report
       if: always()
       uses: scacap/action-surefire-report@v1

@@ -2,17 +2,17 @@ def balancerDir = file("$buildDir/balancer-core")
 def balancerRepo = "https://github.com/balancer-labs/balancer-core.git"
 
 task cloneBalancer {
-  doLast{
-    exec{
-      workingDir projectDir
-        commandLine "git", "clone", balancerRepo, balancerDir
+    doLast {
+        exec {
+            workingDir projectDir
+            commandLine "git", "clone", balancerRepo, balancerDir
+        }
+        exec {
+            workingDir balancerDir
+            commandLine "git", "checkout", "v1.0.0"
+        }
     }
-    exec{
-      workingDir balancerDir
-        commandLine "git", "checkout", "v1.0.0"
-    }
-  }
 
-  outputs.dir balancerDir
+    outputs.dir balancerDir
 }
 

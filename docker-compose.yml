@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  ganache:
+    image: trufflesuite/ganache-cli
+    ports:
+      - 7545:7545
+    command: --gasLimit 0xfffffffffff --callGasLimit 0xfffffffffff -p 7545
+
+  arbie:
+    image: arbie
+    depends_on:
+      - ganache
+    volumes:
+      - .:/arbie
+    command: /arbie/gradlew test
+
