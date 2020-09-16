@@ -29,8 +29,11 @@ class Contract(object):
 
 class ContractFactory(object):
 
-    def __init__(self, w3, factory_class):
+    def __init__(self, w3, factory_class: Contract):
         self.w3 = w3
+
+        if factory_class.name is None or factory_class.abi is None or factory_class.protocol is None:
+            raise ValueError(f'{factory_class} dosent contain default parameters')
         self.factory_class = factory_class
 
     def load_contract(self, **kwargs) -> Contract:

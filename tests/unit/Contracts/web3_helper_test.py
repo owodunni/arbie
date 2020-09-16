@@ -6,8 +6,13 @@ from Arbie.Contracts.contract import Address
 
 
 @pytest.fixture
-def w3():
-    return Web3(Web3.HTTPProvider('http://ganache:7545'))
+def web3_server(request):
+    return request.config.getoption('--web3_server')
+
+
+@pytest.fixture
+def w3(web3_server):
+    return Web3(Web3.HTTPProvider(web3_server))
 
 
 @pytest.fixture
