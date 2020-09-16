@@ -15,3 +15,9 @@ def pool_factory(deploy_address, w3) -> PoolFactory:
 def test_create_new_pool(pool_factory):  # noqa: WPS442
     pool_factory.new_bpool()
     assert len(pool_factory.all_pools()) == 1
+
+
+def test_get_number_of_tokens(pool_factory):  # noqa: WPS442
+    pool_factory.new_bpool()
+    pools = pool_factory.all_pools()
+    assert pools[0].get_number_of_tokens() == 0

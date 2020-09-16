@@ -1,12 +1,18 @@
 """Utility functions for interacting with balancer."""
 
-from Arbie.Contracts import Contract
+from typing import List
+
+from Arbie.Contracts import Address, Contract, ContractFactory
 
 
 class Pool(Contract):
 
     name = 'pool'
     protocol = 'balancer'
+    abi = 'bpool'
+
+    def get_number_of_tokens(self):
+        return self.contract.functions.getNumTokens().call()
 
 
 class PoolFactory(Contract):
@@ -22,6 +28,15 @@ class PoolFactory(Contract):
         })
         self.w3.eth.waitForTransactionReceipt(tx_hash, 180)  # noqa: WPS432
 
-    def all_pools(self):
+    def all_pools(self) -> List[Pool]:
         event_filter = self.contract.events.LOG_NEW_POOL.createFilter(fromBlock=0)
-        return event_filter.get_all_entries()
+        return self._create_pools(event_filter.get_all_entries())
+
+    def _create_pools(self, new_pool_event):
+        pools = []
+        factory = ContractFactory(self.w3, Pool)
+
+        for event in new_pool_event:
+            pool = factory.load_contract(address=Address(event.args.pool))
+            pools.append(pool)
+        return pools
