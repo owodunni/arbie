@@ -73,14 +73,14 @@ class ContractFactory(object):
         json_data = self._read_resource(None, 'contract_addresses.json')
 
         return Address(
-            json.loads(json_data)[self.factory_class.protocol][self.factory_class.name][network.name])  # noqa: WPS221
+            json.loads(json_data)[self.factory_class.protocol][self.factory_class.abi][network.name])  # noqa: WPS221
 
     def _read_abi(self):
-        return self._read_resource(self.factory_class.protocol, '{0}_abi.json'.format(self.factory_class.name))
+        return self._read_resource(self.factory_class.protocol, '{0}_abi.json'.format(self.factory_class.abi))
 
     def _read_bytecode(self):
         key = 'bytecode'
-        filename = '{0}_{1}.json'.format(self.factory_class.name, key)
+        filename = '{0}_{1}.json'.format(self.factory_class.abi, key)
         json_data = self._read_resource(self.factory_class.protocol, filename)
         return json.loads(json_data)[key]
 
