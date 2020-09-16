@@ -10,12 +10,14 @@ class Pair(Contract):
 
     name = 'pair'
     protocol = 'uniswap'
+    abi = 'pair'
 
 
 class Factory(Contract):
 
     name = 'factory_v2'
     protocol = 'uniswap'
+    abi = 'factory_v2'
 
     def all_pairs_length(self) -> int:
         return self.contract.functions.allPairsLength().call()

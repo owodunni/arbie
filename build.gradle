@@ -11,6 +11,8 @@ def homeDir = System.getenv("HOME")
 
 def codecov = "$buildDir/tools/codecov.sh"
 
+def web3_server = System.getenv('RUNNING_IN_DOCKER') ? 'http://ganache:7545' : 'http://127.0.0.1:7545'
+
 ext {
     charset = 'UTF-8'
 }
@@ -43,7 +45,7 @@ task test(type: Exec) {
             "--cov-report", "html:$testResultDir/cov/html",
             "--cov-report", "xml:$testResultDir/cov/coverage.xml",
             "--junitxml=$testResultDir/surefire-reports/TEST-report.xml",
-            "--cov=$sorceDir", "$unitDir"
+            "--cov=$sorceDir", "$unitDir", "--web3_server", "$web3_server"
 }
 
 task lint(type: Exec) {
@@ -112,7 +114,5 @@ task startJupyter(type: KonsoleTask) {
 }
 
 task startGanache(type: KonsoleTask) {
-    command = "docker run -p 7545:7545 trufflesuite/ganache-cli " +
-            "--gasLimit 0xfffffffffff " +
-            "--callGasLimit 0xfffffffffff -p 7545"
+    command = "docker-compose up ganache"
 }

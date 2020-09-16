@@ -3,9 +3,16 @@
 from Arbie.Contracts import Contract
 
 
+class Pool(Contract):
+
+    name = 'pool'
+    protocol = 'balancer'
+
+
 class PoolFactory(Contract):
     name = 'pool_factory'
     protocol = 'balancer'
+    abi = 'pool_factory'
 
     def new_bpool(self):
         transaction = self.contract.functions.newBPool()
