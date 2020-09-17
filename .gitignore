@@ -9,3 +9,5 @@ build
 .gradle
 .ipynb_checkpoints/
 .venv/
+.idea/.name
+fragmap.html
