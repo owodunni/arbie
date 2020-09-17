@@ -5,8 +5,6 @@ from Arbie.Contracts import ContractFactory
 from Arbie.Contracts.tokens import GenericToken
 from Arbie.Contracts.uniswap import Factory
 
-from .web3_helper_test import *  # noqa: F403, WPS300, WPS347, F401
-
 
 @pytest.fixture
 def factory(deploy_address, w3) -> Factory:
