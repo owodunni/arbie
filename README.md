@@ -60,7 +60,7 @@ Install requirment:
 
 test:
 ```
-./gradlew test
+./gradlew startGanache test
 ```
 
 lint:
