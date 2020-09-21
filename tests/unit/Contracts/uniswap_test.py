@@ -38,3 +38,15 @@ def test_create_pair(factory, dai, weth):
 def test_get_all_pairs(factory, dai, weth):
     factory.create_pair(dai, weth)
     assert len(factory.all_pairs()) == 1
+
+
+def test_get_k(factory, dai, weth):
+    factory.create_pair(dai, weth)
+    pairs = factory.all_pairs()
+    assert pairs[0].get_k_last() == 0
+
+
+def test_get_weights(factory, dai, weth):
+    factory.create_pair(dai, weth)
+    pairs = factory.all_pairs()
+    assert pairs[0].get_reserves() == [0, 0, 0]
