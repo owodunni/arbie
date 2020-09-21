@@ -1,6 +1,6 @@
 """Utility functions for interacting with Uniswap."""
 
-from typing import List
+from typing import List, Tuple
 
 from Arbie.Contracts.contract import Address, Contract, ContractFactory
 from Arbie.Contracts.tokens import GenericToken
@@ -11,6 +11,12 @@ class Pair(Contract):
     name = 'pair'
     protocol = 'uniswap'
     abi = 'pair'
+
+    def get_k_last(self) -> int:
+        return self.contract.functions.kLast().call()
+
+    def get_reserves(self) -> Tuple[int, int, int]:
+        return self.contract.functions.getReserves().call()
 
 
 class Factory(Contract):
