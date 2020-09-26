@@ -23,10 +23,7 @@ class PoolFactory(Contract):
     def new_bpool(self):
         transaction = self.contract.functions.newBPool()
 
-        tx_hash = transaction.transact({
-            'from': self.w3.eth.accounts[0],
-        })
-        self.w3.eth.waitForTransactionReceipt(tx_hash, 180)  # noqa: WPS432
+        self._transact(transaction)
 
     def all_pools(self) -> List[Pool]:
         event_filter = self.contract.events.LOG_NEW_POOL.createFilter(fromBlock=0)

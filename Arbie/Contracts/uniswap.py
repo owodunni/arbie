@@ -38,10 +38,7 @@ class Factory(Contract):
 
     def create_pair(self, token_a: GenericToken, token_b: GenericToken):
         transaction = self.contract.functions.createPair(
-            token_a.address.value,
-            token_b.address.value)
+            token_a.contract.address,
+            token_b.contract.address)
 
-        tx_hash = transaction.transact({
-            'from': self.w3.eth.accounts[0],
-        })
-        self.w3.eth.waitForTransactionReceipt(tx_hash, 180)  # noqa: WPS432
+        self._transact(transaction)
