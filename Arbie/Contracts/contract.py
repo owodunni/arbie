@@ -18,6 +18,16 @@ class Network(Enum):
     ropsten = 2
 
 
+def transact(w3, address: Address, transaction):
+    """Transact a transcation and return transaction receipt."""
+    tx_hash = transaction.transact({
+        'from': address.value,
+        'gas': 48814000,
+    })
+    # wait for the transaction to be mined
+    return w3.eth.waitForTransactionReceipt(tx_hash, 180)  # noqa: WPS432
+
+
 class Contract(object):
     """Base class for contracts."""
 
@@ -25,6 +35,9 @@ class Contract(object):
         self.w3 = w3
         self.address = address
         self.contract = contract
+
+    def _transact(self, transaction):
+        transact(self.w3, self.address, transaction)
 
 
 class ContractFactory(object):
@@ -45,19 +58,15 @@ class ContractFactory(object):
     def deploy_contract(self, deploy_address: Address, *args) -> Contract:
         contract_address = self._deploy_contract(deploy_address, *args)
         contract = self._load_contract(contract_address)
-        return self.factory_class(self.w3, contract_address, contract)
+        return self.factory_class(self.w3, deploy_address, contract)
 
     def _deploy_contract(self, deploy_address: Address, *args) -> Address:
+        """Deploy contract and pass on args to contract abi constructor."""
         contract = self.w3.eth.contract(abi=self._read_abi(), bytecode=self._read_bytecode())
 
-        # issue a transaction to deploy the contract.
-        tx_hash = contract.constructor(*args).transact({
-            'from': deploy_address.value,
-            'gas': 48814000,
-        })
-        # wait for the transaction to be mined
-        tx_receipt = self.w3.eth.waitForTransactionReceipt(tx_hash, 180)  # noqa: WPS432
-        # instantiate and return an instance of our contract.
+        transaction = contract.constructor(*args)
+        tx_receipt = transact(self.w3, deploy_address, transaction)
+
         return Address(tx_receipt.contractAddress)
 
     def _read_resource(self, path: str, filename: str) -> str:
@@ -70,10 +79,13 @@ class ContractFactory(object):
         return resource_string(file_path, filename).decode('utf-8')
 
     def _get_address(self, network: Network):
-        json_data = self._read_resource(None, 'contract_addresses.json')
+        json_data = json.loads(self._read_resource(
+            None, 'contract_addresses.json'))
 
-        return Address(
-            json.loads(json_data)[self.factory_class.protocol][self.factory_class.abi][network.name])  # noqa: WPS221
+        address = json_data[self.factory_class.protocol][
+            self.factory_class.abi][network.name]
+
+        return Address(address)
 
     def _read_abi(self):
         return self._read_resource(self.factory_class.protocol, '{0}_abi.json'.format(self.factory_class.abi))
