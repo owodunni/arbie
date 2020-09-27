@@ -6,9 +6,9 @@ from Arbie.Contracts import ContractFactory
 from Arbie.Contracts.tokens import GenericToken
 from Arbie.Contracts.uniswap import Factory, Pair
 
-
 bg10 = BigNumber(10)
 bg5 = BigNumber(5)
+
 
 @pytest.fixture
 def factory(deploy_address, w3) -> Factory:
@@ -63,7 +63,7 @@ def test_get_k(pair):
 
 
 def test_get_weights(pair):
-    assert pair.get_reserves() == [0, 0, 0]
+    assert pair.get_reserves() == [0, 0]
 
 
 def test_mint(
@@ -75,5 +75,18 @@ def test_mint(
     assert dai.transfer(pair.get_address(), bg10)
     assert weth.transfer(pair.get_address(), bg10)
     assert pair.mint(deploy_address)
-    assert pair.get_reserves()[0:2] == [bg10, bg10]
+    assert pair.get_reserves() == [bg10, bg10]
     assert pair.get_k_last() == 0
+
+
+def test_create_amm(
+        pair: Pair,
+        dai: GenericToken,
+        weth: GenericToken,
+        deploy_address):
+
+    assert dai.transfer(pair.get_address(), bg5)
+    assert weth.transfer(pair.get_address(), bg10)
+    assert pair.mint(deploy_address)
+    amm = pair.create_amm()
+    assert amm.spot_price(weth.create_token(), dai.create_token()) == 2

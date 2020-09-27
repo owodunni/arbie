@@ -24,4 +24,8 @@ def test_approve(dai: GenericToken, deploy_address):  # noqa:WPS442
 def test_transfer(dai: GenericToken, deploy_address, dummy_address):  # noqa:WPS442
     dai.approve(deploy_address, BigNumber(10))
     dai.transfer(dummy_address, BigNumber(10))
-    assert dai.balance_of(dummy_address).to_numer() == 10
+    assert dai.balance_of(dummy_address).to_number() == 10
+
+
+def test_name(dai: GenericToken):  # noqa:WPS442
+    assert dai.get_name() == 'BNB'

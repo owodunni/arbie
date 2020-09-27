@@ -9,8 +9,12 @@ x = symbols('x')
 class Token(object):
     """Token can be used to identify a ERC20 token."""
 
-    def __init__(self, name: str):
+    def __init__(self, name: str, address=None):
         self.name = name
+        self.address = address
+
+    def __eq__(self, other):
+        return self.address == other.address and self.name == other.name
 
 
 class Variable(object):
