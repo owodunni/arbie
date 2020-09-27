@@ -1,6 +1,7 @@
 """Test uniswap contracts."""
 import pytest
 
+from Arbie import BigNumber
 from Arbie.Contracts import ContractFactory
 from Arbie.Contracts.tokens import GenericToken
 from Arbie.Contracts.uniswap import Factory, Pair
@@ -18,12 +19,16 @@ def token_factory(w3) -> ContractFactory:
 
 @pytest.fixture
 def dai(deploy_address, token_factory) -> GenericToken:
-    return token_factory.deploy_contract(deploy_address, 100, 'Dai', 18, 'DAI')  # noqa: WPS432
+    token = token_factory.deploy_contract(deploy_address, 10000, 'Dai', 18, 'DAI')  # noqa: WPS432
+    token.approve_owner()
+    return token
 
 
 @pytest.fixture
 def weth(deploy_address, token_factory) -> GenericToken:
-    return token_factory.deploy_contract(deploy_address, 100, 'Weth', 18, 'WETH')  # noqa: WPS432
+    token = token_factory.deploy_contract(deploy_address, 10000, 'Weth', 18, 'WETH')  # noqa: WPS432
+    token.approve_owner()
+    return token
 
 
 @pytest.fixture
@@ -56,3 +61,9 @@ def test_get_k(pair):
 
 def test_get_weights(pair):
     assert pair.get_reserves() == [0, 0, 0]
+
+
+def test_mint(pair: Pair, dai: GenericToken, weth: GenericToken, deploy_address):
+    assert dai.transfer(pair.get_address(), BigNumber(10))
+    assert weth.transfer(pair.get_address(), BigNumber(10))
+    assert pair.mint(deploy_address)

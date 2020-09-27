@@ -1,6 +1,7 @@
 """Test uniswap contracts."""
 import pytest
 
+from Arbie import BigNumber
 from Arbie.Contracts import ContractFactory
 from Arbie.Contracts.tokens import GenericToken
 
@@ -17,10 +18,10 @@ def dai(deploy_address, token_factory) -> GenericToken:  # noqa: WPS442
 
 
 def test_approve(dai: GenericToken, deploy_address):  # noqa:WPS442
-    assert dai.approve(deploy_address, 10)
+    assert dai.approve(deploy_address, BigNumber(10))
 
 
 def test_transfer(dai: GenericToken, deploy_address, dummy_address):  # noqa:WPS442
-    dai.approve(deploy_address, 10)
-    dai.transfer(dummy_address, 10)
-    assert dai.balance_of(dummy_address) == 10
+    dai.approve(deploy_address, BigNumber(10))
+    dai.transfer(dummy_address, BigNumber(10))
+    assert dai.balance_of(dummy_address).to_numer() == 10

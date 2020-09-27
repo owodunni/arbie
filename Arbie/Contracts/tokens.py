@@ -1,5 +1,6 @@
 """Utility functions for interacting with Tokens."""
 
+from Arbie import BigNumber
 from Arbie.Contracts import Address, Contract
 
 
@@ -8,16 +9,27 @@ class GenericToken(Contract):
     protocol = 'tokens'
     abi = 'bnb'
 
-    def balance_of(self, owner: Address) -> int:
-        return self.contract.functions.balanceOf(owner.value).call()
+    def decimals(self) -> int:
+        return self.contract.functions.decimals().call()
 
-    def transfer(self, to: Address, value: int) -> bool:
-        transaction = self.contract.functions.transfer(to.value, value)
+    def balance_of(self, owner: Address) -> BigNumber:
+        value = self.contract.functions.balanceOf(
+            owner.value).call()
+        return BigNumber.from_value(value, self.decimals())
+
+    def transfer(self, to: Address, bg_number: BigNumber) -> bool:
+        transaction = self.contract.functions.transfer(
+            to.value, bg_number.value)
         return self._transact_status(transaction)
 
-    def approve(self, spender: Address, value: int) -> bool:
-        transaction = self.contract.functions.approve(spender.value, value)
+    def approve(
+            self,
+            spender: Address,
+            bg_number: BigNumber) -> bool:
+        transaction = self.contract.functions.approve(
+            spender.value, bg_number.value)
         return self._transact_status(transaction)
 
     def approve_owner(self):
-        return self.approve(self.address, self.balance_of(self.address))
+        return self.approve(
+            self.owner_address, self.balance_of(self.owner_address))

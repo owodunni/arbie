@@ -19,7 +19,7 @@ class Network(Enum):
 
 
 def transact(w3, address: Address, transaction):
-    """Transact a transcation and return transaction receipt."""
+    """Transact a transaction and return transaction receipt."""
     tx_hash = transaction.transact({
         'from': address.value,
         'gas': 48814000,
@@ -31,13 +31,16 @@ def transact(w3, address: Address, transaction):
 class Contract(object):
     """Base class for contracts."""
 
-    def __init__(self, w3, address: Address, contract):
+    def __init__(self, w3, owner_address: Address, contract):
         self.w3 = w3
-        self.address = address
+        self.owner_address = owner_address
         self.contract = contract
 
+    def get_address(self) -> Address:
+        return Address(self.contract.address)
+
     def _transact(self, transaction):
-        return transact(self.w3, self.address, transaction)
+        return transact(self.w3, self.owner_address, transaction)
 
     def _transact_status(self, transaction) -> bool:
         return bool(self._transact(transaction).status)
@@ -49,19 +52,19 @@ class ContractFactory(object):
         self.w3 = w3
 
         if factory_class.name is None or factory_class.abi is None or factory_class.protocol is None:
-            raise ValueError(f'{factory_class} dosent contain default parameters')
+            raise ValueError(f'{factory_class} dose not contain default parameters')
         self.factory_class = factory_class
 
-    def load_contract(self, **kwargs) -> Contract:
+    def load_contract(self, owner_address: Address, **kwargs) -> Contract:
         """Load contract require address or network to be passed in kwargs."""
         address = self._read_address(**kwargs)
         contract = self._load_contract(address)
-        return self.factory_class(self.w3, address, contract)
+        return self.factory_class(self.w3, owner_address, contract)
 
-    def deploy_contract(self, deploy_address: Address, *args) -> Contract:
-        contract_address = self._deploy_contract(deploy_address, *args)
+    def deploy_contract(self, owner_address: Address, *args) -> Contract:
+        contract_address = self._deploy_contract(owner_address, *args)
         contract = self._load_contract(contract_address)
-        return self.factory_class(self.w3, deploy_address, contract)
+        return self.factory_class(self.w3, owner_address, contract)
 
     def _deploy_contract(self, deploy_address: Address, *args) -> Address:
         """Deploy contract and pass on args to contract abi constructor."""
