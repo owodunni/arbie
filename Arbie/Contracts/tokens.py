@@ -8,10 +8,13 @@ class GenericToken(Contract):
     protocol = 'tokens'
     abi = 'bnb'
 
+    def balance_of(self, owner: Address) -> int:
+        return self.contract.functions.balanceOf(owner.value).call()
+
+    def transfer(self, to: Address, value: int) -> bool:
+        transaction = self.contract.functions.transfer(to.value, value)
+        return self._transact_status(transaction)
+
     def approve(self, spender: Address, value: int) -> bool:
-        transaction = self.contract.function.approve(spender.value, value)
-
-        self.transact(transaction)
-
-        # TODO: Get result from tx_recipt
-        return False
+        transaction = self.contract.functions.approve(spender.value, value)
+        return self._transact_status(transaction)
