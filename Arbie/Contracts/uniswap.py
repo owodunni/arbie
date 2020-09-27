@@ -21,17 +21,6 @@ class Pair(Contract):
         transaction = self.contract.functions.mint(address.value)
         return self._transact_status(transaction)
 
-    def get_price0(self) -> BigNumber:
-        function = self.contract.functions.price0CumulativeLast()
-        return self._get_price(function, self.get_token0().decimals())
-
-    def get_price1(self) -> BigNumber:
-        function = self.contract.functions.price1CumulativeLast()
-        return self._get_price(function, self.get_token1().decimals())
-
-    def get_k_last(self) -> int:
-        return self.contract.functions.kLast().call()
-
     def get_token0(self) -> GenericToken:
         return self._get_token(self.contract.functions.token0())
 
@@ -56,10 +45,6 @@ class Pair(Contract):
         balances = list(map((lambda bg: bg.to_number()), self.get_reserves()))
 
         return Amm(tokens, balances, [weight, weight], fee)
-
-    def _get_price(self, function, exp) -> BigNumber:
-        price = function.call()
-        return BigNumber.from_value(price, exp)
 
     def _get_token(self, function) -> GenericToken:
         cf = ContractFactory(self.w3, GenericToken)
