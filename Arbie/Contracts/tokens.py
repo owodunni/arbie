@@ -18,3 +18,6 @@ class GenericToken(Contract):
     def approve(self, spender: Address, value: int) -> bool:
         transaction = self.contract.functions.approve(spender.value, value)
         return self._transact_status(transaction)
+
+    def approve_owner(self):
+        return self.approve(self.address, self.balance_of(self.address))

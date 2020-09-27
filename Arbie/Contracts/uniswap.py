@@ -36,9 +36,8 @@ class Factory(Contract):
             pairs.append(cf.load_contract(address=Address(address)))
         return pairs
 
-    def create_pair(self, token_a: GenericToken, token_b: GenericToken):
+    def create_pair(self, token_a: GenericToken, token_b: GenericToken) -> bool:
         transaction = self.contract.functions.createPair(
             token_a.contract.address,
             token_b.contract.address)
-
-        self._transact(transaction)
+        return self._transact_status(transaction)

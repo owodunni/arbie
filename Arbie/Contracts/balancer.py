@@ -20,10 +20,9 @@ class PoolFactory(Contract):
     protocol = 'balancer'
     abi = 'pool_factory'
 
-    def new_bpool(self):
+    def new_bpool(self) -> bool:
         transaction = self.contract.functions.newBPool()
-
-        self._transact(transaction)
+        return self._transact_status(transaction)
 
     def all_pools(self) -> List[Pool]:
         event_filter = self.contract.events.LOG_NEW_POOL.createFilter(fromBlock=0)
