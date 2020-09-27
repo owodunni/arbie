@@ -33,6 +33,6 @@ class PoolFactory(Contract):
         factory = ContractFactory(self.w3, Pool)
 
         for event in new_pool_event:
-            pool = factory.load_contract(address=Address(event.args.pool))
+            pool = factory.load_contract(self.owner_address, address=Address(event.args.pool))
             pools.append(pool)
         return pools

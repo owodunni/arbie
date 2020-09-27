@@ -12,6 +12,10 @@ class Pair(Contract):
     protocol = 'uniswap'
     abi = 'pair'
 
+    def mint(self, address: Address) -> bool:
+        transaction = self.contract.functions.mint(address.value)
+        return self._transact_status(transaction)
+
     def get_k_last(self) -> int:
         return self.contract.functions.kLast().call()
 
@@ -33,11 +37,11 @@ class Factory(Contract):
         pairs = []
         for i in range(0, self.all_pairs_length()):
             address = self.contract.functions.allPairs(i).call()
-            pairs.append(cf.load_contract(address=Address(address)))
+            pairs.append(cf.load_contract(self.owner_address, address=Address(address)))
         return pairs
 
     def create_pair(self, token_a: GenericToken, token_b: GenericToken) -> bool:
         transaction = self.contract.functions.createPair(
-            token_a.contract.address,
-            token_b.contract.address)
+            token_a.get_address().value,
+            token_b.get_address().value)
         return self._transact_status(transaction)
