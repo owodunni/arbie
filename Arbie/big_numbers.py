@@ -10,7 +10,7 @@ class BigNumber(object):
 
     def __eq__(self, other):
         if isinstance(other, BigNumber):
-            return self.value==other.value and self.exp==other.exp
+            return self.value == other.value and self.exp == other.exp
         return self.value == other
 
     @classmethod
@@ -19,7 +19,5 @@ class BigNumber(object):
         bg.value = value
         return bg
 
-    def to_numer(self):
+    def to_number(self):
         return self.value / (10 ** self.exp)
-
-        

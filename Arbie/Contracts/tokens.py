@@ -1,6 +1,7 @@
 """Utility functions for interacting with Tokens."""
 
 from Arbie import BigNumber
+from Arbie.Actions.arbitrage import Token
 from Arbie.Contracts import Address, Contract
 
 
@@ -33,3 +34,9 @@ class GenericToken(Contract):
     def approve_owner(self):
         return self.approve(
             self.owner_address, self.balance_of(self.owner_address))
+
+    def get_name(self):
+        return self.contract.functions.name().call()
+
+    def create_token(self):
+        return Token(self.get_name(), self.get_address().value)
