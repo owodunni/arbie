@@ -23,3 +23,8 @@ def w3(web3_server):
 def deploy_address(w3) -> Address:
     deploy_address = w3.eth.accounts[0]
     return Address(deploy_address)
+
+@pytest.fixture
+def dummy_address(w3) -> Address:
+    address = w3.eth.accounts[1]
+    return Address(address)

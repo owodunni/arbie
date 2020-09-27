@@ -37,7 +37,10 @@ class Contract(object):
         self.contract = contract
 
     def _transact(self, transaction):
-        transact(self.w3, self.address, transaction)
+        return transact(self.w3, self.address, transaction)
+
+    def _transact_status(self, transaction) -> bool:
+        return bool(self._transact(transaction).status)
 
 
 class ContractFactory(object):
