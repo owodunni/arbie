@@ -58,10 +58,6 @@ def pair(factory_with_pair) -> Pair:
     return pairs[0]
 
 
-def test_get_k(pair):
-    assert pair.get_k_last() == 0
-
-
 def test_get_weights(pair):
     assert pair.get_reserves() == [0, 0]
 
@@ -76,7 +72,6 @@ def test_mint(
     assert weth.transfer(pair.get_address(), bg10)
     assert pair.mint(deploy_address)
     assert pair.get_reserves() == [bg10, bg10]
-    assert pair.get_k_last() == 0
 
 
 def test_create_amm(
