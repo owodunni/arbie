@@ -10,6 +10,12 @@ class GenericToken(Contract):
     protocol = 'tokens'
     abi = 'bnb'
 
+    def __str__(self):
+        return f'GenericToken, name: {self.get_name()}, address: {self.get_address().value}'
+
+    def __repr__(self):
+        return self.__str__()
+
     def decimals(self) -> int:
         return self.contract.functions.decimals().call()
 

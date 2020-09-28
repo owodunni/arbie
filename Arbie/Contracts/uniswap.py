@@ -62,12 +62,17 @@ class Factory(Contract):
     def all_pairs_length(self) -> int:
         return self.contract.functions.allPairsLength().call()
 
+    def get_pair_address(self, index) -> Address:
+        return Address(
+            self.contract.functions.allPairs(index).call())
+
     def all_pairs(self) -> List[Pair]:
         cf = ContractFactory(self.w3, Pair)
         pairs = []
         for i in range(0, self.all_pairs_length()):
-            address = self.contract.functions.allPairs(i).call()
-            pairs.append(cf.load_contract(self.owner_address, address=Address(address)))
+            pairs.append(
+                cf.load_contract(
+                    self.owner_address, address=self.get_pair_address(i)))
         return pairs
 
     def create_pair(self, token_a: GenericToken, token_b: GenericToken) -> bool:
