@@ -16,25 +16,6 @@ def factory(deploy_address, w3) -> Factory:
 
 
 @pytest.fixture
-def token_factory(w3) -> ContractFactory:
-    return ContractFactory(w3, GenericToken)
-
-
-@pytest.fixture
-def dai(deploy_address, token_factory) -> GenericToken:
-    token = token_factory.deploy_contract(deploy_address, 10000, 'Dai', 18, 'DAI')  # noqa: WPS432
-    token.approve_owner()
-    return token
-
-
-@pytest.fixture
-def weth(deploy_address, token_factory) -> GenericToken:
-    token = token_factory.deploy_contract(deploy_address, 10000, 'Weth', 18, 'WETH')  # noqa: WPS432
-    token.approve_owner()
-    return token
-
-
-@pytest.fixture
 def factory_with_pair(factory, dai, weth) -> Factory:
     assert factory.create_pair(dai, weth)
     return factory

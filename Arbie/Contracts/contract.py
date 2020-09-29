@@ -11,6 +11,9 @@ class Address(object):
     def __init__(self, address: str):
         self.value = address
 
+    def __eq__(self, other):
+        return self.value == other.value
+
 
 class Network(Enum):
     mainnet = 0
