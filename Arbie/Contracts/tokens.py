@@ -16,6 +16,9 @@ class GenericToken(Contract):
     def __repr__(self):
         return self.__str__()
 
+    def __eq__(self, other):
+        return self.get_address() == other.get_address()
+
     def decimals(self) -> int:
         return self.contract.functions.decimals().call()
 

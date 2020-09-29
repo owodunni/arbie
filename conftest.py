@@ -2,8 +2,8 @@
 import pytest
 from web3 import Web3
 
-from Arbie.Contracts.contract import Address
-
+from Arbie.Contracts.contract import Address, ContractFactory
+from Arbie.Contracts.tokens import GenericToken
 
 def pytest_addoption(parser):
     parser.addoption('--web3_server', action='store', default='http://127.0.0.1:7545')
@@ -24,7 +24,27 @@ def deploy_address(w3) -> Address:
     deploy_address = w3.eth.accounts[0]
     return Address(deploy_address)
 
+
 @pytest.fixture
 def dummy_address(w3) -> Address:
     address = w3.eth.accounts[1]
     return Address(address)
+
+
+@pytest.fixture
+def token_factory(w3) -> ContractFactory:
+    return ContractFactory(w3, GenericToken)
+
+
+@pytest.fixture
+def dai(deploy_address, token_factory) -> GenericToken:
+    token = token_factory.deploy_contract(deploy_address, 10000, 'Dai', 18, 'DAI')  # noqa: WPS432
+    token.approve_owner()
+    return token
+
+
+@pytest.fixture
+def weth(deploy_address, token_factory) -> GenericToken:
+    token = token_factory.deploy_contract(deploy_address, 10000, 'Weth', 18, 'WETH')  # noqa: WPS432
+    token.approve_owner()
+    return token
