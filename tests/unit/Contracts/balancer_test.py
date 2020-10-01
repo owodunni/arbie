@@ -6,6 +6,9 @@ from Arbie.Contracts import Address, ContractFactory
 from Arbie.Contracts.balancer import Pool, PoolFactory
 from Arbie.Contracts.tokens import GenericToken
 
+bg10 = BigNumber(10)
+bg5 = BigNumber(5)
+
 
 @pytest.fixture
 def pool_factory(deploy_address, w3) -> PoolFactory:
@@ -13,46 +16,57 @@ def pool_factory(deploy_address, w3) -> PoolFactory:
 
 
 @pytest.fixture
-def pool(pool_factory) -> Pool:  # noqa: WPS442
+def pool(pool_factory) -> Pool:
     pool_factory.new_bpool()
     return pool_factory.all_pools()[0]
 
 
-def test_create_new_pool(pool_factory):  # noqa: WPS442
+def test_create_new_pool(pool_factory):
     pool_factory.new_bpool()
     assert len(pool_factory.all_pools()) == 1
 
 
-def test_get_number_of_tokens(pool_factory):  # noqa: WPS442
+def test_get_number_of_tokens(pool_factory):
     pool_factory.new_bpool()
     pools = pool_factory.all_pools()
     assert pools[0].get_number_of_tokens() == 0
 
 
-def test_bind_weight(pool):  # noqa: WPS442
+def test_bind_weight(pool):
     with pytest.raises(ValueError):
         amount = BigNumber(5)
         weight = 0.2
         pool.bind(Address(''), amount, weight)
 
 
-def test_bind_token_to_pool(
-        pool: Pool,  # noqa: WPS442
+@pytest.fixture
+def pool_with_tokens(
+        pool: Pool,
         dai: GenericToken,
-        weth: GenericToken):
-    amount = BigNumber(5)
+        weth: GenericToken) -> Pool:
     weight = 5
 
     dai.approve_owner()
-    dai.approve(pool.get_address(), amount)
+    dai.approve(pool.get_address(), bg5)
 
     weth.approve_owner()
-    weth.approve(pool.get_address(), amount)
+    weth.approve(pool.get_address(), bg10)
 
-    pool.bind(dai.get_address(), amount, weight)
-    pool.bind(weth.get_address(), amount, weight)
+    pool.bind(dai.get_address(), bg5, weight)
+    pool.bind(weth.get_address(), bg10, weight)
 
     pool.finalize()
-    tokens = pool.get_tokens()
+    return pool
+
+
+def test_bind_token_to_pool(pool_with_tokens: Pool):
+    tokens = pool_with_tokens.get_tokens()
     assert len(tokens) == 2
-    assert tokens[0].get_address() == dai.get_address()
+
+
+def test_create_amm(
+        pool_with_tokens: Pool,
+        dai: GenericToken,
+        weth: GenericToken):
+    amm = pool_with_tokens.create_amm()
+    assert amm.spot_price(weth.create_token(), dai.create_token()) == 2

@@ -40,7 +40,7 @@ def pair(factory_with_pair) -> Pair:
 
 
 def test_get_weights(pair):
-    assert pair.get_reserves() == [0, 0]
+    assert pair.get_balances() == [0, 0]
 
 
 def test_mint(
@@ -52,7 +52,7 @@ def test_mint(
     assert dai.transfer(pair.get_address(), bg10)
     assert weth.transfer(pair.get_address(), bg10)
     assert pair.mint(deploy_address)
-    assert pair.get_reserves() == [bg10, bg10]
+    assert pair.get_balances() == [bg10, bg10]
 
 
 def test_create_amm(

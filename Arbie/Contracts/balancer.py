@@ -4,10 +4,11 @@ from typing import List
 
 from Arbie import BigNumber
 from Arbie.Contracts import Address, Contract, ContractFactory
+from Arbie.Contracts.amm_contract import AmmContract
 from Arbie.Contracts.tokens import GenericToken
 
 
-class Pool(Contract):
+class Pool(AmmContract):
 
     name = 'pool'
     protocol = 'balancer'
@@ -23,6 +24,27 @@ class Pool(Contract):
             (lambda a: cf.load_contract(
                 owner_address=self.owner_address, address=Address(a))),
             token_addresses))
+
+    def get_balances(self) -> List[BigNumber]:
+        tokens = self.get_tokens()
+        balances = []
+        for token in tokens:
+            b = self.contract.functions.getBalance(token.get_address().value).call()
+            balances.append(BigNumber(
+                b,
+                token.decimals()))
+        return balances
+
+    def get_weights(self) -> List[float]:
+        weights = list(map((
+            lambda t:
+            self.contract.functions.getNormalizedWeight(t.get_address().value).call()),
+            self.get_tokens()))
+        sum_of_weights = sum(weights)
+        return list(map((lambda x: x / sum_of_weights), weights))
+
+    def get_fee(self) -> float:
+        return BigNumber(self.contract.functions.getSwapFee().call()).to_number()
 
     def bind(self, address: Address, balance: BigNumber, denorm_weight: int) -> bool:
         if denorm_weight < 1:
