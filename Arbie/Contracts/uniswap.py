@@ -3,19 +3,19 @@
 from typing import List
 
 from Arbie import BigNumber
-from Arbie.Actions.amm import Amm
+from Arbie.Contracts.amm_contract import AmmContract
 from Arbie.Contracts.contract import Address, Contract, ContractFactory
 from Arbie.Contracts.tokens import GenericToken
 
-fee = 0.003
-weight = 0.5
 
-
-class Pair(Contract):
+class Pair(AmmContract):
 
     name = 'pair'
     protocol = 'uniswap'
     abi = 'pair'
+
+    fee = 0.003
+    weight = 0.5
 
     def mint(self, address: Address) -> bool:
         transaction = self.contract.functions.mint(address.value)
@@ -30,7 +30,7 @@ class Pair(Contract):
     def get_tokens(self) -> List[GenericToken]:
         return [self.get_token0(), self.get_token1()]
 
-    def get_reserves(self) -> List[BigNumber]:
+    def get_balances(self) -> List[BigNumber]:
         reserves = self.contract.functions.getReserves().call()
 
         bg_reservers = []
@@ -40,11 +40,11 @@ class Pair(Contract):
 
         return bg_reservers
 
-    def create_amm(self) -> Amm:
-        tokens = list(map((lambda t: t.create_token()), self.get_tokens()))
-        balances = list(map((lambda bg: bg.to_number()), self.get_reserves()))
+    def get_fee(self) -> float:
+        return self.fee
 
-        return Amm(tokens, balances, [weight, weight], fee)
+    def get_weights(self) -> List[float]:
+        return [self.weight, self.weight]
 
     def _get_token(self, function) -> GenericToken:
         cf = ContractFactory(self.w3, GenericToken)
