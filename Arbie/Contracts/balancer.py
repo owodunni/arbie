@@ -30,7 +30,7 @@ class Pool(AmmContract):
         balances = []
         for token in tokens:
             b = self.contract.functions.getBalance(token.get_address().value).call()
-            balances.append(BigNumber(
+            balances.append(BigNumber.from_value(
                 b,
                 token.decimals()))
         return balances
