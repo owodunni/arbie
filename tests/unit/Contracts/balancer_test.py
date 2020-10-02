@@ -62,6 +62,8 @@ def pool_with_tokens(
 def test_bind_token_to_pool(pool_with_tokens: Pool):
     tokens = pool_with_tokens.get_tokens()
     assert len(tokens) == 2
+    assert pool_with_tokens.get_balances() == [bg5, bg10]
+    assert pool_with_tokens.get_weights() == [0.5, 0.5]
 
 
 def test_create_amm(
