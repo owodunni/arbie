@@ -61,8 +61,12 @@ def test_create_amm(
         weth: GenericToken,
         deploy_address):
 
-    assert dai.transfer(pair.get_address(), bg5)
-    assert weth.transfer(pair.get_address(), bg10)
-    assert pair.mint(deploy_address)
+    dai.transfer(pair.get_address(), bg5)
+    weth.transfer(pair.get_address(), bg10)
+    pair.mint(deploy_address)
     amm = pair.create_amm()
+
     assert amm.spot_price(weth.create_token(), dai.create_token()) == 2
+    balances = amm.get_balances(weth.create_token(), dai.create_token())
+    assert balances[0] == 10
+    assert balances[1] == 5
