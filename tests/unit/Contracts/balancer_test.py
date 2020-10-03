@@ -72,3 +72,5 @@ def test_create_amm(
         weth: GenericToken):
     amm = pool_with_tokens.create_amm()
     assert amm.spot_price(weth.create_token(), dai.create_token()) == 2
+    assert amm.balances[0].value == 5
+    assert amm.balances[1].value == 10
