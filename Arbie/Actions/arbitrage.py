@@ -4,7 +4,7 @@ from typing import List
 
 from sympy import nsolve, symbols
 
-from Arbie.Actions.amm import Amm, Token
+from Arbie.Actions.amm import Amm, Token, Variable
 
 Pools = List[Amm]
 x = symbols('x')
@@ -19,7 +19,7 @@ class TradeOpertunity(object):
         self.token_out = token_out
 
 
-def find_arbitrage(trade: TradeOpertunity) -> float:
+def find_arbitrage(trade: TradeOpertunity) -> Variable:
     if len(trade.pools) != 2:
         raise ValueError('Can only found arbitrage opertunity between two pools')
 
@@ -27,9 +27,11 @@ def find_arbitrage(trade: TradeOpertunity) -> float:
         raise ValueError('Tokens does not exist in pools')
 
     if not opertunity(trade):
-        raise ValueError('No arbitrage opertunity found in pools')
+        raise ValueError(
+            'No arbitrage opertunity found in pools, perform the trade in reverse order')
 
-    return calculate_optimal_arbitrage(trade)
+    profit = calculate_optimal_arbitrage(trade)
+    return Variable(trade.token_in, profit)
 
 
 def token_in_pools(trade: TradeOpertunity) -> bool:

@@ -13,6 +13,12 @@ class Token(object):
         self.name = name
         self.address = address
 
+    def __str__(self):
+        return f'Token(Name: {self.name}, Address: {self.address})'
+
+    def __repr__(self):
+        return self.__str__()
+
     def __eq__(self, other):
         return self.address == other.address and self.name == other.name
 
@@ -23,6 +29,12 @@ class Variable(object):
     def __init__(self, token: Token, value: float):
         self.token = token
         self.value = value
+
+    def __str__(self):
+        return f'Variable(Token: {self.token}, Value: {self.value})'
+
+    def __repr__(self):
+        return self.__str__()
 
     @classmethod
     def create(cls, tokens: List[Token], values: List[float]) -> List[object]:
@@ -50,7 +62,12 @@ class Amm(object):
     The math can be found here https://balancer.finance/whitepaper/
     """
 
-    def __init__(self, tokens: List[Token], balances: List[float], weights: List[float], fee: float = 0):  # noqa: WPS221
+    def __init__(
+            self,
+            tokens: List[Token],
+            balances: List[float],
+            weights: List[float],
+            fee: float = 0):  # noqa: WPS221
 
         self.tokens = tokens
         self.balances = Variable.create(tokens, balances)
@@ -59,6 +76,20 @@ class Amm(object):
 
         if sum(weights) != 1:
             raise ValueError('Weights are not normalized')
+
+        if self.fee > 1 or self.fee < 0:
+            raise ValueError(f'Fee: {self.fee}, should be between 0 and 1')
+
+    def __str__(self):
+        return f"""
+Amm(
+  Tokens: {self.tokens},
+  Balances: {self.balances},
+  Weights: {self.weights},
+  Fee: {self.fee})"""
+
+    def __repr__(self):
+        return self.__str__()
 
     def get_weights(self, token_in: Token, token_out: Token) -> Tuple[Variables, Variables]:
         return (get_value(self.weights, token_in), get_value(self.weights, token_out))
