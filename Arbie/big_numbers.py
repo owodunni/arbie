@@ -14,7 +14,7 @@ class BigNumber(object):
         return self.value == other
 
     @classmethod
-    def from_value(cls, value, exp):
+    def from_value(cls, value, exp=18):
         bg = cls(0, exp)
         bg.value = value
         return bg

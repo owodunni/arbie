@@ -18,14 +18,14 @@ class TestArbitrage(object):
         pool2 = Amm(tokens, [410, 1], [0.5, 0.5])
         trade = TradeOpertunity([pool1, pool2], dai, eth)
 
-        assert find_arbitrage(trade) == pytest.approx(2.48456731316587)  # noqa: WPS432
+        assert find_arbitrage(trade).value == pytest.approx(2.48456731316587)  # noqa: WPS432
 
     def test_find_arbitrage_unbalanced(self):
         pool1 = Amm(tokens, [400, 1], [0.9, 0.1])
         pool2 = Amm(tokens, [410, 1], [0.1, 0.9])
         trade = TradeOpertunity([pool1, pool2], dai, eth)
 
-        assert find_arbitrage(trade) == pytest.approx(27.8547574719045)  # noqa: WPS432
+        assert find_arbitrage(trade).value == pytest.approx(27.8547574719045)  # noqa: WPS432
 
     def test_find_arbitrage_no_opertunity(self):
         pool1 = Amm(tokens, [400, 1], [0.9, 0.1])

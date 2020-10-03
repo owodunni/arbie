@@ -44,7 +44,8 @@ class Pool(AmmContract):
         return list(map((lambda x: x / sum_of_weights), weights))
 
     def get_fee(self) -> float:
-        return BigNumber(self.contract.functions.getSwapFee().call()).to_number()
+        return BigNumber.from_value(
+            self.contract.functions.getSwapFee().call()).to_number()
 
     def bind(self, address: Address, balance: BigNumber, denorm_weight: int) -> bool:
         if denorm_weight < 1:
