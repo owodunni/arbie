@@ -15,10 +15,9 @@ jobs:
         docker pull docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit || true
         docker build . -t arbie --cache-from=docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit
         docker tag arbie docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit && docker push docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit || true
-    - name: Test with pytest
+    - name: Test and Lint
       run: |
-        docker-compose up -d ganache
-        docker-compose up arbie
+        docker-compose run arbie ./gradlew testAndLint
     - name: Publish Test Report
       if: always()
       uses: scacap/action-surefire-report@v1
@@ -29,6 +28,3 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         file: build/tests/cov/coverage.xml
-    - name: Lint with flake8
-      run: |
-        docker run -v $(pwd):/arbie arbie ./gradlew lint
