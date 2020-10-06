@@ -1,7 +1,8 @@
 def sorceDir = "$projectDir/${project.name}"
 
 def testDir = "$projectDir/tests"
-def unitDir = "$testDir/unit"
+def unitTestDir = "$testDir/unit"
+def systemTestDir = "$testDir/system"
 def testResultDir = "$buildDir/tests"
 
 def pipDir = "$projectDir/pip"
@@ -41,16 +42,37 @@ task test(type: Exec) {
     dependsOn install
     workingDir projectDir
 
-    commandLine "pytest", "-v", "--pyargs", "${project.name}",
+    commandLine "pytest", "-v", "--pyargs", "$testDir",
             "--cov-report", "html:$testResultDir/cov/html",
             "--cov-report", "xml:$testResultDir/cov/coverage.xml",
             "--junitxml=$testResultDir/surefire-reports/TEST-report.xml",
-            "--cov=$sorceDir", "$unitDir", "--web3_server", "$web3_server"
+            "--cov=$sorceDir",  "--web3_server", "$web3_server"
+}
+
+task systemTest(type: Exec) {
+    dependsOn install
+    workingDir projectDir
+
+    commandLine "pytest", "-v", "--pyargs", "$systemTestDir",
+            "--cov-report", "html:$testResultDir/cov/system/html",
+            "--cov=$sorceDir",  "--web3_server", "$web3_server"
+}
+
+task unitTest(type: Exec) {
+    dependsOn install
+    workingDir projectDir
+
+    commandLine "pytest", "-v", "--pyargs", "$unitTestDir",
+            "--cov-report", "html:$testResultDir/cov/unit/html",
+            "--cov=$sorceDir"
 }
 
 task lint(type: Exec) {
-
     commandLine "flake8", "Arbie", "tests"
+}
+
+task testAndLint{
+  dependsOn test, lint
 }
 
 task stylefix(type: Exec) {
@@ -70,41 +92,12 @@ class KonsoleTask extends DefaultTask {
     String command
 
     @TaskAction
-    void download() {
+    void launchKonsole() {
         ext.process = new ProcessBuilder()
                 .directory(project.projectDir)
                 .command('konsole', '--noclose', '-e', command)
                 .start()
     }
-}
-
-class MyDownload extends DefaultTask {
-    @Input
-    String sourceUrl
-
-    @OutputFile
-    File target
-
-    @TaskAction
-    void download() {
-        ant.get(src: sourceUrl, dest: target)
-    }
-}
-
-task downloadCodecov(type: MyDownload) {
-    sourceUrl = 'https://codecov.io/bash'
-    target = new File(codecov)
-    doLast {
-        exec {
-            commandLine "chmod", "+x", target
-        }
-    }
-}
-
-task uploadCodecov(type: Exec) {
-    dependsOn downloadCodecov
-
-    commandLine "$codecov", "-f", "$testResultDir/cov/coverage.xml"
 }
 
 task startJupyter(type: KonsoleTask) {
