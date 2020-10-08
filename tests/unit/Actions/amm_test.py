@@ -2,23 +2,12 @@
 
 import pytest
 
-from Arbie.Actions.amm import Amm, Token, Variable
+from Arbie import Token
+from Arbie.Actions.amm import Amm
 
 dai = Token('dai')
 eth = Token('eth')
 tokens = [dai, eth]
-
-
-class TestVariable(object):
-
-    def test_create(self):
-        Variable.create(tokens, [1, 2])
-
-    def test_create_wrong_len(self):
-        with pytest.raises(ValueError):
-            Variable.create(tokens, [1, 2, 3])
-        with pytest.raises(ValueError):
-            Variable.create(tokens, [1])
 
 
 class TestAmm(object):

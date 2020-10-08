@@ -1,56 +1,14 @@
 """Test class for setting up AMMs."""
-from typing import List, NewType, Tuple
+from typing import List, Tuple
 
 from sympy import symbols
+
+from Arbie import Balance, Balances, Token, Tokens
 
 x = symbols('x')
 
 
-class Token(object):
-    """Token can be used to identify a ERC20 token."""
-
-    def __init__(self, name: str, address=None):
-        self.name = name
-        self.address = address
-
-    def __str__(self):
-        return f'Token(Name: {self.name}, Address: {self.address})'
-
-    def __repr__(self):
-        return self.__str__()
-
-    def __eq__(self, other):
-        return self.address == other.address and self.name == other.name
-
-
-class Variable(object):
-    """Variable bound to Token in pool."""
-
-    def __init__(self, token: Token, value: float):
-        self.token = token
-        self.value = value
-
-    def __str__(self):
-        return f'Variable(Token: {self.token}, Value: {self.value})'
-
-    def __repr__(self):
-        return self.__str__()
-
-    @classmethod
-    def create(cls, tokens: List[Token], values: List[float]) -> List[object]:
-        if len(tokens) != len(values):
-            raise ValueError('All inputs must be of same length.')
-
-        variables = []
-        for token, value in zip(tokens, values):
-            variables.append(cls(token, value))
-        return variables
-
-
-Variables = NewType('Variables', List[Variable])
-
-
-def get_value(values: Variables, token: Token) -> Variable:
+def get_value(values: Balances, token: Token) -> Balance:
     for v in values:
         if v.token == token:
             return v.value
@@ -64,14 +22,14 @@ class Amm(object):
 
     def __init__(
             self,
-            tokens: List[Token],
+            tokens: Tokens,
             balances: List[float],
             weights: List[float],
             fee: float = 0):  # noqa: WPS221
 
         self.tokens = tokens
-        self.balances = Variable.create(tokens, balances)
-        self.weights = Variable.create(tokens, weights)
+        self.balances = Balance.create(tokens, balances)
+        self.weights = Balance.create(tokens, weights)
         self.fee = fee
 
         if sum(weights) != 1:
@@ -91,10 +49,10 @@ Amm(
     def __repr__(self):
         return self.__str__()
 
-    def get_weights(self, token_in: Token, token_out: Token) -> Tuple[Variables, Variables]:
+    def get_weights(self, token_in: Token, token_out: Token) -> Tuple[Balances, Balances]:
         return (get_value(self.weights, token_in), get_value(self.weights, token_out))
 
-    def get_balances(self, token_in: Token, token_out: Token) -> Tuple[Variables, Variables]:
+    def get_balances(self, token_in: Token, token_out: Token) -> Tuple[Balances, Balances]:
         return (get_value(self.balances, token_in), get_value(self.balances, token_out))
 
     def spot_price(self, token_in: Token, token_out: Token) -> float:
