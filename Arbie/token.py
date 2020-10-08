@@ -27,10 +27,10 @@ class Balance(object):
         self.value = value
 
     def __str__(self):
-        return f' {self.token}, Value: {self.value}'
+        return f'Balance(Token: {self.token}, Value: {self.value})'
 
     def __repr__(self):
-        return f'Balance(Token: {self.token}, Value: {self.value})'
+        return self.__str__()
 
     @classmethod
     def create(cls, tokens: List[Token], values: List[float]) -> List[object]:
