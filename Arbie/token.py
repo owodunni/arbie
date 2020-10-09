@@ -16,7 +16,12 @@ class Token(object):
         return self.__str__()
 
     def __eq__(self, other):
-        return self.address == other.address and self.name == other.name
+        return self.__hash__() == other.__hash__()
+
+    def __hash__(self):
+        if self.address is not None:
+            return hash(self.address)
+        return hash(self.name)
 
 
 class Balance(object):

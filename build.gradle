@@ -62,7 +62,7 @@ task unitTest(type: Exec) {
     dependsOn install
     workingDir projectDir
 
-    commandLine "pytest", "-v", "--pyargs", "$unitTestDir",
+    commandLine "pytest", "--pyargs", "$unitTestDir",
             "--cov-report", "html:$testResultDir/cov/unit/html",
             "--cov=$sorceDir"
 }
