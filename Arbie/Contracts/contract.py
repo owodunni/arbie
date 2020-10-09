@@ -5,14 +5,7 @@ from enum import Enum
 
 from pkg_resources import resource_string
 
-
-class Address(object):
-
-    def __init__(self, address: str):
-        self.value = address
-
-    def __eq__(self, other):
-        return self.value == other.value
+from Arbie import Address
 
 
 class Network(Enum):

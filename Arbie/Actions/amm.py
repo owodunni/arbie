@@ -3,7 +3,7 @@ from typing import List, Tuple
 
 from sympy import symbols
 
-from Arbie import Balance, Balances, Token, Tokens
+from Arbie import Address, Balance, Balances, Token, Tokens
 
 x = symbols('x')
 
@@ -25,7 +25,8 @@ class Amm(object):
             tokens: Tokens,
             balances: List[float],
             weights: List[float],
-            fee: float = 0):  # noqa: WPS221
+            fee: float = 0,
+            **kwargs):  # noqa: WPS221
 
         self.tokens = tokens
         self.balances = Balance.create(tokens, balances)
@@ -38,6 +39,11 @@ class Amm(object):
         if self.fee > 1 or self.fee < 0:
             raise ValueError(f'Fee: {self.fee}, should be between 0 and 1')
 
+        if 'address' in kwargs:
+            self.address = kwargs.get('address')
+        else:
+            self.address = Address()
+
     def __str__(self):
         return f"""
 Amm(
@@ -47,7 +53,10 @@ Amm(
   Fee: {self.fee})"""
 
     def __repr__(self):
-        return self.__str__()
+        return self.address
+
+    def __hash__(self):
+        return hash(self.address)
 
     def get_weights(self, token_in: Token, token_out: Token) -> Tuple[Balances, Balances]:
         return (get_value(self.weights, token_in), get_value(self.weights, token_out))

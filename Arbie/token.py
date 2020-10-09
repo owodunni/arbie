@@ -1,13 +1,17 @@
 """Basic token representation."""
 from typing import List, NewType
 
+from Arbie import Address
+
 
 class Token(object):
     """Token is a light weight representation of a ERC20 token."""
 
-    def __init__(self, name: str, address=None):
+    def __init__(self, name: str, address: Address = None):
         self.name = name
         self.address = address
+        if self.address is None:
+            self.address = Address()
 
     def __str__(self):
         return f'Token(Name: {self.name}, Address: {self.address})'
@@ -16,12 +20,10 @@ class Token(object):
         return self.__str__()
 
     def __eq__(self, other):
-        return self.__hash__() == other.__hash__()
+        return hash(self) == hash(other)
 
     def __hash__(self):
-        if self.address is not None:
-            return hash(self.address)
-        return hash(self.name)
+        return hash(self.address)
 
 
 class Balance(object):
