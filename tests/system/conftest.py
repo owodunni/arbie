@@ -2,7 +2,8 @@
 import pytest
 from web3 import Web3
 
-from Arbie.Contracts.contract import Address, ContractFactory
+from Arbie import Address
+from Arbie.Contracts.contract import ContractFactory
 from Arbie.Contracts.tokens import GenericToken
 
 

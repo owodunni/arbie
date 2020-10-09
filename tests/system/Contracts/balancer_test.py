@@ -1,8 +1,8 @@
 """Test balancer contracts."""
 import pytest
 
-from Arbie import BigNumber
-from Arbie.Contracts import Address, ContractFactory
+from Arbie import Address, BigNumber
+from Arbie.Contracts import ContractFactory
 from Arbie.Contracts.balancer import Pool, PoolFactory
 from Arbie.Contracts.tokens import GenericToken
 
@@ -36,7 +36,7 @@ def test_bind_weight(pool):
     with pytest.raises(ValueError):
         amount = BigNumber(5)
         weight = 0.2
-        pool.bind(Address(''), amount, weight)
+        pool.bind(Address(), amount, weight)
 
 
 @pytest.fixture

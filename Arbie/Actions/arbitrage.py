@@ -4,8 +4,8 @@ from typing import List
 
 from sympy import nsolve, symbols
 
-from Arbie import Balance, Token
 from Arbie.Actions.amm import Amm
+from Arbie.token import Balance, Token
 
 Pools = List[Amm]
 x = symbols('x')
