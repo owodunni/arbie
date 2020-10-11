@@ -14,10 +14,10 @@ class Token(object):
             self.address = Address()
 
     def __str__(self):
-        return f'Token(Name: {self.name}, Address: {self.address})'
+        return self.name
 
     def __repr__(self):
-        return self.__str__()
+        return f'Token(Name: {self.name}, Address: {self.address})'
 
     def __eq__(self, other):
         return hash(self) == hash(other)
