@@ -50,10 +50,11 @@ Amm(
   Tokens: {self.tokens},
   Balances: {self.balances},
   Weights: {self.weights},
-  Fee: {self.fee})"""
+  Fee: {self.fee}
+  Address: {self.address.value})"""
 
     def __repr__(self):
-        return self.address
+        return self.__str__()
 
     def __hash__(self):
         return hash(self.address)
