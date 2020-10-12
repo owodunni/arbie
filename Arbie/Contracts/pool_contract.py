@@ -1,14 +1,14 @@
-"""Base abstract class for amm contracts."""
+"""Base abstract class for pool contracts."""
 
 from typing import List
 
-from Arbie import BigNumber
-from Arbie.Actions.amm import Amm, Token
+from Arbie import BigNumber, Token
 from Arbie.Contracts.contract import Contract
 from Arbie.Contracts.tokens import GenericToken
+from Arbie.Variables.pool import Pool
 
 
-class AmmContract(Contract):
+class PoolContract(Contract):
 
     def get_tokens(self) -> List[GenericToken]:
         raise NotImplementedError()
@@ -25,10 +25,10 @@ class AmmContract(Contract):
     def create_tokens(self) -> List[Token]:
         return list(map((lambda t: t.create_token()), self.get_tokens()))
 
-    def create_amm(self) -> Amm:
+    def create_pool(self) -> Pool:
         tokens = self.create_tokens()
         balances = list(map((lambda bg: bg.to_number()), self.get_balances()))
-        return Amm(
+        return Pool(
             tokens,
             balances,
             self.get_weights(),

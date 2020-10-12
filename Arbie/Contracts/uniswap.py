@@ -3,12 +3,12 @@
 from typing import List
 
 from Arbie import BigNumber
-from Arbie.Contracts.amm_contract import AmmContract
 from Arbie.Contracts.contract import Address, Contract, ContractFactory
+from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.Contracts.tokens import GenericToken
 
 
-class Pair(AmmContract):
+class Pair(PoolContract):
 
     name = 'pair'
     protocol = 'uniswap'
