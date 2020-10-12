@@ -55,7 +55,7 @@ def test_mint(
     assert pair.get_balances() == [bg10, bg10]
 
 
-def test_create_amm(
+def test_create_pool(
         pair: Pair,
         dai: GenericToken,
         weth: GenericToken,
@@ -64,9 +64,9 @@ def test_create_amm(
     dai.transfer(pair.get_address(), bg5)
     weth.transfer(pair.get_address(), bg10)
     pair.mint(deploy_address)
-    amm = pair.create_amm()
+    pool = pair.create_pool()
 
-    assert amm.spot_price(weth.create_token(), dai.create_token()) == 2
-    balances = amm.get_balances(weth.create_token(), dai.create_token())
+    assert pool.spot_price(weth.create_token(), dai.create_token()) == 2
+    balances = pool.get_balances(weth.create_token(), dai.create_token())
     assert balances[0] == 10
     assert balances[1] == 5

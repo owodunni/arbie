@@ -66,11 +66,11 @@ def test_bind_token_to_pool(pool_with_tokens: Pool):
     assert pool_with_tokens.get_weights() == [0.5, 0.5]
 
 
-def test_create_amm(
+def test_create_pool(
         pool_with_tokens: Pool,
         dai: GenericToken,
         weth: GenericToken):
-    amm = pool_with_tokens.create_amm()
-    assert amm.spot_price(weth.create_token(), dai.create_token()) == 2
-    assert amm.balances[0].value == 5
-    assert amm.balances[1].value == 10
+    pool = pool_with_tokens.create_pool()
+    assert pool.spot_price(weth.create_token(), dai.create_token()) == 2
+    assert pool.balances[0].value == 5
+    assert pool.balances[1].value == 10

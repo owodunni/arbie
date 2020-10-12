@@ -14,8 +14,8 @@ def get_value(values: Balances, token: Token) -> Balance:
             return v.value
 
 
-class Amm(object):
-    """Amm can create a arbitrary AMM that can be used for testing.
+class Pool(object):
+    """Pool can create a arbitrary AMM that can be used for testing.
 
     The math can be found here https://balancer.finance/whitepaper/
     """
@@ -46,7 +46,7 @@ class Amm(object):
 
     def __str__(self):
         return f"""
-Amm(
+Pool(
   Tokens: {self.tokens},
   Balances: {self.balances},
   Weights: {self.weights},

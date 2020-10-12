@@ -7,8 +7,8 @@ from typing import List
 
 import networkx as nx
 
-from Arbie.Actions.amm import Amm
 from Arbie.token import Token
+from Arbie.Variables.pool import Pool
 
 
 class Graph(object):
@@ -39,12 +39,12 @@ class TradingGraph(Graph):
     Represents each possible trading path between all tokens.
     """
 
-    def __init__(self, amms: List[Amm]):
+    def __init__(self, pools: List[Pool]):
         self.graph = nx.MultiDiGraph()
-        self._create_graph(amms)
+        self._create_graph(pools)
 
-    def _create_graph(self, pools: List[Amm]):
-        """Create graph from a set of Amms."""
+    def _create_graph(self, pools: List[Pool]):
+        """Create graph from a set of Pools."""
         for pool in pools:
             self._add_nodes(pool.tokens)
 
@@ -54,7 +54,7 @@ class TradingGraph(Graph):
     def _add_nodes(self, tokens: List[Token]):
         self.graph.add_nodes_from(tokens)
 
-    def _add_edges(self, pool: Amm):
+    def _add_edges(self, pool: Pool):
 
         for start_node in pool.tokens:
             for end_node in pool.tokens:

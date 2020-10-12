@@ -4,11 +4,11 @@ from typing import List
 
 from Arbie import BigNumber
 from Arbie.Contracts import Address, Contract, ContractFactory
-from Arbie.Contracts.amm_contract import AmmContract
+from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.Contracts.tokens import GenericToken
 
 
-class Pool(AmmContract):
+class Pool(PoolContract):
 
     name = 'pool'
     protocol = 'balancer'

@@ -1,13 +1,13 @@
-"""arbitrage can be used to find to arbitrage opertunity between two Amms."""
+"""arbitrage can be used to find to arbitrage opertunity between two Pools."""
 
 from typing import List
 
 from sympy import nsolve, symbols
 
-from Arbie.Actions.amm import Amm
-from Arbie.token import Balance, Token
+from Arbie import Balance, Token
+from Arbie.Variables.pool import Pool
 
-Pools = List[Amm]
+Pools = List[Pool]
 x = symbols('x')
 
 
