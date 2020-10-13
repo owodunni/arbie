@@ -11,15 +11,11 @@ class Store(object):
     def __init__(self):
         self.state = {}
 
-
-class ActionFactory(object):
-    """ActionFactory can be used to create Actions.
-
-    Creates and initializes actions
-    """
-
-    def __init__(self, store):
-        self.store = store
+    def __getitem__(self, key):
+        return self.state[key]
+    
+    def add(self, key, item):
+        self.state[key] = item
 
 
 class Action(object):

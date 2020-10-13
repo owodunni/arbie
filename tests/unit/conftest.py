@@ -5,9 +5,6 @@ from Arbie import Token
 from Arbie.Variables.pool import Pool
 from typing import List
 
-btc = Token('btc')  # 10000
-yam = Token('yam')  # 0.1
-
 small = 10
 medium = 100
 large = 1000
@@ -24,7 +21,17 @@ def dai() -> Token:
 
 
 @pytest.fixture
-def pools() -> List[Pool]:
+def btc() -> Token:
+    return Token('btc') # 10000
+
+
+@pytest.fixture
+def yam() -> Token:
+    return Token('yam') # 0.1
+
+
+@pytest.fixture
+def pools(dai, eth, btc, yam) -> List[Pool]:
     return [
         Pool(
             [eth, dai, yam],
