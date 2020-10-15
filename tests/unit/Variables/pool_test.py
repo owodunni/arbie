@@ -20,7 +20,7 @@ class TestPool(object):
     def test_init(self, tokens):
         Pool(tokens, [400, 1], [0.75, 0.25])
 
-    def test_init_fee(self, tokens):
+    def test_init_fee_raises(self, tokens):
         with pytest.raises(ValueError):
             Pool(tokens, [400, 1], [0.75, 0.25], fee=2)
 
