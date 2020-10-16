@@ -84,8 +84,8 @@ class FilteredTradingGraph(Graph):
             edge_data = self.graph.get_edge_data(start_node, end_node)
 
             if edge_data is not None:
-                if edge_data[self.weight_key] > data[self.weight_key]:
-                    # The right path is already added
+                if edge_data[self.weight_key] < data[self.weight_key]:
+                    # The most valuable path is already added
                     continue
 
             self._add_edge(

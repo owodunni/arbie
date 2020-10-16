@@ -82,4 +82,4 @@ Also find the ratio of taking that trade"""
         token = self.store['UoA']
         graph = FilteredTradingGraph(TradingGraph(pools))
         finder = CycleFinder(graph.graph, token)
-        return sorted(finder.find_all_cycles(), key=lambda x: x.ratio, reverse=True)
+        return sorted(finder.find_all_cycles(), key=lambda x: x.ratio)
