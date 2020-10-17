@@ -3,13 +3,12 @@
 import pytest
 
 from Arbie import Token
-from Arbie.Actions.arbitrage import (Trade,
-                                     calculate_optimal_arbitrage,
+from Arbie.Actions.arbitrage import (Trade, calculate_optimal_arbitrage,
                                      find_arbitrage)
 from Arbie.Variables.pool import Pool
 
-dai = Token('dai')
-eth = Token('eth')
+dai = Token('dai', 300.0)
+eth = Token('eth', 1)
 tokens = [dai, eth]
 
 
@@ -50,7 +49,7 @@ class TestArbitrage(object):
     def test_find_arbitrage_wrong_token(self):
         pool1 = Pool(tokens, [400, 1], [0.9, 0.1])
         pool2 = Pool(tokens, [410, 1], [0.1, 0.9])
-        sai = Token('sai')
+        sai = Token('sai', 300.0)
         trade = [Trade(pool1, dai, sai), Trade(pool2, sai, dai)]
 
         with pytest.raises(ValueError):

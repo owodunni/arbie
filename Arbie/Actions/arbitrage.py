@@ -42,7 +42,10 @@ def token_in_pools(trades: TradeOpportunity) -> bool:
 
 
 def arbitrage_expr(trades: TradeOpportunity):
-    expr = trades[0].pool.out_given_in_expr(trades[0].token_in, trades[0].token_out)
+    first_trade = trades[0]
+    expr = first_trade.pool.out_given_in_expr(
+        first_trade.token_in,
+        first_trade.token_out)
 
     for trade in trades[1:]:
         inner_expr = trade.pool.out_given_in_expr(trade.token_in, trade.token_out)

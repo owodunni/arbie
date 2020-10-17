@@ -13,7 +13,7 @@ class Store(object):
 
     def __getitem__(self, key):
         return self.state[key]
-    
+
     def add(self, key, item):
         self.state[key] = item
 

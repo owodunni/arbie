@@ -48,4 +48,4 @@ class GenericToken(Contract):
         return self.contract.functions.name().call()
 
     def create_token(self):
-        return Token(self.get_name(), self.get_address().value)
+        return Token(self.get_name(), address=self.get_address().value)

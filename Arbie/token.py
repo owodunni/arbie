@@ -7,8 +7,9 @@ from Arbie import Address
 class Token(object):
     """Token is a light weight representation of a ERC20 token."""
 
-    def __init__(self, name: str, address: Address = None):
+    def __init__(self, name: str, price=-1, address: Address = None):
         self.name = name
+        self.price = price
         self.address = address
         if self.address is None:
             self.address = Address()
@@ -17,7 +18,7 @@ class Token(object):
         return self.name
 
     def __repr__(self):
-        return f'Token(Name: {self.name}, Address: {self.address})'
+        return f'Token(Name: {self.name}, Price: {self.price}, Address: {self.address})'  # noqa: WPS221
 
     def __eq__(self, other):
         return hash(self) == hash(other)

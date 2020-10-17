@@ -1,33 +1,34 @@
 """Help module for web3 tests."""
+from typing import List
+
 import pytest
 
 from Arbie import Token
 from Arbie.Variables.pool import Pool
-from typing import List
 
-small = 10
-medium = 100
-large = 1000
+small = 10000
+medium = 1000000
+large = 100000000
 
 
 @pytest.fixture
 def eth() -> Token:
-    return Token('eth') # 300
+    return Token('eth', 1)
 
 
 @pytest.fixture
 def dai() -> Token:
-    return Token('dai') # 1
+    return Token('dai', 300)
 
 
 @pytest.fixture
 def btc() -> Token:
-    return Token('btc') # 10000
+    return Token('btc', 3.0 / 100)
 
 
 @pytest.fixture
 def yam() -> Token:
-    return Token('yam') # 0.1
+    return Token('yam', 3000)
 
 
 @pytest.fixture

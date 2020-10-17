@@ -18,8 +18,11 @@ def pool(tokens):
 class TestPool(object):
 
     def test_init_multi(self, tokens):
-        new_tokens = tokens + [Token('sai')]
-        pool = Pool(new_tokens, [4e3, 10, 10e5], [1/3.0, 1/3.0, 1/3.0])
+        new_tokens = tokens + [Token('sai', 100)]
+        pool = Pool(
+            new_tokens,
+            [4e3, 10, 10e5],
+            [1 / 3.0, 1 / 3.0, 1 / 3.0])  # noqa: WPS221
         assert pool.spot_price(new_tokens[0], new_tokens[1]) == 400
         assert pool.spot_price(new_tokens[2], new_tokens[1]) == 100000
 
