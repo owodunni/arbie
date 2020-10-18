@@ -21,4 +21,9 @@ setup(
     package_data={'': extra_files},
     install_requires=read('pip/requirements.txt'),
     tests_require=read('pip/requirements-dev.txt'),
+    entry_points={
+        'console_scripts': [
+            'Arbie = Arbie.__main__:main'
+            ]
+        }
 )
