@@ -77,9 +77,8 @@ task testAndLint{
 
 task stylefix(type: Exec) {
 
-    commandLine "bash", "-c", "autopep8 --in-place --recursive ."
-    commandLine "bash", "-c", "isort --recursive Arbie"
-    commandLine "bash", "-c", "isort --recursive tests"
+    commandLine "autopep8", "-i", "-r", "-a", "."
+    commandLine "isort", "--atomic", "--recursive"
 }
 
 task venv(type: Exec) {

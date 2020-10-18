@@ -1,5 +1,86 @@
 """Base class for actions."""
 
+from typing import Dict
+
+import yaml
+
+
+class Argument(object):
+
+    def __init__(self, default_value):
+        self.name = None
+        self.value = None
+        if default_value == 'None':
+            return
+        elif isinstance(default_value, str):
+            self.name = default_value
+        else:
+            self.value = default_value
+
+
+def parse_settings(settings: Dict):
+    parsed_settings = {}
+    for key, argument in settings.items():
+        parsed_settings[key] = Argument(argument)
+    return parsed_settings
+
+
+class Action(object):
+    """Action is a base class for data processing actions.
+
+    Actions are combined to ActionTrees. Actions are configured
+    by parsing their __doc__ and comparing with the settings that
+    have been given when starting Arbie.
+
+    [Settings]
+    Everything bellow the settings section is parsed as yaml.
+    There are two lists that need to be configured. The input
+    list and the output list. These are then mapped to the items
+    that can be read to the store.
+
+    input:
+        key: default value | variable name
+    output:
+        key: variable name
+    """
+
+    input_key = 'input'
+    output_key = 'output'
+
+    def __init__(self, config=None):
+        self.settings = self._create_settings()
+        self.settings = self._update_settings_with_config(config)
+
+    def get_input_settings(self):
+        return self.settings[self.input_key]
+
+    def get_output_settings(self):
+        return self.settings[self.output_key]
+
+    def on_next(self, data):
+        raise NotImplementedError('Action does not have a on_next statement')
+
+    def _create_settings(self):
+        settings = yaml.safe_load(self.__doc__.split('[Settings]\n')[1])
+
+        return {self.input_key: parse_settings(settings[self.input_key]),
+                self.output_key: parse_settings(settings[self.output_key])}
+
+    def _update_settings_with_config(self, config):
+        if config is None:
+            return self.settings
+
+        self._emplace_settings(config[self.input_key], self.get_input_settings())
+        self._emplace_settings(config[self.output_key], self.get_output_settings())
+
+        return self.settings
+
+    def _emplace_settings(self, config, settings):
+        for key, name in config.items():
+            if key not in settings:
+                raise ValueError(f'Argument: {key} not found in action: {type(self).__name__}')
+            settings[key] = Argument(name)
+
 
 class Store(object):
     """Store the state of the Action Tree.
@@ -17,20 +98,22 @@ class Store(object):
     def add(self, key, item):
         self.state[key] = item
 
+    def get(self, key):
+        return self.state[key]
 
-class Action(object):
-    """Action operates on data.
+    def create_input(self, action):
+        return self._create_data(action.get_input_settings(), action.get_output_settings())
 
-    It can also get and set data to the store.
-    However the primary result should be transmitted
-    as input and output of the on_next function
-    """
+    def _create_data(self, input_settings, output_settings):
+        methods = {}
+        for key, argument in input_settings.items():  # noqa: WPS426
+            if argument.name in self.state:
+                methods[key] = lambda _, name=argument.name: self.get(name)
+            elif argument.value is not None:
+                methods[key] = lambda _, value=argument.value: value
+            else:
+                raise ValueError(f'Argument {key}, with name {argument.name} not found in state and no default value')
 
-    def __init__(self, store):
-        self.store = store
-
-    def on_next(self, data):
-        raise NotImplementedError('Action does not have a on_next statement')
-
-    def on_error(self, error):
-        raise NotImplementedError('Action does not have an on_error statement')
+        for key_out, argument_out in output_settings.items():  # noqa: WPS426
+            methods[key_out] = lambda _, value, name=argument_out.name: self.add(name, value)  # noqa: WPS221
+        return type('ActionData', (), methods)()

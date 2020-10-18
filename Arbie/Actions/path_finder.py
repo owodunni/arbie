@@ -85,17 +85,17 @@ class PathFinder(Action):
     """Find all trades from a trading graph.
 
     Also find the ratio of taking that trade.
+
+    [Settings]
+    input:
+        pools: pools
+        unit_of_account: None
+        min_liquidity: 1
+    output:
+        cycles: all_cycles
     """
 
-    class Config(object):  # noqa: WPS431
-        """Configuration object for PathFinder."""
-
-        unit_of_account = 'unit_of_account'
-        min_liquidity = 'min_liquidity'
-
-    conf = Config()
-
-    def on_next(self, pools: List[Pool]) -> List[TradeOpportunity]:
-        graph = FilteredTradingGraph(TradingGraph(pools), self.store[self.conf.min_liquidity])
-        finder = CycleFinder(graph.graph, self.store[self.conf.unit_of_account])
-        return sorted(finder.find_all_cycles(), key=lambda x: x.ratio)
+    def on_next(self, data):
+        graph = FilteredTradingGraph(TradingGraph(data.pools()), data.min_liquidity())
+        finder = CycleFinder(graph.graph, data.unit_of_account())
+        data.cycles(sorted(finder.find_all_cycles(), key=lambda x: x.ratio))
