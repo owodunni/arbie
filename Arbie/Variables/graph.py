@@ -72,20 +72,39 @@ class FilteredTradingGraph(Graph):
     weight_key = 'weight'
     pool_key = 'object'
 
-    def __init__(self, graph: TradingGraph):
+    def __init__(self, trading_graph: TradingGraph, min_edge_liquidity):
+        self.min_edge_liquidity = min_edge_liquidity
         self.graph = nx.DiGraph()
-        self._filter_graph(graph)
+        self._filter_graph(trading_graph)
 
-    def _filter_graph(self, graph: TradingGraph):
-        self.graph.add_nodes_from(graph.get_nodes())
+    def _check_node_liquidity(self, balance, node: Token) -> bool:
+        return balance * node.price < self.min_edge_liquidity
 
-        for (start_node, end_node, data) in graph.get_edges().data():
+    def _check_liquidity(
+            self,
+            start_node: Token,
+            end_node: Token,
+            pool: Pool) -> bool:
+        t1, t2 = pool.get_balances(start_node, end_node)
+        return self._check_node_liquidity(t1, start_node) or self._check_node_liquidity(t2, end_node)
 
+    def _filter_graph(self, trading_graph: TradingGraph):  # noqa: WPS231
+        self.graph.add_nodes_from(trading_graph.get_nodes())
+
+        for (start_node, end_node, data) in trading_graph.get_edges().data():
+
+            # Check if there is an edge between two nodes in the filtered graph
             edge_data = self.graph.get_edge_data(start_node, end_node)
 
+            if self._check_liquidity(
+                    start_node,
+                    end_node,
+                    data[self.pool_key]):
+                continue
+
             if edge_data is not None:
-                if edge_data[self.weight_key] > data[self.weight_key]:
-                    # The right path is already added
+                if edge_data[self.weight_key] < data[self.weight_key]:
+                    # The most valuable path is already added
                     continue
 
             self._add_edge(

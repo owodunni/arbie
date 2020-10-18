@@ -59,13 +59,22 @@ Pool(
     def __hash__(self):
         return hash(self.address)
 
-    def get_weights(self, token_in: Token, token_out: Token) -> Tuple[Balances, Balances]:
+    def get_weights(self, token_in: Token, token_out: Token) -> Tuple[float, float]:
         return (get_value(self.weights, token_in), get_value(self.weights, token_out))
 
-    def get_balances(self, token_in: Token, token_out: Token) -> Tuple[Balances, Balances]:
+    def get_balances(self, token_in: Token, token_out: Token) -> Tuple[float, float]:
         return (get_value(self.balances, token_in), get_value(self.balances, token_out))
 
     def spot_price(self, token_in: Token, token_out: Token) -> float:
+        """Ratio between token_in and token_out.
+
+        A ratio > 1 means that token_in is less valuable then token_out
+        A ratio < 1 means that token_in is more valuable then token_out
+
+        token_in / ratio = token_out
+
+        If the ratio is 400 then it takes 400 token_in for 1 token_out
+        """
         bi, bo = self.get_balances(token_in, token_out)
         wi, wo = self.get_weights(token_in, token_out)
         return (bi / wi) / (bo / wo)
