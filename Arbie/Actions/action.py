@@ -12,13 +12,15 @@ class Argument(object):
         self.value = None
         if default_value == 'None':
             return
-        elif isinstance(default_value, str):
+        if isinstance(default_value, str):
             self.name = default_value
         else:
             self.value = default_value
 
 
 def parse_settings(settings: Dict):
+    if settings is None:
+        return None
     parsed_settings = {}
     for key, argument in settings.items():
         parsed_settings[key] = Argument(argument)
@@ -70,8 +72,11 @@ class Action(object):
         if config is None:
             return self.settings
 
-        self._emplace_settings(config[self.input_key], self.get_input_settings())
-        self._emplace_settings(config[self.output_key], self.get_output_settings())
+        if self.input_key in config:
+            self._emplace_settings(config[self.input_key], self.get_input_settings())
+
+        if self.output_key in config:
+            self._emplace_settings(config[self.output_key], self.get_output_settings())
 
         return self.settings
 
@@ -80,6 +85,10 @@ class Action(object):
             if key not in settings:
                 raise ValueError(f'Argument: {key} not found in action: {type(self).__name__}')
             settings[key] = Argument(name)
+
+
+def get_value_lambda(value):
+    return lambda _: value
 
 
 class Store(object):
@@ -102,18 +111,26 @@ class Store(object):
         return self.state[key]
 
     def create_input(self, action):
-        return self._create_data(action.get_input_settings(), action.get_output_settings())
+        return self._create_data(
+            action.get_input_settings(),
+            action.get_output_settings())
 
     def _create_data(self, input_settings, output_settings):
         methods = {}
-        for key, argument in input_settings.items():  # noqa: WPS426
+        for key, argument in input_settings.items():
             if argument.name in self.state:
-                methods[key] = lambda _, name=argument.name: self.get(name)
+                methods[key] = self._get_lambda(argument.name)
             elif argument.value is not None:
-                methods[key] = lambda _, value=argument.value: value
+                methods[key] = get_value_lambda(argument.value)
             else:
                 raise ValueError(f'Argument {key}, with name {argument.name} not found in state and no default value')
 
-        for key_out, argument_out in output_settings.items():  # noqa: WPS426
-            methods[key_out] = lambda _, value, name=argument_out.name: self.add(name, value)  # noqa: WPS221
+        for key_out, argument_out in output_settings.items():
+            methods[key_out] = self._add_lambda(argument_out.name)
         return type('ActionData', (), methods)()
+
+    def _get_lambda(self, key):
+        return lambda _: self.get(key)
+
+    def _add_lambda(self, key):
+        return lambda _, value: self.add(key, value)

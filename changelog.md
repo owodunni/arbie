@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - Find all cycles in a set of Pools. These can then be converted to trading opertunities.
+- CLI application structure. Making it possible to configure Actions from yaml config.
 
 ## [0.2.0] - The Base - 2020-10-12
 ### Added
