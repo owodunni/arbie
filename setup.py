@@ -1,10 +1,13 @@
 """Packaging logic for arbie."""
-from setuptools import find_packages, setup
 import os
+
+from setuptools import find_packages, setup
+
 
 def read(path):
     with open(path) as req:
         return req.read().splitlines()
+
 
 def package_files(directory, file_filter):
     paths = []
@@ -14,6 +17,7 @@ def package_files(directory, file_filter):
                 paths.append(os.path.join('..', path, filename))
     return paths
 
+
 extra_files = package_files('Arbie/resources', ['.json'])
 
 setup(
@@ -21,4 +25,9 @@ setup(
     package_data={'': extra_files},
     install_requires=read('pip/requirements.txt'),
     tests_require=read('pip/requirements-dev.txt'),
+    entry_points={
+        'console_scripts': [
+            'Arbie = Arbie.__main__:main'
+        ]
+    }
 )
