@@ -93,9 +93,12 @@ class PathFinder(Action):
         min_liquidity: 1
     output:
         cycles: all_cycles
+        trades: all_trades
     """
 
     def on_next(self, data):
         graph = FilteredTradingGraph(TradingGraph(data.pools()), data.min_liquidity())
         finder = CycleFinder(graph.graph, data.unit_of_account())
-        data.cycles(sorted(finder.find_all_cycles(), key=lambda x: x.ratio))
+        cycles = sorted(finder.find_all_cycles(), key=lambda x: x.ratio)
+        data.cycles(cycles)
+        data.trades(create_trade(cycles))

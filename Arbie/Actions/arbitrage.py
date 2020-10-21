@@ -28,7 +28,7 @@ def find_arbitrage(trades: TradeOpportunity) -> Balance:
 
     if not token_in_pools(trades):
         raise ValueError('Tokens does not exist in pools')
-
+    
     profit = calculate_optimal_arbitrage(trades)
     return Balance(trades[0].token_in, profit)
 
@@ -61,5 +61,31 @@ def arbitrage_diff_expr(trade: TradeOpportunity):
 def calculate_optimal_arbitrage(trade: TradeOpportunity) -> float:
     sol = nsolve(arbitrage_diff_expr(trade), 0)
     if sol <= 0:
-        raise ValueError('No arbitrage opportunity found.')
+        raise  AssertionError('No arbitrage opportunity found.')
     return sol
+
+
+class Arbitrage(Action):
+    """Find optimal arbitrage opertunity for a list sorted trades.
+
+    Remove all trades that are not profitable.
+
+    [Settings]
+    input:
+        trades: all_trades
+    output:
+        out_trades: filtered_trades
+        out_balance: trade_balance
+    """
+
+    def on_next(self, data):
+        out_trades = []
+        out_balance = []
+        for trade in data.trades()
+            try:
+                out_balance.append(find_arbitrage(trade))
+                out_trades.append(trade)
+
+        
+                
+            
