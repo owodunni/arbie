@@ -1,9 +1,9 @@
 """Test uniswap contracts."""
 import pytest
 
-from Arbie.Variables import BigNumber
 from Arbie.Contracts import ContractFactory
 from Arbie.Contracts.tokens import GenericToken
+from Arbie.Variables import BigNumber
 
 
 @pytest.fixture

@@ -4,8 +4,6 @@ import pytest
 import yaml
 
 from Arbie.Actions import Store
-from Arbie.Actions.arbitrage import find_arbitrage
-from Arbie.Actions.path_finder import create_trade
 from Arbie.arbie import App
 
 

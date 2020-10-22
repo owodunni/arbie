@@ -2,8 +2,8 @@
 
 from typing import List
 
-from Arbie.Variables.token import Balance, Token
 from Arbie.Variables.pool import Pool
+from Arbie.Variables.token import Balance, Token
 
 
 class Trade(object):

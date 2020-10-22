@@ -2,10 +2,9 @@
 
 import pytest
 
-from Arbie.Variables import Pool, Token, Trade, ArbitrageOpportunity
-from Arbie.Actions.arbitrage import (calculate_optimal_arbitrage,
-                                     find_arbitrage, Arbitrage)
 from Arbie.Actions import ActionTree, Store
+from Arbie.Actions.arbitrage import Arbitrage, ArbitrageFinder
+from Arbie.Variables import ArbitrageOpportunity, Pool, Token, Trade
 
 dai = Token('dai', 300.0)
 eth = Token('eth', 1)
@@ -30,11 +29,11 @@ class TestArbitrage(object):
     """Test Arbitrage."""
 
     def test_find_arbitrage(self, trade1):
-        amount, profit = find_arbitrage(trade1)
+        amount, profit = ArbitrageFinder(trade1).find_arbitrage()
         assert amount == pytest.approx(2.48456731316587)  # noqa: WPS432
 
     def test_find_arbitrage_unbalanced(self, trade2):
-        amount, profit = find_arbitrage(trade2)
+        amount, profit = ArbitrageFinder(trade2).find_arbitrage()
         assert amount == pytest.approx(27.8547574719045)  # noqa: WPS432
 
     def test_find_arbitrage_no_opportunity(self):
@@ -43,7 +42,7 @@ class TestArbitrage(object):
         trade = [Trade(pool1, eth, dai), Trade(pool2, dai, eth)]
 
         with pytest.raises(ValueError):
-            find_arbitrage(ArbitrageOpportunity(trade))
+            ArbitrageFinder(ArbitrageOpportunity(trade)).find_arbitrage()
 
     def test_calc_optimal_arbitrage_no_opportunity(self):
         pool1 = Pool(tokens, [400, 1], [0.9, 0.1])
@@ -51,7 +50,7 @@ class TestArbitrage(object):
         trade = [Trade(pool1, eth, dai), Trade(pool2, dai, eth)]
 
         with pytest.raises(ValueError) as e:
-            calculate_optimal_arbitrage(ArbitrageOpportunity(trade))
+            ArbitrageFinder(ArbitrageOpportunity(trade)).calculate_optimal_arbitrage()
             assert e.message == 'No arbitrage opportunity found.'
 
     def test_find_arbitrage_wrong_token(self):
@@ -61,7 +60,7 @@ class TestArbitrage(object):
         trade = [Trade(pool1, dai, sai), Trade(pool2, sai, dai)]
 
         with pytest.raises(ValueError):
-            find_arbitrage(ArbitrageOpportunity(trade))
+            ArbitrageFinder(ArbitrageOpportunity(trade)).find_arbitrage()
 
 
 class TestArbitrageAction(object):

@@ -1,7 +1,7 @@
 """Utility functions for interacting with Tokens."""
 
-from Arbie.Variables import Address, BigNumber, Token 
 from Arbie.Contracts import Contract
+from Arbie.Variables import Address, BigNumber, Token
 
 
 class GenericToken(Contract):

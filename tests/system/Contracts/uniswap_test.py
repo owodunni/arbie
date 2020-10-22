@@ -1,10 +1,10 @@
 """Test uniswap contracts."""
 import pytest
 
-from Arbie.Variables import BigNumber
 from Arbie.Contracts import ContractFactory
 from Arbie.Contracts.tokens import GenericToken
 from Arbie.Contracts.uniswap import Factory, Pair
+from Arbie.Variables import BigNumber
 
 bg10 = BigNumber(10)
 bg5 = BigNumber(5)

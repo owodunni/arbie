@@ -7,8 +7,8 @@ from typing import List
 
 import networkx as nx
 
-from Arbie.Variables.token import Token
 from Arbie.Variables.pool import Pool
+from Arbie.Variables.token import Token
 
 
 class Graph(object):

@@ -5,7 +5,7 @@ from typing import List
 import networkx as nx
 
 from Arbie.Actions import Action
-from Arbie.Variables import Pool, Token, Tokens, Trade, ArbitrageOpportunity
+from Arbie.Variables import ArbitrageOpportunity, Pool, Token, Tokens, Trade
 from Arbie.Variables.graph import FilteredTradingGraph, TradingGraph
 
 
@@ -58,11 +58,11 @@ class CycleFinder(object):
             self._visit_node(found_cycles, visited, next_node, ratio_to_next_node)
 
     def _visit_node(
-        self,
-        found_cycles: List[Cycle],
-        visited: Tokens,
-        current_node: Node,
-        ratio_to_current_node):
+            self,
+            found_cycles: List[Cycle],
+            visited: Tokens,
+            current_node: Node,
+            ratio_to_current_node):
         if current_node == self.start_node:
             # We have come back to start. Append cycle to result
             found_cycles.append(Cycle(visited + [current_node], ratio_to_current_node))
