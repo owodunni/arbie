@@ -77,7 +77,7 @@ task testAndLint{
 
 task stylefix(type: Exec) {
 
-    commandLine "autopep8", "-i", "-r", "-a", "Arbie"
+    commandLine "black", "."
     commandLine "isort", "-y", "--recursive"
 }
 
