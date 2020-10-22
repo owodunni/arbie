@@ -2,10 +2,9 @@
 
 from typing import List
 
-from Arbie import BigNumber, Token
 from Arbie.Contracts.contract import Contract
 from Arbie.Contracts.tokens import GenericToken
-from Arbie.Variables.pool import Pool
+from Arbie.Variables import BigNumber, Pool, Token
 
 
 class PoolContract(Contract):

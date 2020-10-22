@@ -3,8 +3,7 @@ from typing import List
 
 import pytest
 
-from Arbie import Token
-from Arbie.Variables.pool import Pool
+from Arbie.Variables import Pool, Token
 
 small = 10000
 medium = 1000000

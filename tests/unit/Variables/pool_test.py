@@ -1,8 +1,7 @@
 """Unittest of pool."""
 import pytest
 
-from Arbie import Address, Token
-from Arbie.Variables.pool import Pool
+from Arbie.Variables import Address, Pool, Token
 
 
 @pytest.fixture

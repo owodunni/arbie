@@ -1,7 +1,7 @@
 """Unittest of Token and Balance."""
 import pytest
 
-from Arbie import Balance, Token
+from Arbie.Variables import Balance, Token
 
 dai_string = 'dai'
 

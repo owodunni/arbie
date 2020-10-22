@@ -1,6 +1,6 @@
 """Tests for Address."""
 
-from Arbie import Address
+from Arbie.Variables import Address
 
 
 def test_create():

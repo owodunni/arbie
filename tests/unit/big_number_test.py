@@ -1,6 +1,6 @@
 """Tests for BigNumber."""
 
-from Arbie import BigNumber
+from Arbie.Variables import BigNumber
 
 
 def test_create_big_number():

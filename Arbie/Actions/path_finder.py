@@ -4,11 +4,9 @@ from typing import List
 
 import networkx as nx
 
-from Arbie import Token, Tokens
 from Arbie.Actions import Action
-from Arbie.Actions.arbitrage import Trade, TradeOpportunity
+from Arbie.Variables import Pool, Token, Tokens, Trade, ArbitrageOpportunity
 from Arbie.Variables.graph import FilteredTradingGraph, TradingGraph
-from Arbie.Variables.pool import Pool
 
 
 class Node(object):
@@ -72,13 +70,13 @@ class CycleFinder(object):
         self._visit_neighbours(found_cycles, visited + [current_node], current_node, ratio_to_current_node)
 
 
-def create_trade(cycle: Cycle) -> TradeOpportunity:
+def create_trade(cycle: Cycle) -> ArbitrageOpportunity:
     trades = []
     start_node = cycle.nodes[0].token
     for node in cycle.nodes[1:]:
         trades.append(Trade(node.pool, start_node, node.token))
         start_node = node.token
-    return trades
+    return ArbitrageOpportunity(trades, ratio=cycle.ratio)
 
 
 class PathFinder(Action):

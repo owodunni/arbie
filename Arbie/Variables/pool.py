@@ -1,9 +1,10 @@
 """Test class for setting up AMMs."""
-from typing import List, Tuple
+from typing import List, NewType, Tuple
 
 from sympy import symbols
 
-from Arbie import Address, Balance, Balances, Token, Tokens
+from Arbie.Variables.address import Address
+from Arbie.Variables.token import Token, Tokens, Balance, Balances
 
 x = symbols('x')
 
@@ -98,3 +99,5 @@ Pool(
     def out_given_in(self, token_in: Token, token_out: Token, amount: float) -> float:
         expr = self.out_given_in_expr(token_in, token_out)
         return expr.subs(x, amount)
+
+Pools = NewType('Pools', List[Pool])
