@@ -6,11 +6,10 @@ import yaml
 
 
 class Argument(object):
-
     def __init__(self, default_value):
         self.name = None
         self.value = None
-        if default_value == 'None':
+        if default_value == "None":
             return
         if isinstance(default_value, str):
             self.name = default_value
@@ -46,8 +45,8 @@ class Action(object):
         key: variable name
     """
 
-    input_key = 'input'
-    output_key = 'output'
+    input_key = "input"
+    output_key = "output"
 
     def __init__(self, config=None):
         self.settings = self._create_settings()
@@ -60,13 +59,15 @@ class Action(object):
         return self.settings[self.output_key]
 
     def on_next(self, data):
-        raise NotImplementedError('Action does not have a on_next statement')
+        raise NotImplementedError("Action does not have a on_next statement")
 
     def _create_settings(self):
-        settings = yaml.safe_load(self.__doc__.split('[Settings]\n')[1])
+        settings = yaml.safe_load(self.__doc__.split("[Settings]\n")[1])
 
-        return {self.input_key: parse_settings(settings[self.input_key]),
-                self.output_key: parse_settings(settings[self.output_key])}
+        return {
+            self.input_key: parse_settings(settings[self.input_key]),
+            self.output_key: parse_settings(settings[self.output_key]),
+        }
 
     def _update_settings_with_config(self, config):
         if config is None:
@@ -83,7 +84,9 @@ class Action(object):
     def _emplace_settings(self, config, settings):
         for key, name in config.items():
             if key not in settings:
-                raise ValueError(f'Argument: {key} not found in action: {type(self).__name__}')
+                raise ValueError(
+                    f"Argument: {key} not found in action: {type(self).__name__}"
+                )
             settings[key] = Argument(name)
 
 
@@ -112,8 +115,8 @@ class Store(object):
 
     def create_input(self, action):
         return self._create_data(
-            action.get_input_settings(),
-            action.get_output_settings())
+            action.get_input_settings(), action.get_output_settings()
+        )
 
     def _create_data(self, input_settings, output_settings):
         methods = {}
@@ -123,11 +126,13 @@ class Store(object):
             elif argument.value is not None:
                 methods[key] = get_value_lambda(argument.value)
             else:
-                raise ValueError(f'Argument {key}, with name {argument.name} not found in state and no default value')
+                raise ValueError(
+                    f"Argument {key}, with name {argument.name} not found in state and no default value"
+                )
 
         for key_out, argument_out in output_settings.items():
             methods[key_out] = self._add_lambda(argument_out.name)
-        return type('ActionData', (), methods)()
+        return type("ActionData", (), methods)()
 
     def _get_lambda(self, key):
         return lambda _: self.get(key)

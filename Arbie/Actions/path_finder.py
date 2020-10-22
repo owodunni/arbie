@@ -46,23 +46,25 @@ class CycleFinder(object):
         return cycles
 
     def _visit_neighbours(
-            self,
-            found_cycles: List[Cycle],
-            visited: List[Node],
-            current_node: Node,
-            ratio_to_current_node):
+        self,
+        found_cycles: List[Cycle],
+        visited: List[Node],
+        current_node: Node,
+        ratio_to_current_node,
+    ):
 
         for _, next_token, data in self.graph.edges(current_node.token, data=True):
-            ratio_to_next_node = ratio_to_current_node * data['weight']
-            next_node = Node(next_token, data['object'])
+            ratio_to_next_node = ratio_to_current_node * data["weight"]
+            next_node = Node(next_token, data["object"])
             self._visit_node(found_cycles, visited, next_node, ratio_to_next_node)
 
     def _visit_node(
-            self,
-            found_cycles: List[Cycle],
-            visited: Tokens,
-            current_node: Node,
-            ratio_to_current_node):
+        self,
+        found_cycles: List[Cycle],
+        visited: Tokens,
+        current_node: Node,
+        ratio_to_current_node,
+    ):
         if current_node == self.start_node:
             # We have come back to start. Append cycle to result
             found_cycles.append(Cycle(visited + [current_node], ratio_to_current_node))
@@ -73,10 +75,8 @@ class CycleFinder(object):
             return
 
         self._visit_neighbours(
-            found_cycles,
-            visited + [current_node],
-            current_node,
-            ratio_to_current_node)
+            found_cycles, visited + [current_node], current_node, ratio_to_current_node
+        )
 
 
 def create_trade(cycle: Cycle) -> ArbitrageOpportunity:

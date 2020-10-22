@@ -9,7 +9,7 @@ from Arbie.Variables import Address
 
 @pytest.fixture
 def web3_server(request):
-    return request.config.getoption('--web3_server')
+    return request.config.getoption("--web3_server")
 
 
 @pytest.fixture
@@ -36,15 +36,13 @@ def token_factory(w3) -> ContractFactory:
 
 @pytest.fixture
 def dai(deploy_address, token_factory) -> GenericToken:
-    token = token_factory.deploy_contract(
-        deploy_address, 10000, 'Dai', 18, 'DAI')
+    token = token_factory.deploy_contract(deploy_address, 10000, "Dai", 18, "DAI")
     token.approve_owner()
     return token
 
 
 @pytest.fixture
 def weth(deploy_address, token_factory) -> GenericToken:
-    token = token_factory.deploy_contract(
-        deploy_address, 10000, 'Weth', 18, 'WETH')
+    token = token_factory.deploy_contract(deploy_address, 10000, "Weth", 18, "WETH")
     token.approve_owner()
     return token

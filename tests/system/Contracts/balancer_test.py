@@ -40,10 +40,7 @@ def test_bind_weight(pool):
 
 
 @pytest.fixture
-def pool_with_tokens(
-        pool: Pool,
-        dai: GenericToken,
-        weth: GenericToken) -> Pool:
+def pool_with_tokens(pool: Pool, dai: GenericToken, weth: GenericToken) -> Pool:
     weight = 5
 
     dai.approve_owner()
@@ -66,10 +63,7 @@ def test_bind_token_to_pool(pool_with_tokens: Pool):
     assert pool_with_tokens.get_weights() == [0.5, 0.5]
 
 
-def test_create_pool(
-        pool_with_tokens: Pool,
-        dai: GenericToken,
-        weth: GenericToken):
+def test_create_pool(pool_with_tokens: Pool, dai: GenericToken, weth: GenericToken):
     pool = pool_with_tokens.create_pool()
     assert pool.spot_price(weth.create_token(), dai.create_token()) == 2
     assert pool.balances[0].value == 5

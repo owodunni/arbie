@@ -3,15 +3,14 @@ import pytest
 
 from Arbie.Variables import Balance, Token
 
-dai_string = 'dai'
+dai_string = "dai"
 
-dai = Token(dai_string, 'aaaa')
-eth = Token('eth', 'bbbb')
+dai = Token(dai_string, "aaaa")
+eth = Token("eth", "bbbb")
 tokens = [dai, eth]
 
 
 class TestToken(object):
-
     def test_str(self):
         dai_str = dai.__str__()
 
@@ -21,11 +20,10 @@ class TestToken(object):
         dai_repr = dai.__repr__()
 
         assert dai_string in dai_repr
-        assert 'aaaa' in dai_repr
+        assert "aaaa" in dai_repr
 
 
 class TestBalance(object):
-
     def test_create(self):
         Balance.create(tokens, [1, 2])
 
@@ -42,4 +40,4 @@ class TestBalance(object):
 
         assert bal_str == bal_repr
         assert dai_string in bal_str
-        assert '2.5' in bal_str
+        assert "2.5" in bal_str

@@ -19,9 +19,9 @@ from Arbie.arbie import App
 
 def main(argv=None):
     arguments = docopt(__doc__, argv, version=Arbie.__version__)  # noqa: WPS609
-    path_to_file = str(arguments['--file'])
+    path_to_file = str(arguments["--file"])
 
     config = None
-    with open(path_to_file, 'r') as file:
+    with open(path_to_file, "r") as file:
         config = yaml.safe_load(file)
     App(config)

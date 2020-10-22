@@ -10,8 +10,8 @@ from Arbie.arbie import App
 @pytest.fixture
 def store(pools, eth) -> Store:
     store = Store()
-    store.add('pools', pools)
-    store.add('eth', eth)
+    store.add("pools", pools)
+    store.add("eth", eth)
     return store
 
 
@@ -21,10 +21,10 @@ def app(store, config_file):
     app = App(config, store)
     assert len(app.action_tree.actions) == 2
     app.run()
-    assert len(store['found_cycles']) == 5
+    assert len(store["found_cycles"]) == 5
     return app
 
 
 def test_profit_of_paths(app: App):
-    trades = app.store['filtered_trades']
+    trades = app.store["filtered_trades"]
     assert trades[0].profit == pytest.approx(1.47700668)

@@ -13,12 +13,13 @@ def token_factory(w3) -> ContractFactory:
 
 @pytest.fixture
 def dai(deploy_address, token_factory) -> GenericToken:
-    return token_factory.deploy_contract(
-        deploy_address, 100, 'Dai', 18, 'DAI')
+    return token_factory.deploy_contract(deploy_address, 100, "Dai", 18, "DAI")
 
 
 def test_equals(dai, token_factory):
-    dai2 = token_factory.load_contract(owner_address=dai.owner_address, address=dai.get_address())
+    dai2 = token_factory.load_contract(
+        owner_address=dai.owner_address, address=dai.get_address()
+    )
     assert dai == dai2
 
 
@@ -33,4 +34,4 @@ def test_transfer(dai: GenericToken, deploy_address, dummy_address):
 
 
 def test_name(dai: GenericToken):
-    assert dai.get_name() == 'BNB'
+    assert dai.get_name() == "BNB"
