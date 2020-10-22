@@ -4,4 +4,4 @@ flake8
 autopep8
 wemake-python-styleguide
 isort < 5.0.0
-pylint
+black
