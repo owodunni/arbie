@@ -57,7 +57,12 @@ class CycleFinder(object):
             next_node = Node(next_token, data['object'])
             self._visit_node(found_cycles, visited, next_node, ratio_to_next_node)
 
-    def _visit_node(self, found_cycles: List[Cycle], visited: Tokens, current_node: Node, ratio_to_current_node):
+    def _visit_node(
+        self,
+        found_cycles: List[Cycle],
+        visited: Tokens,
+        current_node: Node,
+        ratio_to_current_node):
         if current_node == self.start_node:
             # We have come back to start. Append cycle to result
             found_cycles.append(Cycle(visited + [current_node], ratio_to_current_node))
@@ -67,7 +72,11 @@ class CycleFinder(object):
             # We have found a cycle back to the current node. Stop
             return
 
-        self._visit_neighbours(found_cycles, visited + [current_node], current_node, ratio_to_current_node)
+        self._visit_neighbours(
+            found_cycles,
+            visited + [current_node],
+            current_node,
+            ratio_to_current_node)
 
 
 def create_trade(cycle: Cycle) -> ArbitrageOpportunity:
@@ -99,4 +108,7 @@ class PathFinder(Action):
         finder = CycleFinder(graph.graph, data.unit_of_account())
         cycles = sorted(finder.find_all_cycles(), key=lambda x: x.ratio)
         data.cycles(cycles)
-        data.trades(create_trade(cycles))
+        trades = []
+        for cycle in cycles:
+            trades.append(create_trade(cycle))
+        data.trades(trades)
