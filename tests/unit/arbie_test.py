@@ -21,14 +21,12 @@ def store(pools, eth) -> Store:
 def app(store, config_file):
     config = yaml.safe_load(config_file)
     app = App(config, store)
-    assert len(app.action_tree.actions) == 1
+    assert len(app.action_tree.actions) == 2
     app.run()
     assert len(store['found_cycles']) == 5
     return app
 
 
 def test_profit_of_paths(app: App):
-    cycles = app.store['found_cycles']
-    trade = create_trade(cycles[0])
-    balance = find_arbitrage(trade)
-    assert balance.value == pytest.approx(3.35866448326422)
+    trades = app.store['filtered_trades']
+    assert trades[0].profit == pytest.approx(1.47700668)

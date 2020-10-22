@@ -65,4 +65,6 @@ def config_file():
                 min_liquidity: 4
             output:
                 cycles: found_cycles
+        Arbitrage:
+
     """
