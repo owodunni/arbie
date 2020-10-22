@@ -11,7 +11,7 @@ class App(object):
     def __init__(self, config, store=default_store):
         self.config = config
         self.store = store
-        self.action_tree = ActionTree.create(self.config['actions'], self.store)
+        self.action_tree = ActionTree.create(self.config["actions"], self.store)
 
     def run(self):
         self.action_tree.run()

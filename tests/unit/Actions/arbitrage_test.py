@@ -6,8 +6,8 @@ from Arbie.Actions import ActionTree, Store
 from Arbie.Actions.arbitrage import Arbitrage, ArbitrageFinder
 from Arbie.Variables import ArbitrageOpportunity, Pool, Token, Trade
 
-dai = Token('dai', 300.0)
-eth = Token('eth', 1)
+dai = Token("dai", 300.0)
+eth = Token("eth", 1)
 tokens = [dai, eth]
 
 
@@ -51,12 +51,12 @@ class TestArbitrage(object):
 
         with pytest.raises(ValueError) as e:
             ArbitrageFinder(ArbitrageOpportunity(trade)).calculate_optimal_arbitrage()
-            assert e.message == 'No arbitrage opportunity found.'
+            assert e.message == "No arbitrage opportunity found."
 
     def test_find_arbitrage_wrong_token(self):
         pool1 = Pool(tokens, [400, 1], [0.9, 0.1])
         pool2 = Pool(tokens, [410, 1], [0.1, 0.9])
-        sai = Token('sai', 300.0)
+        sai = Token("sai", 300.0)
         trade = [Trade(pool1, dai, sai), Trade(pool2, sai, dai)]
 
         with pytest.raises(ValueError):
@@ -64,12 +64,11 @@ class TestArbitrage(object):
 
 
 class TestArbitrageAction(object):
-
     def test_on_next(self, trade1, trade2):
         store = Store()
-        store.add('all_trades', [trade1, trade2])
+        store.add("all_trades", [trade1, trade2])
         tree = ActionTree(store)
         tree.add_action(Arbitrage())
         tree.run()
 
-        assert len(store.get('filtered_trades')) == 2
+        assert len(store.get("filtered_trades")) == 2

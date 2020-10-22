@@ -7,21 +7,21 @@ from sympy import nsolve, symbols
 from Arbie.Actions import Action
 from Arbie.Variables import ArbitrageOpportunity
 
-x = symbols('x')
+x = symbols("x")
 
 
 class ArbitrageFinder(object):
-
     def __init__(self, trades: ArbitrageOpportunity):
         self.trades = trades
 
     def find_arbitrage(self) -> Tuple[float, float]:
         if len(self.trades) < 2:
             raise ValueError(
-                'Can only found arbitrage opportunity between two or more pools')
+                "Can only found arbitrage opportunity between two or more pools"
+            )
 
         if not self.token_in_pools():
-            raise ValueError('Tokens does not exist in pools')
+            raise ValueError("Tokens does not exist in pools")
 
         trade_input = self.calculate_optimal_arbitrage()
         profit = self.calculate_profit(trade_input)
@@ -38,8 +38,8 @@ class ArbitrageFinder(object):
     def trade_expr(self):
         first_trade = self.trades[0]
         expr = first_trade.pool.out_given_in_expr(
-            first_trade.token_in,
-            first_trade.token_out)
+            first_trade.token_in, first_trade.token_out
+        )
 
         for trade in self.trades[1:]:
             inner_expr = trade.pool.out_given_in_expr(trade.token_in, trade.token_out)
@@ -50,8 +50,8 @@ class ArbitrageFinder(object):
     def arbitrage_expr(self):
         first_trade = self.trades[0]
         expr = first_trade.pool.out_given_in_expr(
-            first_trade.token_in,
-            first_trade.token_out)
+            first_trade.token_in, first_trade.token_out
+        )
 
         for trade in self.trades[1:]:
             inner_expr = trade.pool.out_given_in_expr(trade.token_in, trade.token_out)
@@ -65,7 +65,7 @@ class ArbitrageFinder(object):
     def calculate_optimal_arbitrage(self) -> float:
         sol = nsolve(self.arbitrage_diff_expr(), 0)
         if sol <= 0:
-            raise AssertionError('No arbitrage opportunity found.')
+            raise AssertionError("No arbitrage opportunity found.")
         return sol
 
     def calculate_profit(self, value) -> float:
@@ -92,7 +92,8 @@ class Arbitrage(Action):
             profit = None
             try:
                 amount_in, profit = ArbitrageFinder(
-                    arbitrage_opportunity).find_arbitrage()
+                    arbitrage_opportunity
+                ).find_arbitrage()
             except AssertionError:
                 continue
 

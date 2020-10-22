@@ -6,7 +6,7 @@ from sympy import symbols
 from Arbie.Variables.address import Address
 from Arbie.Variables.token import Balance, Balances, Token, Tokens
 
-x = symbols('x')
+x = symbols("x")
 
 
 def get_value(values: Balances, token: Token) -> Balance:
@@ -22,12 +22,13 @@ class Pool(object):
     """
 
     def __init__(
-            self,
-            tokens: Tokens,
-            balances: List[float],
-            weights: List[float],
-            fee: float = 0,
-            **kwargs):  # noqa: WPS221
+        self,
+        tokens: Tokens,
+        balances: List[float],
+        weights: List[float],
+        fee: float = 0,
+        **kwargs,
+    ):  # noqa: WPS221
 
         self.tokens = tokens
         self.balances = Balance.create(tokens, balances)
@@ -35,13 +36,13 @@ class Pool(object):
         self.fee = fee
 
         if sum(weights) != 1:
-            raise ValueError('Weights are not normalized')
+            raise ValueError("Weights are not normalized")
 
         if self.fee > 1 or self.fee < 0:
-            raise ValueError(f'Fee: {self.fee}, should be between 0 and 1')
+            raise ValueError(f"Fee: {self.fee}, should be between 0 and 1")
 
-        if 'address' in kwargs:
-            self.address = kwargs.get('address')
+        if "address" in kwargs:
+            self.address = kwargs.get("address")
         else:
             self.address = Address()
 
@@ -84,13 +85,13 @@ Pool(
         bi, bo = self.get_balances(token_in, token_out)
         wi, wo = self.get_weights(token_in, token_out)
 
-        return bi * ((bo / (bo - x * (1 - self.fee)))**(wo / wi) - 1)  # noqa: WPS221'
+        return bi * ((bo / (bo - x * (1 - self.fee))) ** (wo / wi) - 1)  # noqa: WPS221'
 
     def out_given_in_expr(self, token_in: Token, token_out: Token) -> float:
         bi, bo = self.get_balances(token_in, token_out)
         wi, wo = self.get_weights(token_in, token_out)
 
-        return bo * (1 - (bi / (bi + x * (1 - self.fee)))**(wi / wo))  # noqa: WPS221
+        return bo * (1 - (bi / (bi + x * (1 - self.fee))) ** (wi / wo))  # noqa: WPS221
 
     def in_given_out(self, token_in: Token, token_out: Token, amount: float) -> float:
         expr = self.in_given_out_expr(token_in, token_out)
@@ -101,4 +102,4 @@ Pool(
         return expr.subs(x, amount)
 
 
-Pools = NewType('Pools', List[Pool])
+Pools = NewType("Pools", List[Pool])

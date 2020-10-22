@@ -15,13 +15,11 @@ def pool(tokens):
 
 
 class TestPool(object):
-
     def test_init_multi(self, tokens):
-        new_tokens = tokens + [Token('sai', 100)]
+        new_tokens = tokens + [Token("sai", 100)]
         pool = Pool(
-            new_tokens,
-            [4e3, 10, 10e5],
-            [1 / 3.0, 1 / 3.0, 1 / 3.0])  # noqa: WPS221
+            new_tokens, [4e3, 10, 10e5], [1 / 3.0, 1 / 3.0, 1 / 3.0]  # noqa: WPS221
+        )  # noqa: WPS221
         assert pool.spot_price(new_tokens[0], new_tokens[1]) == 400
         assert pool.spot_price(new_tokens[2], new_tokens[1]) == 100000
 
@@ -42,7 +40,11 @@ class TestPool(object):
         assert pool.spot_price(dai, eth) == 400  # noqa: WPS432
 
     def test_out_give_in(self, pool, dai, eth):
-        assert pool.out_given_in(eth, dai, 1) == pytest.approx(363.636363636364)  # noqa: WPS432
+        assert pool.out_given_in(eth, dai, 1) == pytest.approx(
+            363.636363636364
+        )  # noqa: WPS432
 
     def test_in_give_out(self, pool, dai, eth):
-        assert pool.in_given_out(dai, eth, 1) == pytest.approx(444.444444444444)  # noqa: WPS432
+        assert pool.in_given_out(dai, eth, 1) == pytest.approx(
+            444.444444444444
+        )  # noqa: WPS432

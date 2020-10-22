@@ -69,8 +69,8 @@ class FilteredTradingGraph(Graph):
     The best trade is the one that has the highest ratio.
     """
 
-    weight_key = 'weight'
-    pool_key = 'object'
+    weight_key = "weight"
+    pool_key = "object"
 
     def __init__(self, trading_graph: TradingGraph, min_edge_liquidity):
         self.min_edge_liquidity = min_edge_liquidity
@@ -80,13 +80,11 @@ class FilteredTradingGraph(Graph):
     def _check_node_liquidity(self, balance, node: Token) -> bool:
         return balance * node.price < self.min_edge_liquidity
 
-    def _check_liquidity(
-            self,
-            start_node: Token,
-            end_node: Token,
-            pool: Pool) -> bool:
+    def _check_liquidity(self, start_node: Token, end_node: Token, pool: Pool) -> bool:
         t1, t2 = pool.get_balances(start_node, end_node)
-        return self._check_node_liquidity(t1, start_node) or self._check_node_liquidity(t2, end_node)
+        return self._check_node_liquidity(t1, start_node) or self._check_node_liquidity(
+            t2, end_node
+        )
 
     def _filter_graph(self, trading_graph: TradingGraph):  # noqa: WPS231
         self.graph.add_nodes_from(trading_graph.get_nodes())
@@ -96,10 +94,7 @@ class FilteredTradingGraph(Graph):
             # Check if there is an edge between two nodes in the filtered graph
             edge_data = self.graph.get_edge_data(start_node, end_node)
 
-            if self._check_liquidity(
-                    start_node,
-                    end_node,
-                    data[self.pool_key]):
+            if self._check_liquidity(start_node, end_node, data[self.pool_key]):
                 continue
 
             if edge_data is not None:
@@ -108,7 +103,5 @@ class FilteredTradingGraph(Graph):
                     continue
 
             self._add_edge(
-                start_node,
-                end_node,
-                data[self.weight_key],
-                data[self.pool_key])
+                start_node, end_node, data[self.weight_key], data[self.pool_key]
+            )

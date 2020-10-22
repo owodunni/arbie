@@ -12,7 +12,7 @@ def is_class_action(member):
 
 
 def get_all_actions(extra_actions=None) -> List[Tuple[str, type(Action)]]:
-    actions = inspect.getmembers(sys.modules['Arbie.Actions'], is_class_action)
+    actions = inspect.getmembers(sys.modules["Arbie.Actions"], is_class_action)
     if extra_actions is not None:
         return actions + extra_actions
     return actions
@@ -22,11 +22,10 @@ def create_action(name, config, extra_actions):
     for name_cls, action_cls in get_all_actions(extra_actions):
         if name_cls == name:
             return action_cls(config)
-    raise ValueError(f'Action: {name} not found.')
+    raise ValueError(f"Action: {name} not found.")
 
 
 class ActionTree(object):
-
     def __init__(self, store: Store):
         self.store = store
         self.actions = []

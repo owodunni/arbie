@@ -7,7 +7,6 @@ from Arbie.Variables.token import Balance, Token
 
 
 class Trade(object):
-
     def __init__(self, pool: Pool, token_in: Token, token_out: Token):
         self.pool = pool
         self.token_in = token_in
@@ -15,7 +14,6 @@ class Trade(object):
 
 
 class ArbitrageOpportunity(object):
-
     def __init__(self, trades: List[Trade], ratio=None):
         self.trades = trades
         self.amount_in = None

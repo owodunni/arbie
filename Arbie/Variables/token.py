@@ -18,7 +18,7 @@ class Token(object):
         return self.name
 
     def __repr__(self):
-        return f'Token(Name: {self.name}, Price: {self.price}, Address: {self.address})'  # noqa: WPS221
+        return f"Token(Name: {self.name}, Price: {self.price}, Address: {self.address})"  # noqa: WPS221
 
     def __eq__(self, other):
         return hash(self) == hash(other)
@@ -35,7 +35,7 @@ class Balance(object):
         self.value = value
 
     def __str__(self):
-        return f'Balance(Token: {self.token}, Value: {self.value})'
+        return f"Balance(Token: {self.token}, Value: {self.value})"
 
     def __repr__(self):
         return self.__str__()
@@ -43,7 +43,7 @@ class Balance(object):
     @classmethod
     def create(cls, tokens: List[Token], values: List[float]) -> List[object]:
         if len(tokens) != len(values):
-            raise ValueError('All inputs must be of same length.')
+            raise ValueError("All inputs must be of same length.")
 
         balances = []
         for token, value in zip(tokens, values):
@@ -51,5 +51,5 @@ class Balance(object):
         return balances
 
 
-Balances = NewType('Balances', List[Balance])
-Tokens = NewType('Tokens', List[Token])
+Balances = NewType("Balances", List[Balance])
+Tokens = NewType("Tokens", List[Token])

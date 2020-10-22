@@ -12,7 +12,9 @@ bg5 = BigNumber(5)
 
 @pytest.fixture
 def factory(deploy_address, w3) -> Factory:
-    return ContractFactory(w3, Factory).deploy_contract(deploy_address, deploy_address.value)
+    return ContractFactory(w3, Factory).deploy_contract(
+        deploy_address, deploy_address.value
+    )
 
 
 @pytest.fixture
@@ -43,11 +45,7 @@ def test_get_weights(pair):
     assert pair.get_balances() == [0, 0]
 
 
-def test_mint(
-        pair: Pair,
-        dai: GenericToken,
-        weth: GenericToken,
-        deploy_address):
+def test_mint(pair: Pair, dai: GenericToken, weth: GenericToken, deploy_address):
 
     assert dai.transfer(pair.get_address(), bg10)
     assert weth.transfer(pair.get_address(), bg10)
@@ -55,11 +53,7 @@ def test_mint(
     assert pair.get_balances() == [bg10, bg10]
 
 
-def test_create_pool(
-        pair: Pair,
-        dai: GenericToken,
-        weth: GenericToken,
-        deploy_address):
+def test_create_pool(pair: Pair, dai: GenericToken, weth: GenericToken, deploy_address):
 
     dai.transfer(pair.get_address(), bg5)
     weth.transfer(pair.get_address(), bg10)
