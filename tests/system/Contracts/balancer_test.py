@@ -1,10 +1,10 @@
 """Test balancer contracts."""
 import pytest
 
-from Arbie.Variables import Address, BigNumber
 from Arbie.Contracts import ContractFactory
 from Arbie.Contracts.balancer import Pool, PoolFactory
 from Arbie.Contracts.tokens import GenericToken
+from Arbie.Variables import Address, BigNumber
 
 bg10 = BigNumber(10)
 bg5 = BigNumber(5)

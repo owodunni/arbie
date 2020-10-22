@@ -4,73 +4,73 @@ from typing import Tuple
 
 from sympy import nsolve, symbols
 
-from Arbie.Variables import ArbitrageOpportunity, Balance
 from Arbie.Actions import Action
+from Arbie.Variables import ArbitrageOpportunity
 
 x = symbols('x')
 
 
-def find_arbitrage(trades: ArbitrageOpportunity) -> Tuple[float, float]:
-    if len(trades) < 2:
-        raise ValueError('Can only found arbitrage opportunity between two or more pools')
+class ArbitrageFinder(object):
 
-    if not token_in_pools(trades):
-        raise ValueError('Tokens does not exist in pools')
+    def __init__(self, trades: ArbitrageOpportunity):
+        self.trades = trades
 
-    trade_input = calculate_optimal_arbitrage(trades)
-    profit = calculate_profit(trades, trade_input)
+    def find_arbitrage(self) -> Tuple[float, float]:
+        if len(self.trades) < 2:
+            raise ValueError(
+                'Can only found arbitrage opportunity between two or more pools')
 
-    return trade_input, profit
+        if not self.token_in_pools():
+            raise ValueError('Tokens does not exist in pools')
 
+        trade_input = self.calculate_optimal_arbitrage()
+        profit = self.calculate_profit(trade_input)
 
-def token_in_pools(trades: ArbitrageOpportunity) -> bool:
-    for trade in trades:
-        pool = trade.pool
-        if trade.token_in not in pool.tokens or trade.token_out not in pool.tokens:
-            return False
-    return True
+        return trade_input, profit
 
+    def token_in_pools(self) -> bool:
+        for trade in self.trades:
+            pool = trade.pool
+            if trade.token_in not in pool.tokens or trade.token_out not in pool.tokens:
+                return False
+        return True
 
-def trade_expr(trades: ArbitrageOpportunity):
-    first_trade = trades[0]
-    expr = first_trade.pool.out_given_in_expr(
-        first_trade.token_in,
-        first_trade.token_out)
+    def trade_expr(self):
+        first_trade = self.trades[0]
+        expr = first_trade.pool.out_given_in_expr(
+            first_trade.token_in,
+            first_trade.token_out)
 
-    for trade in trades[1:]:
-        inner_expr = trade.pool.out_given_in_expr(trade.token_in, trade.token_out)
-        expr = inner_expr.subs(x, expr)
+        for trade in self.trades[1:]:
+            inner_expr = trade.pool.out_given_in_expr(trade.token_in, trade.token_out)
+            expr = inner_expr.subs(x, expr)
 
-    return expr
+        return expr
 
+    def arbitrage_expr(self):
+        first_trade = self.trades[0]
+        expr = first_trade.pool.out_given_in_expr(
+            first_trade.token_in,
+            first_trade.token_out)
 
-def arbitrage_expr(trades: ArbitrageOpportunity):
-    first_trade = trades[0]
-    expr = first_trade.pool.out_given_in_expr(
-        first_trade.token_in,
-        first_trade.token_out)
+        for trade in self.trades[1:]:
+            inner_expr = trade.pool.out_given_in_expr(trade.token_in, trade.token_out)
+            expr = inner_expr.subs(x, expr) - x
 
-    for trade in trades[1:]:
-        inner_expr = trade.pool.out_given_in_expr(trade.token_in, trade.token_out)
-        expr = inner_expr.subs(x, expr) - x
+        return expr
 
-    return expr
+    def arbitrage_diff_expr(self):
+        return self.arbitrage_expr().diff(x)
 
+    def calculate_optimal_arbitrage(self) -> float:
+        sol = nsolve(self.arbitrage_diff_expr(), 0)
+        if sol <= 0:
+            raise AssertionError('No arbitrage opportunity found.')
+        return sol
 
-def arbitrage_diff_expr(trade: ArbitrageOpportunity):
-    return arbitrage_expr(trade).diff(x)
-
-
-def calculate_optimal_arbitrage(trade: ArbitrageOpportunity) -> float:
-    sol = nsolve(arbitrage_diff_expr(trade), 0)
-    if sol <= 0:
-        raise AssertionError('No arbitrage opportunity found.')
-    return sol
-
-
-def calculate_profit(trade: ArbitrageOpportunity, value) -> float:
-    expr = trade_expr(trade)
-    return expr.subs(x, value) - value
+    def calculate_profit(self, value) -> float:
+        expr = self.trade_expr()
+        return expr.subs(x, value) - value
 
 
 class Arbitrage(Action):
@@ -88,13 +88,17 @@ class Arbitrage(Action):
     def on_next(self, data):
         trades = []
         for arbitrage_opportunity in data.trades():
+            amount_in = None
+            profit = None
             try:
-                amount_in, profit = find_arbitrage(arbitrage_opportunity)
-                arbitrage_opportunity.amount_in = amount_in
-                arbitrage_opportunity.profit = profit
-                trades.append(arbitrage_opportunity)
+                amount_in, profit = ArbitrageFinder(
+                    arbitrage_opportunity).find_arbitrage()
             except AssertionError:
-                pass
+                continue
+
+            arbitrage_opportunity.amount_in = amount_in
+            arbitrage_opportunity.profit = profit
+            trades.append(arbitrage_opportunity)
 
         sorted_trade = sorted(trades, key=lambda trade: trade.profit, reverse=True)
         data.out_trades(sorted_trade)
