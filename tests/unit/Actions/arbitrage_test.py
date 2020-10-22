@@ -30,10 +30,12 @@ class TestArbitrage(object):
     """Test Arbitrage."""
 
     def test_find_arbitrage(self, trade1):
-        assert find_arbitrage(trade1).value == pytest.approx(2.48456731316587)  # noqa: WPS432
+        amount, profit = find_arbitrage(trade1)
+        assert amount == pytest.approx(2.48456731316587)  # noqa: WPS432
 
     def test_find_arbitrage_unbalanced(self, trade2):
-        assert find_arbitrage(trade2).value == pytest.approx(27.8547574719045)  # noqa: WPS432
+        amount, profit = find_arbitrage(trade2)
+        assert amount == pytest.approx(27.8547574719045)  # noqa: WPS432
 
     def test_find_arbitrage_no_opportunity(self):
         pool1 = Pool(tokens, [400, 1], [0.9, 0.1])
