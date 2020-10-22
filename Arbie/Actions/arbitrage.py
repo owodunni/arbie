@@ -4,25 +4,13 @@ from typing import List, NewType
 
 from sympy import nsolve, symbols
 
-from Arbie import Balance, Token
-from Arbie.Variables.pool import Pool
+from Arbie.Variables import ArbitrageOpportunity, Balance, Pools, Token
+from Arbie.Actions import Action
 
-Pools = List[Pool]
 x = symbols('x')
 
 
-class Trade(object):
-
-    def __init__(self, pool: Pool, token_in: Token, token_out: Token):
-        self.pool = pool
-        self.token_in = token_in
-        self.token_out = token_out
-
-
-TradeOpportunity = NewType('TradeOpportunity', List[Trade])
-
-
-def find_arbitrage(trades: TradeOpportunity) -> Balance:
+def find_arbitrage(trades: ArbitrageOpportunity) -> Balance:
     if len(trades) < 2:
         raise ValueError('Can only found arbitrage opportunity between two or more pools')
 
@@ -33,7 +21,7 @@ def find_arbitrage(trades: TradeOpportunity) -> Balance:
     return Balance(trades[0].token_in, profit)
 
 
-def token_in_pools(trades: TradeOpportunity) -> bool:
+def token_in_pools(trades: ArbitrageOpportunity) -> bool:
     for trade in trades:
         pool = trade.pool
         if trade.token_in not in pool.tokens or trade.token_out not in pool.tokens:
@@ -41,7 +29,7 @@ def token_in_pools(trades: TradeOpportunity) -> bool:
     return True
 
 
-def arbitrage_expr(trades: TradeOpportunity):
+def arbitrage_expr(trades: ArbitrageOpportunity):
     first_trade = trades[0]
     expr = first_trade.pool.out_given_in_expr(
         first_trade.token_in,
@@ -54,11 +42,11 @@ def arbitrage_expr(trades: TradeOpportunity):
     return expr
 
 
-def arbitrage_diff_expr(trade: TradeOpportunity):
+def arbitrage_diff_expr(trade: ArbitrageOpportunity):
     return arbitrage_expr(trade).diff(x)
 
 
-def calculate_optimal_arbitrage(trade: TradeOpportunity) -> float:
+def calculate_optimal_arbitrage(trade: ArbitrageOpportunity) -> float:
     sol = nsolve(arbitrage_diff_expr(trade), 0)
     if sol <= 0:
         raise  AssertionError('No arbitrage opportunity found.')

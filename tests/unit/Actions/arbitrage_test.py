@@ -2,10 +2,9 @@
 
 import pytest
 
-from Arbie import Token
-from Arbie.Actions.arbitrage import (Trade, calculate_optimal_arbitrage,
+from Arbie.Variables import Pool, Token, Trade
+from Arbie.Actions.arbitrage import (calculate_optimal_arbitrage,
                                      find_arbitrage)
-from Arbie.Variables.pool import Pool
 
 dai = Token('dai', 300.0)
 eth = Token('eth', 1)

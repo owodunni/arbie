@@ -1,7 +1,7 @@
 """Basic token representation."""
 from typing import List, NewType
 
-from Arbie import Address
+from Arbie.Variables.address import Address
 
 
 class Token(object):

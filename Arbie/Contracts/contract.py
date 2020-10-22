@@ -5,7 +5,7 @@ from enum import Enum
 
 from pkg_resources import resource_string
 
-from Arbie import Address
+from Arbie.Variables import Address
 
 
 class Network(Enum):

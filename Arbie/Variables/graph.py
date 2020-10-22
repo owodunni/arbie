@@ -7,7 +7,7 @@ from typing import List
 
 import networkx as nx
 
-from Arbie.token import Token
+from Arbie.Variables.token import Token
 from Arbie.Variables.pool import Pool
 
 

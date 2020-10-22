@@ -2,8 +2,8 @@
 
 from typing import List
 
-from Arbie import BigNumber
-from Arbie.Contracts.contract import Address, Contract, ContractFactory
+from Arbie.Variables import Address, BigNumber
+from Arbie.Contracts.contract import Contract, ContractFactory
 from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.Contracts.tokens import GenericToken
 
