@@ -1,5 +1,7 @@
 """Arbie.
 
+Arbie is configured through a Yaml file.
+
 Usage:
   Arbie -f config.yml
   Arbie (-h | --help)
@@ -10,6 +12,8 @@ Options:
   -h --help     Show this screen.
   -v --version     Show version.
 """
+import logging
+
 import yaml
 from docopt import docopt
 
@@ -17,7 +21,16 @@ import Arbie
 from Arbie.arbie import App
 
 
+def setup_logging():
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(name)-12s: %(levelname)-8s %(message)s",  # noqa: WPS323
+        datefmt="%m-%d %H:%M",  # noqa: WPS323
+    )
+
+
 def main(argv=None):
+    setup_logging()
     arguments = docopt(__doc__, argv, version=Arbie.__version__)  # noqa: WPS609
     path_to_file = str(arguments["--file"])
 

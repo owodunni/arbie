@@ -48,21 +48,3 @@ def pools(dai, eth, btc, yam) -> List[Pool]:
         ),
         Pool([dai, yam], [small / 1.1, small / 0.1], [1 / 2.0, 1 / 2.0], 0.001),
     ]
-
-
-@pytest.fixture
-def config_file():
-    return """
-    w3_address: http://127.0.0.1
-    w3_port: 7545
-
-    actions:
-        PathFinder:
-            input:
-                unit_of_account: eth
-                min_liquidity: 4
-            output:
-                cycles: found_cycles
-        Arbitrage:
-
-    """

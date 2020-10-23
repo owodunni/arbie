@@ -8,6 +8,20 @@ from Arbie.arbie import App
 
 
 @pytest.fixture
+def config_file():
+    return """
+    actions:
+        PathFinder:
+            input:
+                unit_of_account: eth
+                min_liquidity: 4
+            output:
+                cycles: found_cycles
+        Arbitrage:
+    """
+
+
+@pytest.fixture
 def store(pools, eth) -> Store:
     store = Store()
     store.add("pools", pools)
