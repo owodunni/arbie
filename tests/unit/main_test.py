@@ -6,6 +6,20 @@ import pytest
 from Arbie.__main__ import main
 
 
+@pytest.fixture
+def config_file():
+    return """
+    actions:
+        PathFinder:
+            input:
+                unit_of_account: eth
+                min_liquidity: 4
+            output:
+                cycles: found_cycles
+        Arbitrage:
+    """
+
+
 class TestMain(object):
     def test_file_not_found(self):
         with pytest.raises(FileNotFoundError):
