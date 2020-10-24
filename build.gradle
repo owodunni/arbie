@@ -75,10 +75,13 @@ task testAndLint{
   dependsOn test, lint
 }
 
-task stylefix(type: Exec) {
-
+task stylefix {
+  exec{
     commandLine "black", "."
+  }
+  exec{
     commandLine "isort", "-y", "--recursive"
+  }
 }
 
 task venv(type: Exec) {
