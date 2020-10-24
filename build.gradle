@@ -67,21 +67,22 @@ task unitTest(type: Exec) {
             "--cov=$sorceDir"
 }
 
+
+task black(type: Exec){
+  commandLine "black", "."
+}
+
+task isort(type: Exec){
+    commandLine "isort", "-y", "--recursive"
+}
+
 task lint(type: Exec) {
-    commandLine "flake8", "Arbie", "tests"
+  dependsOn lint, black
+  commandLine "flake8", "Arbie", "tests"
 }
 
 task testAndLint{
   dependsOn test, lint
-}
-
-task stylefix {
-  exec{
-    commandLine "black", "."
-  }
-  exec{
-    commandLine "isort", "-y", "--recursive"
-  }
 }
 
 task venv(type: Exec) {
