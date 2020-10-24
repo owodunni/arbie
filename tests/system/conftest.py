@@ -1,4 +1,6 @@
 """Help module for web3 tests."""
+from typing import List
+
 import pytest
 from web3 import Web3
 
@@ -46,3 +48,22 @@ def weth(deploy_address, token_factory) -> GenericToken:
     token = token_factory.deploy_contract(deploy_address, 10000, "Weth", 18, "WETH")
     token.approve_owner()
     return token
+
+
+@pytest.fixture
+def yam(deploy_address, token_factory) -> GenericToken:
+    token = token_factory.deploy_contract(deploy_address, 1000000, "yam", 10, "YAM")
+    token.approve_owner()
+    return token
+
+
+@pytest.fixture
+def wbtc(deploy_address, token_factory) -> GenericToken:
+    token = token_factory.deploy_contract(deploy_address, 10000, "Wbtc", 18, "WBTC")
+    token.approve_owner()
+    return token
+
+
+@pytest.fixture
+def tokens(dai, weth, yam, wbtc) -> List[GenericToken]:
+    return [dai, weth, yam, wbtc]

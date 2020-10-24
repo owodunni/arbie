@@ -5,7 +5,7 @@ import logging
 from web3 import Web3
 
 from Arbie.Actions import ActionTree, Store
-from Arbie.Contracts import ContractFactory, Factory, PoolFactory
+from Arbie.Contracts import BalancerFactory, ContractFactory, UniswapFactory
 
 default_store = Store()
 
@@ -23,28 +23,26 @@ class App(object):
         self.action_tree.run()
 
     def _set_up(self):
-        address = self._get_config("w3_address")
-        port = self._get_config("w3_port")
-        if address is None and port is None:
+        address = self._get_config("web3_address")
+        if address is None:
             logging.getLogger().warning("No Web3 confiurations found.")
             return
 
-        self._set_up_web3(address, port)
+        self._set_up_web3(address)
 
-    def _set_up_web3(self, address, port):
-        w3_address = f"{address}:{port}"
-        self.w3 = Web3(w3_address)
+    def _set_up_web3(self, address):
+        self.w3 = Web3(Web3.HTTPProvider(address))
         if not self.w3.isConnected():
             raise ConnectionError("Web3 is not connected")
 
-        logging.getLogger().info(f"Connected to Node {w3_address}")
+        logging.getLogger().info(f"Connected to Node {address}")
         logging.getLogger().info(f"Current block is {self.w3.eth.blockNumber}")
 
         self._set_up_contracts()
 
     def _set_up_contracts(self):
-        uni_factory = ContractFactory(self.w3, Factory)
-        bal_factory = ContractFactory(self.w3, PoolFactory)
+        uni_factory = ContractFactory(self.w3, UniswapFactory)
+        bal_factory = ContractFactory(self.w3, BalancerFactory)
         network = self.config["network"]
         if network is not None:
             self.store.add("uni_factory", uni_factory.load_contract(network=network))
