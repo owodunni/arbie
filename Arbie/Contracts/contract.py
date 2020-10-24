@@ -2,6 +2,7 @@
 
 import json
 from enum import Enum
+from typing import Tuple
 
 from pkg_resources import resource_string
 
@@ -41,7 +42,11 @@ class Contract(object):
         return transact(self.w3, self.owner_address, transaction)
 
     def _transact_status(self, transaction) -> bool:
-        return bool(self._transact(transaction).status)
+        return self._transact(transaction).status
+
+    def _transact_status_and_contract(self, transaction) -> Tuple[bool, Address]:
+        tx_receipt = self._transact(transaction)
+        return tx_receipt.status, Address(tx_receipt.logs[1].address)
 
 
 class ContractFactory(object):

@@ -77,7 +77,7 @@ task isort(type: Exec){
 }
 
 task lint(type: Exec) {
-  dependsOn lint, black
+  dependsOn isort, black
   commandLine "flake8", "Arbie", "tests"
 }
 

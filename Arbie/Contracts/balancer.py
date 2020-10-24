@@ -2,13 +2,14 @@
 
 from typing import List
 
-from Arbie.Contracts import Contract, ContractFactory
+from Arbie import DeployContractError
+from Arbie.Contracts.contract import Contract, ContractFactory
 from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.Contracts.tokens import GenericToken
 from Arbie.Variables import Address, BigNumber
 
 
-class Pool(PoolContract):
+class BalancerPool(PoolContract):
 
     name = "pool"
     protocol = "balancer"
@@ -71,22 +72,42 @@ class Pool(PoolContract):
         return self._transact_status(self.contract.functions.finalize())
 
 
-class PoolFactory(Contract):
+class BalancerFactory(Contract):
     name = "pool_factory"
     protocol = "balancer"
     abi = "pool_factory"
 
-    def new_bpool(self) -> bool:
-        transaction = self.contract.functions.newBPool()
-        return self._transact_status(transaction)
+    def setup_pool(
+        self, tokens: List[GenericToken], weights: List[float], amounts: List[BigNumber]
+    ) -> BalancerPool:
+        pool = self.new_pool()
 
-    def all_pools(self) -> List[Pool]:
+        for token, weight, amount in zip(tokens, weights, amounts):
+            token.approve_owner()
+            token.approve(pool.get_address(), amount)
+            pool.bind(token.get_address(), amount, weight)
+
+        pool.finalize()
+        return pool
+
+    def new_pool(self) -> bool:
+        transaction = self.contract.functions.newBPool()
+        status, address = self._transact_status_and_contract(transaction)
+
+        if not status:
+            raise DeployContractError("Failed to deploy BalancerPool.")
+
+        return ContractFactory(self.w3, BalancerPool).load_contract(
+            self.owner_address, address=address
+        )
+
+    def all_pools(self) -> List[BalancerPool]:
         event_filter = self.contract.events.LOG_NEW_POOL.createFilter(fromBlock=0)
         return self._create_pools(event_filter.get_all_entries())
 
     def _create_pools(self, new_pool_event):
         pools = []
-        factory = ContractFactory(self.w3, Pool)
+        factory = ContractFactory(self.w3, BalancerPool)
 
         for event in new_pool_event:
             pool = factory.load_contract(

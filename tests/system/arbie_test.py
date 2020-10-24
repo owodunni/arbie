@@ -3,13 +3,30 @@
 import pytest
 import yaml
 
-from Arbie.Actions import Store
 from Arbie.arbie import App
+from Arbie.Contracts import BalancerFactory, ContractFactory, UniswapFactory
 
 
 @pytest.fixture
-def config_file():
-    return """
+def uni_factory(deploy_address, w3) -> UniswapFactory:
+    return ContractFactory(w3, UniswapFactory).deploy_contract(
+        deploy_address, deploy_address.value
+    )
+
+
+@pytest.fixture
+def bal_factory(deploy_address, w3) -> BalancerFactory:
+    return ContractFactory(w3, BalancerFactory).deploy_contract(
+        deploy_address, deploy_address.value
+    )
+
+
+@pytest.fixture
+def config_file(web3_server):
+    return f"""
+
+    web3_address: {web3_server}
+
     actions:
         PathFinder:
             input:
@@ -22,23 +39,7 @@ def config_file():
 
 
 @pytest.fixture
-def store(pools, eth) -> Store:
-    store = Store()
-    store.add("pools", pools)
-    store.add("eth", eth)
-    return store
-
-
-@pytest.fixture
 def app(store, config_file):
     config = yaml.safe_load(config_file)
     app = App(config, store)
     assert len(app.action_tree.actions) == 2
-    app.run()
-    assert len(store["found_cycles"]) == 5
-    return app
-
-
-def test_profit_of_paths(app: App):
-    trades = app.store["filtered_trades"]
-    assert trades[0].profit == pytest.approx(1.47700668)

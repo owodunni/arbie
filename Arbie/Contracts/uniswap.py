@@ -8,7 +8,7 @@ from Arbie.Contracts.tokens import GenericToken
 from Arbie.Variables import Address, BigNumber
 
 
-class Pair(PoolContract):
+class UniswapPair(PoolContract):
 
     name = "pair"
     protocol = "uniswap"
@@ -52,7 +52,7 @@ class Pair(PoolContract):
         return cf.load_contract(self.owner_address, address=Address(token_address))
 
 
-class Factory(Contract):
+class UniswapFactory(Contract):
 
     name = "factory_v2"
     protocol = "uniswap"
@@ -64,8 +64,8 @@ class Factory(Contract):
     def get_pair_address(self, index) -> Address:
         return Address(self.contract.functions.allPairs(index).call())
 
-    def all_pairs(self) -> List[Pair]:
-        cf = ContractFactory(self.w3, Pair)
+    def all_pairs(self) -> List[UniswapPair]:
+        cf = ContractFactory(self.w3, UniswapPair)
         pairs = []
         for i in range(0, self.all_pairs_length()):
             pairs.append(
@@ -73,7 +73,7 @@ class Factory(Contract):
             )
         return pairs
 
-    def create_pair(self, token_a: GenericToken, token_b: GenericToken) -> bool:
+    def create_pair(self, token_a: GenericToken, token_b: GenericToken) -> UniswapPair:
         transaction = self.contract.functions.createPair(
             token_a.get_address().value, token_b.get_address().value
         )
