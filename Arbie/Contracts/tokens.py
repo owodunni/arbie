@@ -5,9 +5,9 @@ from Arbie.Variables import Address, BigNumber, Token
 
 
 class GenericToken(Contract):
-    name = "bnb"
+    name = "erc20"
     protocol = "tokens"
-    abi = "bnb"
+    abi = "erc20"
 
     def __str__(self):
         return f"GenericToken, name: {self.get_name()}, address: {self.get_address().value}"

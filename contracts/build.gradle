@@ -1,18 +1,44 @@
-def balancerDir = file("$buildDir/balancer-core")
-def balancerRepo = "https://github.com/balancer-labs/balancer-core.git"
+def zepplinDir = "$buildDir/openzeppelin"
+def contractsDir = "$zepplinDir/contracts/"
 
-task cloneBalancer {
+def cloneRepo = {name, repo, repoDir, tag ->
+  task "clone${name.capitalize()}" {
+    group "Clone Repo"
+    description "Clone $name"
     doLast {
         exec {
             workingDir projectDir
-            commandLine "git", "clone", balancerRepo, balancerDir
+            commandLine "git", "clone", repo, repoDir
+            ignoreExitValue true
         }
         exec {
-            workingDir balancerDir
-            commandLine "git", "checkout", "v1.0.0"
+            workingDir repoDir
+            commandLine "git", "checkout", tag
+            ignoreExitValue true
         }
     }
-
-    outputs.dir balancerDir
+    outputs.dir repoDir
+  }
 }
 
+cloneRepo(
+  'balancer-core',
+  "https://github.com/balancer-labs/balancer-core.git",
+  file("$buildDir/balancer-core"),
+  'v1.0.0')
+
+
+cloneRepo(
+  'openzeppelin',
+  "https://github.com/OpenZeppelin/openzeppelin-contracts.git",
+  file(zepplinDir),
+  'v3.2.1-solc-0.7')
+
+task buildToken(type: Exec){
+  dependsOn cloneOpenzeppelin
+  workingDir contractsDir
+
+  commandLine "solc", "token/ERC20/ERC20.sol", "--allow-paths",
+              contractsDir, "-o", "$buildDir/bin", "--abi",
+              "--bin", "--ast-json", "--asm"
+}
