@@ -61,7 +61,7 @@ class ContractFactory(object):
             raise ValueError(f"{factory_class} dose not contain default parameters")
         self.factory_class = factory_class
 
-    def load_contract(self, owner_address: Address, **kwargs) -> Contract:
+    def load_contract(self, owner_address: Address = None, **kwargs) -> Contract:
         """Load contract require address or network to be passed in kwargs."""
         address = self._read_address(**kwargs)
         contract = self._load_contract(address)

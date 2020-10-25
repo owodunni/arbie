@@ -6,6 +6,7 @@ from web3 import Web3
 
 from Arbie.Actions import ActionTree, Store
 from Arbie.Contracts import BalancerFactory, ContractFactory, UniswapFactory
+from Arbie.Variables import Address
 
 default_store = Store()
 
@@ -43,16 +44,24 @@ class App(object):
     def _set_up_contracts(self):
         uni_factory = ContractFactory(self.w3, UniswapFactory)
         bal_factory = ContractFactory(self.w3, BalancerFactory)
-        network = self.config["network"]
+        network = self._get_config("Network")
         if network is not None:
-            self.store.add("uni_factory", uni_factory.load_contract(network=network))
-            self.store.add("bal_factory", bal_factory.load_contract(network=network))
+            self.store.add(
+                "uniswap_factory", uni_factory.load_contract(network=network)
+            )
+            self.store.add(
+                "balancer_factory", bal_factory.load_contract(network=network)
+            )
             return
 
-        uni_address = self.config["uniswap_address"]
-        bal_address = self.config["balancer_address"]
-        self.store.add("uni_factory", uni_factory.load_contract(address=uni_address))
-        self.store.add("bal_factory", bal_factory.load_contract(address=bal_address))
+        uni_address = Address(self.config["uniswap_address"])
+        bal_address = Address(self.config["balancer_address"])
+        self.store.add(
+            "uniswap_factory", uni_factory.load_contract(address=uni_address)
+        )
+        self.store.add(
+            "balanacer_factory", bal_factory.load_contract(address=bal_address)
+        )
 
     def _get_config(self, key):
         return self.config[key] if key in self.config else None

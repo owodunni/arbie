@@ -2,6 +2,7 @@
 
 from typing import List
 
+from Arbie import DeployContractError
 from Arbie.Contracts.contract import Contract, ContractFactory
 from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.Contracts.tokens import GenericToken
@@ -9,7 +10,6 @@ from Arbie.Variables import Address, BigNumber
 
 
 class UniswapPair(PoolContract):
-
     name = "pair"
     protocol = "uniswap"
     abi = "pair"
@@ -53,7 +53,6 @@ class UniswapPair(PoolContract):
 
 
 class UniswapFactory(Contract):
-
     name = "factory_v2"
     protocol = "uniswap"
     abi = "factory_v2"
@@ -65,16 +64,33 @@ class UniswapFactory(Contract):
         return Address(self.contract.functions.allPairs(index).call())
 
     def all_pairs(self) -> List[UniswapPair]:
-        cf = ContractFactory(self.w3, UniswapPair)
-        pairs = []
-        for i in range(0, self.all_pairs_length()):
-            pairs.append(
-                cf.load_contract(self.owner_address, address=self.get_pair_address(i))
-            )
-        return pairs
+        return list(
+            map(lambda i: self._create_pair_index(i), range(0, self.all_pairs_length()))
+        )
 
     def create_pair(self, token_a: GenericToken, token_b: GenericToken) -> UniswapPair:
         transaction = self.contract.functions.createPair(
             token_a.get_address().value, token_b.get_address().value
         )
-        return self._transact_status(transaction)
+
+        if not self._transact_status(transaction):
+            raise DeployContractError("Failed to deploy UniswapPair")
+
+        return self._create_pair_index(self.all_pairs_length() - 1)
+
+    def setup_pair(
+        self, tokens: List[GenericToken], amounts: List[BigNumber]
+    ) -> UniswapPair:
+        pair = self.create_pair(tokens[0], tokens[1])
+
+        for token, amount in zip(tokens, amounts):
+            token.transfer(pair.get_address(), amount)
+
+        pair.mint(self.owner_address)
+        return pair
+
+    def _create_pair_index(self, index) -> UniswapPair:
+        cf = ContractFactory(self.w3, UniswapPair)
+        return cf.load_contract(
+            self.owner_address, address=self.get_pair_address(index)
+        )

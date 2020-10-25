@@ -5,7 +5,7 @@ class BigNumber(object):
     """BigNumber is used for creating etheruem friendly numbers."""
 
     def __init__(self, value, exp=18):
-        self.value = value * 10 ** exp
+        self.value = int(round(value * 10 ** exp))
         self.exp = exp
 
     def __eq__(self, other):

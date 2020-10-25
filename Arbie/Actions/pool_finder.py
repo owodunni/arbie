@@ -1,29 +1,30 @@
 """Pool finder is responsible for finding all pools."""
 from typing import List
 
-from Arbie.Contracts import Pair
+from Arbie.Actions.action import Action
+from Arbie.Contracts import UniswapPair
 from Arbie.Variables import Token
 
 
 class TokenFinder(object):
-    def __init__(self, pairs: List[Pair]):
+    def __init__(self, pairs: List[UniswapPair]):
         self.pairs = pairs
 
     def get_tokens(self):
         return None
 
 
-class PoolFinder(object):
+class PoolFinder(Action):
     """PoolFinder is responsible for finding pools.
 
     [Settings]
-    inputs:
-        uni_factory: uni_factory
-        bal_factory: bal_factory
-    outputs:
+    input:
+        uniswap_factory: uniswap_factory
+        balanacer_factory: balancer_factory
+    output:
         pools: all_pools
         tokens: all_tokens
-        unit_of_account: eth
+        unit_of_account: weth
     """
 
     def on_next(self, data):
@@ -42,7 +43,7 @@ class PoolFinder(object):
         data.pools(pools)
         data.unit_of_account(
             Token(
-                "eth",
+                "weth",
                 1,
             )
         )
