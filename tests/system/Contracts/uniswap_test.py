@@ -19,7 +19,7 @@ def factory(deploy_address, w3) -> UniswapFactory:
 
 @pytest.fixture
 def factory_with_pair(factory, dai, weth) -> UniswapFactory:
-    assert factory.create_pair(dai, weth)
+    factory.create_pair(dai, weth)
     return factory
 
 
