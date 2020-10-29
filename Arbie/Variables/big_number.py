@@ -20,4 +20,4 @@ class BigNumber(object):
         return bg
 
     def to_number(self):
-        return self.value / (10 ** self.exp)
+        return int(round(self.value / (10 ** self.exp)))

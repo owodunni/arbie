@@ -35,9 +35,11 @@ def token_factory(w3) -> ContractFactory:
     return ContractFactory(w3, GenericToken)
 
 
+large_number = int(10e10)
+
 @pytest.fixture
 def dai(deploy_address, token_factory) -> GenericToken:
-    token = token_factory.deploy_contract(deploy_address, 100000000, "Dai", 18, "DAI")
+    token = token_factory.deploy_contract(deploy_address, "Dai", "DAI", large_number)
     token.approve_owner()
     return token
 
@@ -45,7 +47,7 @@ def dai(deploy_address, token_factory) -> GenericToken:
 @pytest.fixture
 def weth(deploy_address, token_factory) -> GenericToken:
     token = token_factory.deploy_contract(
-        deploy_address, 1000000000, "Weth", 18, "WETH"
+        deploy_address, "Weth", "WETH", large_number
     )
     token.approve_owner()
     return token
@@ -53,7 +55,7 @@ def weth(deploy_address, token_factory) -> GenericToken:
 
 @pytest.fixture
 def yam(deploy_address, token_factory) -> GenericToken:
-    token = token_factory.deploy_contract(deploy_address, 10000000000, "yam", 18, "YAM")
+    token = token_factory.deploy_contract(deploy_address, "yam", "YAM", large_number)
     token.approve_owner()
     return token
 
@@ -61,7 +63,7 @@ def yam(deploy_address, token_factory) -> GenericToken:
 @pytest.fixture
 def wbtc(deploy_address, token_factory) -> GenericToken:
     token = token_factory.deploy_contract(
-        deploy_address, 100000000000, "Wbtc", 18, "WBTC"
+        deploy_address, "Wbtc", "WBTC", large_number
     )
     token.approve_owner()
     return token
