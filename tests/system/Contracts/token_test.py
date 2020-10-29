@@ -5,8 +5,8 @@ from Arbie.Contracts import ContractFactory
 from Arbie.Contracts.tokens import GenericToken
 from Arbie.Variables import BigNumber
 
-
 bg10 = BigNumber(10)
+
 
 @pytest.fixture
 def token_factory(w3) -> ContractFactory:
@@ -23,6 +23,10 @@ def test_equals(dai, token_factory):
         owner_address=dai.owner_address, address=dai.get_address()
     )
     assert dai == dai2
+
+
+def test_decimals(dai: GenericToken):
+    assert dai.decimals() == 18
 
 
 def test_approve(dai: GenericToken, deploy_address):
