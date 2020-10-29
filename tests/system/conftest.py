@@ -5,7 +5,7 @@ from web3 import Web3
 
 from Arbie.Contracts.contract import ContractFactory
 from Arbie.Contracts.tokens import GenericToken
-from Arbie.Variables import Address
+from Arbie.Variables import Address, BigNumber
 
 
 @pytest.fixture
@@ -35,11 +35,11 @@ def token_factory(w3) -> ContractFactory:
     return ContractFactory(w3, GenericToken)
 
 
-large_number = int(10e10)
+large_number = BigNumber(10e6)
 
 @pytest.fixture
 def dai(deploy_address, token_factory) -> GenericToken:
-    token = token_factory.deploy_contract(deploy_address, "Dai", "DAI", large_number)
+    token = token_factory.deploy_contract(deploy_address, "Dai", "DAI", large_number.value)
     token.approve_owner()
     return token
 
@@ -47,7 +47,7 @@ def dai(deploy_address, token_factory) -> GenericToken:
 @pytest.fixture
 def weth(deploy_address, token_factory) -> GenericToken:
     token = token_factory.deploy_contract(
-        deploy_address, "Weth", "WETH", large_number
+        deploy_address, "Weth", "WETH", large_number.value
     )
     token.approve_owner()
     return token
@@ -55,7 +55,7 @@ def weth(deploy_address, token_factory) -> GenericToken:
 
 @pytest.fixture
 def yam(deploy_address, token_factory) -> GenericToken:
-    token = token_factory.deploy_contract(deploy_address, "yam", "YAM", large_number)
+    token = token_factory.deploy_contract(deploy_address, "yam", "YAM", large_number.value)
     token.approve_owner()
     return token
 
@@ -63,7 +63,7 @@ def yam(deploy_address, token_factory) -> GenericToken:
 @pytest.fixture
 def wbtc(deploy_address, token_factory) -> GenericToken:
     token = token_factory.deploy_contract(
-        deploy_address, "Wbtc", "WBTC", large_number
+        deploy_address, "Wbtc", "WBTC", large_number.value
     )
     token.approve_owner()
     return token
