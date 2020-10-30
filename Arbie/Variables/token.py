@@ -7,7 +7,7 @@ from Arbie.Variables.address import Address
 class Token(object):
     """Token is a light weight representation of a ERC20 token."""
 
-    def __init__(self, name: str, price=-1, address: Address = None):
+    def __init__(self, name: str, price: float = None, address: Address = None):
         self.name = name
         self.price = price
         self.address = address
