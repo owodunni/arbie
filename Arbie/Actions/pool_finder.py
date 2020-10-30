@@ -4,26 +4,29 @@ from typing import List
 from Arbie.Actions.action import Action
 from Arbie.Contracts import UniswapPair
 from Arbie.Contracts.pool_contract import PoolContract
-from Arbie.Variables import Token, Tokens, Pools
+from Arbie.Variables import Pools, Token, Tokens
 
 
-def create_tokens_and_pairs(uniswap_pairs: List[UniswapPair], uoa: Token) -> List[Token]:
+def create_tokens_and_pairs(
+    uniswap_pairs: List[UniswapPair], uoa: Token
+) -> List[Token]:
     token_set = set()
     token_set.add(uoa)
     for pair in uniswap_pairs:
-        tokens = pair.get_tokens()
+        t0 = pair.get_token0()
+        t1 = pair.get_token1()
         balances = pair.get_balances()
-        if uoa.address == tokens[0].get_address():
-            token_set.add(
-                tokens[1].create_token(balances[0]/balances[1]))
-        elif uoa.address == tokens[1].get_address():
-            token_set.add(
-                tokens[0].create_token(balances[1] / balances[0]))
+        if uoa.address == t0.get_address():
+            token_set.add(t1.create_token(balances[0] / balances[1]))
+        elif uoa.address == t1.get_address():
+            token_set.add(t0.create_token(balances[1] / balances[0]))
 
     return list(token_set)
 
 
-def create_and_filter_pools(pool_contracts: List[PoolContract], tokens: List[Tokens]) -> Pools:
+def create_and_filter_pools(
+    pool_contracts: List[PoolContract], tokens: List[Tokens]
+) -> Pools:
     pools = []
     for contract in pool_contracts:
         pool = contract.create_pool()
@@ -36,7 +39,6 @@ def create_and_filter_pools(pool_contracts: List[PoolContract], tokens: List[Tok
                 token.price = tokens[index].price
         pools.append(pool)
     return pools
-
 
 
 class PoolFinder(Action):
@@ -53,15 +55,15 @@ class PoolFinder(Action):
     """
 
     def on_next(self, data):
-        uniswap_factory = data.uniswap_factory()
-        balancer_factory = data.balancer_factory()
         weth = data.weth()
 
-        uniswap_pairs = uniswap_factory.all_pairs()
-        balancer_pools = balancer_factory.all_pools()
+        uniswap_pairs = data.uniswap_factory().all_pairs()
+        balancer_pools = data.balancer_factory().all_pools()
         tokens = create_tokens_and_pairs(uniswap_pairs, weth)
 
-        pools = create_and_filter_pools(uniswap_pairs, tokens) + create_and_filter_pools(balancer_pools, tokens)
+        pools = create_and_filter_pools(
+            uniswap_pairs, tokens
+        ) + create_and_filter_pools(balancer_pools, tokens)
 
         data.pools(pools)
         data.tokens(tokens)

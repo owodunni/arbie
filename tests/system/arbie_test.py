@@ -110,5 +110,5 @@ class TestApp(object):
     def test_run(self, app):
         app.run()
         assert len(app.store.state.keys()) == 5
-        assert len(app.store.get('all_pools')) == 6
-        assert len(app.store.get('all_tokens')) == 3
+        assert len(app.store.get("all_pools")) == 6
+        assert len(app.store.get("all_tokens")) == 3
