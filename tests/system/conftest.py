@@ -35,7 +35,7 @@ def token_factory(w3) -> ContractFactory:
     return ContractFactory(w3, GenericToken)
 
 
-large_number = BigNumber(10e6)
+large_number = BigNumber(10e14)
 
 @pytest.fixture
 def dai(deploy_address, token_factory) -> GenericToken:

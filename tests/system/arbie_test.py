@@ -8,9 +8,9 @@ from Arbie.Contracts import BalancerFactory, ContractFactory, UniswapFactory
 from Arbie.Contracts.tokens import GenericToken
 from Arbie.Variables import BigNumber
 
-small = 10000
-medium = 1000000
-large = 100000000
+small = 10e4
+medium = 10e6
+large = 10e8
 
 
 def to_big_number(token: GenericToken, amount) -> BigNumber:
@@ -85,10 +85,11 @@ def pair_factory(
 
 
 @pytest.fixture
-def config_file(web3_server, pool_factory, pair_factory):
+def config_file(web3_server, weth, pool_factory, pair_factory):
     return f"""
 
     web3_address: {web3_server}
+    weth_address: '{weth.get_address()}'
     uniswap_address: '{pair_factory.get_address()}'
     balancer_address: '{pool_factory.get_address()}'
 
@@ -98,8 +99,16 @@ def config_file(web3_server, pool_factory, pair_factory):
 
 
 class TestApp(object):
-    def test_create(self, config_file):
+    @pytest.fixture()
+    def app(self, config_file):
         config = yaml.safe_load(config_file)
         app = App(config)
         assert len(app.action_tree.actions) == 1
-        assert len(app.store.state.keys()) == 2
+        assert len(app.store.state.keys()) == 3
+        return app
+
+    def test_run(self, app):
+        app.run()
+        assert len(app.store.state.keys()) == 5
+        assert len(app.store.get('all_pools')) == 6
+        assert len(app.store.get('all_tokens')) == 3

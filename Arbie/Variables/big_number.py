@@ -13,6 +13,9 @@ class BigNumber(object):
             return self.value == other.value and self.exp == other.exp
         return self.value == other
 
+    def __truediv__(self, other):
+        return self.to_number() / other.to_number()
+
     @classmethod
     def from_value(cls, value, exp=18):
         bg = cls(0, exp)

@@ -3,15 +3,40 @@ from typing import List
 
 from Arbie.Actions.action import Action
 from Arbie.Contracts import UniswapPair
-from Arbie.Variables import Token
+from Arbie.Contracts.pool_contract import PoolContract
+from Arbie.Variables import Token, Tokens, Pools
 
 
-class TokenFinder(object):
-    def __init__(self, pairs: List[UniswapPair]):
-        self.pairs = pairs
+def create_tokens_and_pairs(uniswap_pairs: List[UniswapPair], uoa: Token) -> List[Token]:
+    token_set = set()
+    token_set.add(uoa)
+    for pair in uniswap_pairs:
+        tokens = pair.get_tokens()
+        balances = pair.get_balances()
+        if uoa.address == tokens[0].get_address():
+            token_set.add(
+                tokens[1].create_token(balances[0]/balances[1]))
+        elif uoa.address == tokens[1].get_address():
+            token_set.add(
+                tokens[0].create_token(balances[1] / balances[0]))
 
-    def get_tokens(self):
-        return None
+    return list(token_set)
+
+
+def create_and_filter_pools(pool_contracts: List[PoolContract], tokens: List[Tokens]) -> Pools:
+    pools = []
+    for contract in pool_contracts:
+        pool = contract.create_pool()
+        for token in pool.tokens:
+            try:
+                index = tokens.index(token)
+            except ValueError:
+                continue
+            if token in tokens:
+                token.price = tokens[index].price
+        pools.append(pool)
+    return pools
+
 
 
 class PoolFinder(Action):
@@ -19,31 +44,24 @@ class PoolFinder(Action):
 
     [Settings]
     input:
+        weth: weth
         uniswap_factory: uniswap_factory
-        balanacer_factory: balancer_factory
+        balancer_factory: balancer_factory
     output:
         pools: all_pools
         tokens: all_tokens
-        unit_of_account: weth
     """
 
     def on_next(self, data):
-        uniswap_factory = data.uni_factory()
-        balancer_factory = data.bal_factory()
+        uniswap_factory = data.uniswap_factory()
+        balancer_factory = data.balancer_factory()
+        weth = data.weth()
 
-        pairs = uniswap_factory.all_pairs()
-        data.tokens(TokenFinder(pairs).get_tokens())
+        uniswap_pairs = uniswap_factory.all_pairs()
+        balancer_pools = balancer_factory.all_pools()
+        tokens = create_tokens_and_pairs(uniswap_pairs, weth)
 
-        pairs = pairs + balancer_factory.all_pools()
+        pools = create_and_filter_pools(uniswap_pairs, tokens) + create_and_filter_pools(balancer_pools, tokens)
 
-        pools = []
-
-        for pool in pairs:
-            pools.append(pool.create_pool())
         data.pools(pools)
-        data.unit_of_account(
-            Token(
-                "weth",
-                1,
-            )
-        )
+        data.tokens(tokens)
