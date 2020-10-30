@@ -64,9 +64,7 @@ class UniswapFactory(Contract):
         return Address(self.contract.functions.allPairs(index).call())
 
     def all_pairs(self) -> List[UniswapPair]:
-        return list(
-            map(lambda i: self._create_pair_index(i), range(0, self.all_pairs_length()))
-        )
+        return list(map(self._create_pair_index, range(0, self.all_pairs_length())))
 
     def create_pair(self, token_a: GenericToken, token_b: GenericToken) -> UniswapPair:
         transaction = self.contract.functions.createPair(
