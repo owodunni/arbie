@@ -2,7 +2,7 @@ name: Python Branch Workflow
 on: [push, pull_request]
 
 jobs:
-  build:
+  build-python:
 
     runs-on: ubuntu-latest
 
