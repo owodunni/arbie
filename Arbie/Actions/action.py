@@ -73,10 +73,10 @@ class Action(object):
         if config is None:
             return self.settings
 
-        if self.input_key in config:
+        if self.input_key in config and config[self.input_key] is not None:
             self._emplace_settings(config[self.input_key], self.get_input_settings())
 
-        if self.output_key in config:
+        if self.output_key in config and config[self.output_key] is not None:
             self._emplace_settings(config[self.output_key], self.get_output_settings())
 
         return self.settings
