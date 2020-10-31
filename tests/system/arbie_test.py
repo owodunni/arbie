@@ -40,13 +40,13 @@ def pool_factory(
     factory.setup_pool(
         [weth, wbtc],
         [5, 1],
-        [to_big_number(weth, large / 301.0), to_big_number(wbtc, large / 10000)],
+        [to_big_number(weth, 5* large / 301.0), to_big_number(wbtc, large / 10000)],
     )
     factory.setup_pool(
         [weth, dai, wbtc],
         [2, 1, 1],
         [
-            to_big_number(weth, medium / 301.0),
+            to_big_number(weth, 2 * medium / 301.0),
             to_big_number(dai, medium / 1.1),
             to_big_number(wbtc, large / 10020),
         ],
@@ -85,18 +85,43 @@ def pair_factory(
 
 
 @pytest.fixture
-def config_file(web3_server, weth, pool_factory, pair_factory):
+def base_config(web3_server, weth, pool_factory, pair_factory):
     return f"""
 
     web3_address: {web3_server}
     weth_address: '{weth.get_address()}'
     uniswap_address: '{pair_factory.get_address()}'
     balancer_address: '{pool_factory.get_address()}'
+    """
 
+@pytest.fixture
+def config_file(base_config):
+    return base_config + """
     actions:
         PoolFinder:
     """
 
+@pytest.fixture
+def full_config(base_config):
+    return base_config + """
+    actions:
+        PoolFinder:
+            input:
+            output:
+                pools: pools
+                tokens: tokens
+        PathFinder:
+            input:
+                pools: pools
+                unit_of_account: weth
+            output:
+                trades: trades
+        Arbitrage:
+            input:
+                trades: trades
+            output:
+
+    """
 
 class TestApp(object):
     @pytest.fixture()
@@ -112,3 +137,8 @@ class TestApp(object):
         assert len(app.store.state.keys()) == 5
         assert len(app.store.get("all_pools")) == 6
         assert len(app.store.get("all_tokens")) == 3
+
+    def test_full_pipeline(self, full_config):
+        config = yaml.safe_load(full_config)
+        app = App(config)
+        app.run()
