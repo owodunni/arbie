@@ -40,7 +40,10 @@ def pool_factory(
     factory.setup_pool(
         [weth, wbtc],
         [5, 1],
-        [to_big_number(weth, 5* large / 301.0), to_big_number(wbtc, large / 10000)],
+        [
+            to_big_number(weth, 5 * large / 301.0),
+            to_big_number(wbtc, large / 10000),
+        ],  # noqa: WPS221
     )
     factory.setup_pool(
         [weth, dai, wbtc],
@@ -94,16 +97,23 @@ def base_config(web3_server, weth, pool_factory, pair_factory):
     balancer_address: '{pool_factory.get_address()}'
     """
 
+
 @pytest.fixture
 def config_file(base_config):
-    return base_config + """
+    return (
+        base_config
+        + """
     actions:
         PoolFinder:
     """
+    )
+
 
 @pytest.fixture
 def full_config(base_config):
-    return base_config + """
+    return (
+        base_config
+        + """
     actions:
         PoolFinder:
             input:
@@ -122,6 +132,8 @@ def full_config(base_config):
             output:
 
     """
+    )
+
 
 class TestApp(object):
     @pytest.fixture()
@@ -136,7 +148,8 @@ class TestApp(object):
         app.run()
         assert len(app.store.state.keys()) == 5
         assert len(app.store.get("all_pools")) == 6
-        assert len(app.store.get("all_tokens")) == 3
+        tokens = app.store.get("all_tokens")
+        assert len(tokens) == 3
 
     def test_full_pipeline(self, full_config):
         config = yaml.safe_load(full_config)
