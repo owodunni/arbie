@@ -8,9 +8,10 @@ from Arbie.Actions import ActionTree, Store
 from Arbie.Contracts import (
     BalancerFactory,
     ContractFactory,
-    GenericToken,
+    IERC20Token,
     UniswapFactory,
 )
+from Arbie.Contracts.contract import fromStr
 from Arbie.Variables import Address
 
 default_store = Store()
@@ -50,8 +51,9 @@ class App(object):
     def _set_up_contracts(self):
         uni_factory = ContractFactory(self.w3, UniswapFactory)
         bal_factory = ContractFactory(self.w3, BalancerFactory)
-        network = self._get_config("Network")
-        if network is not None:
+        network_str = self._get_config("network")
+        if network_str is not None:
+            network = fromStr(network_str)
             self.store.add(
                 "uniswap_factory", uni_factory.load_contract(network=network)
             )
@@ -69,7 +71,7 @@ class App(object):
             )
 
     def _set_up_weth(self):
-        weth_factory = ContractFactory(self.w3, GenericToken)
+        weth_factory = ContractFactory(self.w3, IERC20Token)
 
         weth_address = Address(self.config["weth_address"])
         self.store.add(

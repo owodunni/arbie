@@ -15,6 +15,15 @@ class Network(Enum):
     ropsten = 2
 
 
+def fromStr(string: str) -> Network:
+    if string.lower() == "mainnet":
+        return Network.mainnet
+    elif string.lower() == "kovan":
+        return Network.kovan
+    else:
+        return Network.ropsten
+
+
 def transact(w3, address: Address, transaction):
     """Transact a transaction and return transaction receipt."""
     tx_hash = transaction.transact(
