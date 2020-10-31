@@ -1,5 +1,6 @@
 """Utility functions for interacting with balancer."""
 
+import logging
 from typing import List
 
 from Arbie import DeployContractError
@@ -7,6 +8,8 @@ from Arbie.Contracts.contract import Contract, ContractFactory
 from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.Contracts.tokens import GenericToken
 from Arbie.Variables import Address, BigNumber
+
+logger = logging.getLogger()
 
 
 class BalancerPool(PoolContract):
@@ -101,9 +104,18 @@ class BalancerFactory(Contract):
             self.owner_address, address=address
         )
 
-    def all_pools(self) -> List[BalancerPool]:
-        event_filter = self.contract.events.LOG_NEW_POOL.createFilter(fromBlock=0)
-        return self._create_pools(event_filter.get_all_entries())
+    def all_pools(self, start=0, steps=100) -> List[BalancerPool]:
+        last_block = self.w3.eth.blockNumber
+        events = []
+        for from_block in range(start, last_block, steps):
+            to_block = from_block + steps - 1
+            if to_block > last_block:
+                to_block = last_block
+            logger.info(
+                f"Searching for Pools in block range [{from_block}:{to_block}], total pools found: {len(events)}"
+            )
+            events.extend(self._get_pool_events(from_block, to_block))
+        return self._create_pools(events)
 
     def _create_pools(self, new_pool_event):
         pools = []
@@ -115,3 +127,8 @@ class BalancerFactory(Contract):
             )
             pools.append(pool)
         return pools
+
+    def _get_pool_events(self, from_block, to_block):
+        return self.contract.events.LOG_NEW_POOL.createFilter(
+            fromBlock=int(from_block), toBlock=int(to_block)
+        ).get_all_entries()

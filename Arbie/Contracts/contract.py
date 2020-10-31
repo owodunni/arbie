@@ -15,13 +15,12 @@ class Network(Enum):
     ropsten = 2
 
 
-def fromStr(string: str) -> Network:
+def to_network(string: str) -> Network:
     if string.lower() == "mainnet":
         return Network.mainnet
     elif string.lower() == "kovan":
         return Network.kovan
-    else:
-        return Network.ropsten
+    return Network.ropsten
 
 
 def transact(w3, address: Address, transaction):
