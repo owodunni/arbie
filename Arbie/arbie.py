@@ -11,7 +11,7 @@ from Arbie.Contracts import (
     IERC20Token,
     UniswapFactory,
 )
-from Arbie.Contracts.contract import fromStr
+from Arbie.Contracts.contract import to_network  # noqa: WPS347
 from Arbie.Variables import Address
 
 default_store = Store()
@@ -51,14 +51,15 @@ class App(object):
     def _set_up_contracts(self):
         uni_factory = ContractFactory(self.w3, UniswapFactory)
         bal_factory = ContractFactory(self.w3, BalancerFactory)
-        network_str = self._get_config("network")
-        if network_str is not None:
-            network = fromStr(network_str)
+        network = self._get_config("network")
+        if network is not None:
             self.store.add(
-                "uniswap_factory", uni_factory.load_contract(network=network)
+                "uniswap_factory",
+                uni_factory.load_contract(network=to_network(network)),
             )
             self.store.add(
-                "balancer_factory", bal_factory.load_contract(network=network)
+                "balancer_factory",
+                bal_factory.load_contract(network=to_network(network)),
             )
         else:
             uni_address = Address(self.config["uniswap_address"])

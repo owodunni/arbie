@@ -21,9 +21,9 @@ import Arbie
 from Arbie.arbie import App
 
 
-def setup_logging():
+def setup_logging(severity=logging.INFO):
     logging.basicConfig(
-        level=logging.INFO,
+        level=severity,
         format="%(name)-12s: %(levelname)-8s %(message)s",  # noqa: WPS323
         datefmt="%m-%d %H:%M",  # noqa: WPS323
     )

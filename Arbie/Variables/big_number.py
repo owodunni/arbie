@@ -22,5 +22,5 @@ class BigNumber(object):
         bg.value = value
         return bg
 
-    def to_number(self):
-        return int(round(self.value / (10 ** self.exp)))
+    def to_number(self) -> float:
+        return self.value / (10 ** self.exp)
