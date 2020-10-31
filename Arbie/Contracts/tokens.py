@@ -4,16 +4,10 @@ from Arbie.Contracts.contract import Contract
 from Arbie.Variables import Address, BigNumber, Token
 
 
-class GenericToken(Contract):
-    name = "erc20"
+class IERC20Token(Contract):
+    name = "ierc20"
     protocol = "tokens"
-    abi = "erc20"
-
-    def __str__(self):
-        return f"GenericToken, name: {self.get_name()}, address: {self.get_address().value}"
-
-    def __repr__(self):
-        return self.__str__()
+    abi = "ierc20"
 
     def __eq__(self, other):
         return self.get_address() == other.get_address()
@@ -36,8 +30,20 @@ class GenericToken(Contract):
     def approve_owner(self):
         return self.approve(self.owner_address, self.balance_of(self.owner_address))
 
+    def create_token(self, price=0):
+        return Token("", price, self.get_address())
+
+
+class GenericToken(IERC20Token):
+    name = "erc20"
+    protocol = "tokens"
+    abi = "erc20"
+
+    def __str__(self):
+        return f"GenericToken, name: {self.get_name()}, address: {self.get_address().value}"
+
+    def __repr__(self):
+        return self.__str__()
+
     def get_name(self):
         return self.contract.functions.name().call()
-
-    def create_token(self, price=0):
-        return Token(self.get_name(), price, self.get_address())
