@@ -18,7 +18,7 @@ class Network(Enum):
 def to_network(string: str) -> Network:
     if string.lower() == "mainnet":
         return Network.mainnet
-    elif string.lower() == "kovan":
+    if string.lower() == "kovan":
         return Network.kovan
     return Network.ropsten
 
