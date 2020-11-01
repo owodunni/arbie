@@ -4,6 +4,7 @@ import logging
 from typing import List
 
 from Arbie import DeployContractError
+from Arbie.Contracts.circuit_breaker import CircuitBreaker
 from Arbie.Contracts.contract import Contract, ContractFactory
 from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.Contracts.tokens import GenericToken
@@ -129,6 +130,8 @@ class BalancerFactory(Contract):
         return pools
 
     def _get_pool_events(self, from_block, to_block):
-        return self.contract.events.LOG_NEW_POOL.createFilter(
+        func = self.contract.events.LOG_NEW_POOL.createFilter(
             fromBlock=int(from_block), toBlock=int(to_block)
-        ).get_all_entries()
+        ).get_all_entries
+        breaker = CircuitBreaker(3, 10, func)
+        return breaker.safe_call()

@@ -3,6 +3,7 @@
 from typing import List
 
 from Arbie import DeployContractError
+from Arbie.Contracts.circuit_breaker import CircuitBreaker
 from Arbie.Contracts.contract import Contract, ContractFactory
 from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.Contracts.tokens import GenericToken
@@ -92,6 +93,6 @@ class UniswapFactory(Contract):
 
     def _create_pair_index(self, index) -> UniswapPair:
         cf = ContractFactory(self.w3, UniswapPair)
-        return cf.load_contract(
-            self.owner_address, address=self.get_pair_address(index)
-        )
+        breaker = CircuitBreaker(3, 10, self.get_pair_address)
+        address = breaker.safe_call(index)
+        return cf.load_contract(self.owner_address, address=address)
