@@ -17,9 +17,12 @@ def create_tokens_and_pairs(
     for pair in uniswap_pairs:
         t0 = pair.get_token0()
         t1 = pair.get_token1()
+        balances = None
         try:
             balances = pair.get_balances()
         except BadFunctionCallOutput:
+            continue
+        if balances[0] == 0 or balances[1] == 0:
             continue
         if uoa.address == t0.get_address():
             token_set.add(t1.create_token(balances[0] / balances[1]))
