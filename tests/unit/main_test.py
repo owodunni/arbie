@@ -12,7 +12,7 @@ def config_file():
     actions:
         PathFinder:
             input:
-                unit_of_account: eth
+                unit_of_account: weth
                 min_liquidity: 4
             output:
                 cycles: found_cycles

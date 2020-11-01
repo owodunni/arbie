@@ -105,6 +105,8 @@ def config_file(base_config):
         + """
     actions:
         PoolFinder:
+            input:
+                balancer_start: 0
     """
     )
 
@@ -117,6 +119,7 @@ def full_config(base_config):
     actions:
         PoolFinder:
             input:
+                balancer_start: 0
             output:
                 pools: pools
                 tokens: tokens
