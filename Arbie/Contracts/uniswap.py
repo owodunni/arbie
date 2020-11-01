@@ -3,7 +3,7 @@
 import logging
 from typing import List
 
-from Arbie import DeployContractError
+from Arbie import DeployContractError, IERC20TokenError
 from Arbie.Contracts.circuit_breaker import CircuitBreaker
 from Arbie.Contracts.contract import Contract, ContractFactory
 from Arbie.Contracts.pool_contract import PoolContract
@@ -39,7 +39,10 @@ class UniswapPair(PoolContract):
 
         bg_reservers = []
         for reserve, token in zip(reserves, self.get_tokens()):
-            exp = token.decimals()
+            try:
+                exp = token.decimals()
+            except Exception:
+                raise IERC20TokenError("Token doesn't contain decimals.")
             bg_reservers.append(BigNumber.from_value(reserve, exp))
 
         return bg_reservers

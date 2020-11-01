@@ -4,7 +4,7 @@ import pytest
 from web3 import Web3
 
 from Arbie.Contracts.contract import ContractFactory
-from Arbie.Contracts.tokens import GenericToken
+from Arbie.Contracts.tokens import BadERC20Token, GenericToken
 from Arbie.Variables import Address, BigNumber
 
 
@@ -72,3 +72,10 @@ def wbtc(deploy_address, token_factory) -> GenericToken:
     )
     token.approve_owner()
     return token
+
+
+@pytest.fixture
+def bad(deploy_address, w3) -> BadERC20Token:
+    return ContractFactory(w3, BadERC20Token).deploy_contract(
+        deploy_address, large_number.value
+    )

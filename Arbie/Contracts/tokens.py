@@ -34,6 +34,12 @@ class IERC20Token(Contract):
         return Token("", price, self.get_address())
 
 
+class BadERC20Token(IERC20Token):
+    name = "baderc20"
+    protocol = "tokens"
+    abi = "baderc20"
+
+
 class GenericToken(IERC20Token):
     name = "erc20"
     protocol = "tokens"

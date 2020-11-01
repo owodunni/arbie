@@ -23,6 +23,7 @@ def pool_factory(
     weth: GenericToken,
     yam: GenericToken,
     wbtc: GenericToken,
+    bad,
     w3,
     deploy_address,
 ) -> BalancerFactory:
@@ -37,6 +38,16 @@ def pool_factory(
             to_big_number(yam, small / 0.1),
         ],
     )
+    factory.setup_pool(
+        [bad, dai],
+        [5, 5, 5],
+        [
+            BigNumber(100),
+            to_big_number(dai, small / 0.9),
+        ],
+        approve_owner=False,
+    )
+
     factory.setup_pool(
         [weth, wbtc],
         [5, 1],
@@ -63,6 +74,7 @@ def pair_factory(
     weth: GenericToken,
     yam: GenericToken,
     wbtc: GenericToken,
+    bad,
     w3,
     deploy_address,
 ) -> UniswapFactory:
@@ -84,6 +96,7 @@ def pair_factory(
         [weth, wbtc],
         [to_big_number(weth, large / 300), to_big_number(wbtc, large / 10000)],
     )
+    factory.create_pair(weth, bad)
     return factory
 
 
