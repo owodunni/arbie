@@ -2,4 +2,8 @@
 
 
 class DeployContractError(Exception):
-    """Raises when a contract could not be deployed."""
+    """Raised when a contract can not be deployed."""
+
+
+class IERC20TokenError(Exception):
+    """Raised when a IErc20 token is not Erc20 compliant."""

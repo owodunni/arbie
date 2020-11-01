@@ -1,8 +1,7 @@
 """Pool finder is responsible for finding all pools."""
 from typing import List
 
-from web3.exceptions import BadFunctionCallOutput
-
+from Arbie import IERC20TokenError
 from Arbie.Actions.action import Action
 from Arbie.Contracts import UniswapPair
 from Arbie.Contracts.pool_contract import PoolContract
@@ -20,7 +19,7 @@ def create_tokens_and_pairs(
         balances = None
         try:
             balances = pair.get_balances()
-        except BadFunctionCallOutput:
+        except IERC20TokenError:
             continue
         if balances[0] == 0 or balances[1] == 0:
             continue
@@ -37,10 +36,14 @@ def create_and_filter_pools(
 ) -> Pools:
     pools = []
     for contract in pool_contracts:
-        pool = contract.create_pool()
+        try:
+            pool = contract.create_pool()
+        except IERC20TokenError:
+            continue
         for token in pool.tokens:
             try:
                 index = tokens.index(token)
+            # Token not found in pool
             except ValueError:
                 continue
             if token in tokens:

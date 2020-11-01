@@ -3,7 +3,7 @@
 import logging
 from typing import List
 
-from Arbie import DeployContractError
+from Arbie import DeployContractError, IERC20TokenError
 from Arbie.Contracts.circuit_breaker import CircuitBreaker
 from Arbie.Contracts.contract import Contract, ContractFactory
 from Arbie.Contracts.pool_contract import PoolContract
@@ -14,7 +14,6 @@ logger = logging.getLogger()
 
 
 class BalancerPool(PoolContract):
-
     name = "pool"
     protocol = "balancer"
     abi = "bpool"
@@ -41,7 +40,10 @@ class BalancerPool(PoolContract):
         balances = []
         for token in tokens:
             b = self.contract.functions.getBalance(token.get_address().value).call()
-            balances.append(BigNumber.from_value(b, token.decimals()))
+            try:
+                balances.append(BigNumber.from_value(b, token.decimals()))
+            except Exception:
+                raise IERC20TokenError("Bad token in balancer pool")
         return balances
 
     def get_weights(self) -> List[float]:
@@ -82,19 +84,24 @@ class BalancerFactory(Contract):
     abi = "pool_factory"
 
     def setup_pool(
-        self, tokens: List[GenericToken], weights: List[float], amounts: List[BigNumber]
+        self,
+        tokens: List[GenericToken],
+        weights: List[float],
+        amounts: List[BigNumber],
+        approve_owner=True,
     ) -> BalancerPool:
         pool = self.new_pool()
 
         for token, weight, amount in zip(tokens, weights, amounts):
-            token.approve_owner()
+            if approve_owner:
+                token.approve_owner()
             token.approve(pool.get_address(), amount)
             pool.bind(token.get_address(), amount, weight)
 
         pool.finalize()
         return pool
 
-    def new_pool(self) -> bool:
+    def new_pool(self) -> BalancerPool:
         transaction = self.contract.functions.newBPool()
         status, address = self._transact_status_and_contract(transaction)
 
