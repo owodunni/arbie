@@ -22,6 +22,6 @@ class CircuitBreaker(object):
                 return self.func(*args)
             except Exception as e:
                 logger.warning(f"Failed to use network resource, retry number {i}")
-                if i == self.retries:
+                if i == self.retries -1:
                     raise e
                 time.sleep(self.timeout)
