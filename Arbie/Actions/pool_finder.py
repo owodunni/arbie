@@ -49,6 +49,7 @@ class PoolFinder(Action):
         weth: weth
         uniswap_factory: uniswap_factory
         balancer_factory: balancer_factory
+        balancer_start: 9562480
     output:
         pools: all_pools
         tokens: all_tokens
@@ -58,7 +59,7 @@ class PoolFinder(Action):
         weth = data.weth()
 
         uniswap_pairs = data.uniswap_factory().all_pairs()
-        balancer_pools = data.balancer_factory().all_pools()
+        balancer_pools = data.balancer_factory().all_pools(data.balancer_start(), 100)
         tokens = create_tokens_and_pairs(uniswap_pairs, weth)
 
         pools = create_and_filter_pools(

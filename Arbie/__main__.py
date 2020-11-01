@@ -37,4 +37,4 @@ def main(argv=None):
     config = None
     with open(path_to_file, "r") as file:
         config = yaml.safe_load(file)
-    App(config)
+    App(config).run()
