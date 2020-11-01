@@ -1,5 +1,6 @@
 """Utility functions for interacting with Uniswap."""
 
+import logging
 from typing import List
 
 from Arbie import DeployContractError
@@ -8,6 +9,8 @@ from Arbie.Contracts.contract import Contract, ContractFactory
 from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.Contracts.tokens import GenericToken
 from Arbie.Variables import Address, BigNumber
+
+logger = logging.getLogger()
 
 
 class UniswapPair(PoolContract):
@@ -67,6 +70,7 @@ class UniswapFactory(Contract):
     def all_pairs(self, sleep=0) -> List[UniswapPair]:
         pairs = []
         for i in range(0, self.all_pairs_length()):
+            logger.info(f"Adding pair number {i}")
             pairs.append(self._create_pair_index(i))
         return pairs
 
