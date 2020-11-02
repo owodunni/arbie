@@ -47,6 +47,7 @@ def pool_factory(
         ],
         approve_owner=False,
     )
+    factory.new_pool()
 
     factory.setup_pool(
         [weth, wbtc],

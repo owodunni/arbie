@@ -1,6 +1,10 @@
 """Main init."""
 
-from Arbie.exception import DeployContractError, IERC20TokenError  # noqa: F401
+from Arbie.exception import (  # noqa: F401
+    DeployContractError,
+    IERC20TokenError,
+    PoolValueError,
+)
 
 __version__ = "0.3.0"  # noqa: WPS410
 __version_info__ = tuple(
