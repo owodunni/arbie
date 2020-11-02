@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-## [0.3.0] - The Scraper - 2020-10-02
+## [0.3.0] - The Scraper - 2020-11-02
 ### Added
 - Find all cycles in a set of Pools. These can then be converted to trading opertunities.
 - CLI application structure. Making it possible to configure Actions from yaml config.
