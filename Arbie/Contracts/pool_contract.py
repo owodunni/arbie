@@ -26,4 +26,10 @@ class PoolContract(Contract):
     def create_pool(self) -> Pool:
         tokens = self.create_tokens()
         balances = list(map((lambda bg: bg.to_number()), self.get_balances()))
-        return Pool(tokens, balances, self.get_weights(), self.get_fee())
+        return Pool(
+            tokens,
+            balances,
+            self.get_weights(),
+            self.get_fee(),
+            address=self.get_address(),
+        )
