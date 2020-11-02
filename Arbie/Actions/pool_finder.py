@@ -2,7 +2,7 @@
 import logging
 from typing import List
 
-from Arbie import IERC20TokenError
+from Arbie import IERC20TokenError, PoolValueError
 from Arbie.Actions.action import Action
 from Arbie.Contracts import UniswapPair
 from Arbie.Contracts.pool_contract import PoolContract
@@ -47,7 +47,11 @@ def create_and_filter_pools(
         )
         try:
             pool = contract.create_pool()
-        except IERC20TokenError:
+        except IERC20TokenError as e:
+            logger.warning(f"Failed to create pool, bad token. {e}")
+            continue
+        except PoolValueError as e:
+            logger.warning(f"Failed to create pool, bad pool. {e}")
             continue
         for token in pool.tokens:
             try:

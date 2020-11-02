@@ -2,6 +2,7 @@
 
 from typing import List
 
+from Arbie import PoolValueError
 from Arbie.Contracts.contract import Contract
 from Arbie.Contracts.tokens import GenericToken
 from Arbie.Variables import BigNumber, Pool, Token
@@ -25,11 +26,20 @@ class PoolContract(Contract):
 
     def create_pool(self) -> Pool:
         tokens = self.create_tokens()
+        if len(tokens) < 2:
+            raise PoolValueError(
+                f"Pool: {self.get_address}, has insufficient tokens: {len(tokens)}"
+            )
         balances = list(map((lambda bg: bg.to_number()), self.get_balances()))
+        weights = self.get_weights()
+        if sum(weights) != 1:
+            raise PoolValueError(
+                f"Pool: {self.get_address}, weights {sum(weights)} != 1"
+            )
         return Pool(
             tokens,
             balances,
-            self.get_weights(),
+            weights,
             self.get_fee(),
             address=self.get_address(),
         )
