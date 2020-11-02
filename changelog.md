@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Removed
+- Moved Jupyter examples to [arbie-examples](https://github.com/owodunni/arbie-examples)
 
 ## [0.3.0] - The Scraper - 2020-11-02
 ### Added
