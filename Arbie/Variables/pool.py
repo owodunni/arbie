@@ -35,16 +35,20 @@ class Pool(object):
         self.weights = Balance.create(tokens, weights)
         self.fee = fee
 
-        if sum(weights) != 1:
-            raise ValueError("Weights are not normalized")
-
-        if self.fee > 1 or self.fee < 0:
-            raise ValueError(f"Fee: {self.fee}, should be between 0 and 1")
-
         if "address" in kwargs:
             self.address = kwargs.get("address")
         else:
             self.address = Address()
+
+        if sum(weights) != 1:
+            raise ValueError(
+                f"Weights are not normalized, sum is {sum(weights)} for contract {self.address}"
+            )
+
+        if self.fee > 1 or self.fee < 0:
+            raise ValueError(
+                f"Fee: {self.fee}, should be between 0 and 1. Fee is {self.fee}, for contract {self.address}"
+            )
 
     def __str__(self):
         return f"""
