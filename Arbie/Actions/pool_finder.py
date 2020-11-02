@@ -1,4 +1,5 @@
 """Pool finder is responsible for finding all pools."""
+import logging
 from typing import List
 
 from Arbie import IERC20TokenError
@@ -7,6 +8,8 @@ from Arbie.Contracts import UniswapPair
 from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.Variables import Pools, Token, Tokens
 
+logger = logging.getLogger()
+
 
 def create_tokens_and_pairs(
     uniswap_pairs: List[UniswapPair], uoa: Token
@@ -14,6 +17,9 @@ def create_tokens_and_pairs(
     token_set = set()
     token_set.add(uoa)
     for pair in uniswap_pairs:
+        logger.info(
+            f"Creating token {uniswap_pairs.index(pair)} of {len(uniswap_pairs)}"
+        )
         t0 = pair.get_token0()
         t1 = pair.get_token1()
         balances = None
@@ -36,6 +42,9 @@ def create_and_filter_pools(
 ) -> Pools:
     pools = []
     for contract in pool_contracts:
+        logger.info(
+            f"Filtering contract {pool_contracts.index(contract)} of {len(pool_contracts)}"
+        )
         try:
             pool = contract.create_pool()
         except IERC20TokenError:
