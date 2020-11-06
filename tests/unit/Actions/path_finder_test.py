@@ -31,7 +31,7 @@ def store(pools, eth) -> Store:
 class TestPathFinder(object):
     def test_run(self, store, config_file):
         config = yaml.safe_load(config_file)
-        app = App(config, store)
+        app = App(config, store=store)
         assert len(app.action_tree.actions) == 2
         app.run()
         assert len(store["found_cycles"]) == 5
