@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Add logging to file. Logging rotated between 5 1mb files.
+- Make it possible to load and save arbie state on startup, exit and crash.
+- Add CLI option for log path.
+- Add CLI option for state save path.
+- Add CLI option for state load path.
 
 ### Changed
 

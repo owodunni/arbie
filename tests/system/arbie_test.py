@@ -1,4 +1,4 @@
-"""Unittest of app."""
+"""Systemtests of app."""
 
 import pytest
 import yaml
