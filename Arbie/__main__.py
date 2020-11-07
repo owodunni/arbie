@@ -75,5 +75,4 @@ def main(argv=None):
     except Exception as ex:
         logging.getLogger().error(ex)
         raise ex
-    finally:
-        app.save(str(arguments["--save"]))
+    app.save(str(arguments["--save"]))
