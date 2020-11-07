@@ -1,4 +1,5 @@
 """Test class for setting up AMMs."""
+from math import isclose
 from typing import List, NewType, Tuple
 
 from sympy import symbols
@@ -40,7 +41,7 @@ class Pool(object):
         else:
             self.address = Address()
 
-        if sum(weights) != 1:
+        if not isclose(sum(weights), 1, abs_tol=1e-3):  # noqa: WPS432
             raise ValueError(
                 f"Weights are not normalized, sum is {sum(weights)} for contract {self.address}"
             )

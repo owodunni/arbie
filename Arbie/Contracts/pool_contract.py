@@ -1,5 +1,6 @@
 """Base abstract class for pool contracts."""
 
+from math import isclose
 from typing import List
 
 from Arbie import PoolValueError
@@ -32,7 +33,7 @@ class PoolContract(Contract):
             )
         balances = list(map((lambda bg: bg.to_number()), self.get_balances()))
         weights = self.get_weights()
-        if sum(weights) != 1:
+        if not isclose(sum(weights), 1, abs_tol=1e-3):  # noqa: WPS432
             raise PoolValueError(
                 f"Pool: {self.get_address}, weights {sum(weights)} != 1"
             )
