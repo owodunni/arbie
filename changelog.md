@@ -6,16 +6,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+
+### Changed
+
+### Removed
+
+### Fixed
+
+## [0.3.1] - 2020-11-07
+### Added
 - Add logging to file. Logging rotated between 5 1mb files.
 - Make it possible to load and save arbie state on startup, exit and crash.
 - Add CLI option for log path.
 - Add CLI option for state save path.
 - Add CLI option for state load path.
 
-### Changed
-
 ### Removed
-- Moved Jupyter examples to [arbie-examples](https://github.com/owodunni/arbie-examples)
+- Move examples to [arbie-examples](https://github.com/owodunni/arbie-examples) to remove repo size and
+  make it easier to keep examples up to date.
+
+### Fixed
+- Issue with pickeling store containing contracts.
+- Issue with pools not normalizing to 1 and being filtered out.
 
 ## [0.3.0] - The Scraper - 2020-11-02
 ### Added

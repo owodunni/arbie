@@ -5,3 +5,4 @@ ethereum
 networkx
 pyyaml
 docopt
+pickle
