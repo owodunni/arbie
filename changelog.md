@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Issue where names would not be added when creating Tokens from contracts.
 - Issue where pools with zero balance would not be filtered by PoolFinder.
 
+## [0.3.2] - 2020-11-08
+### Fixed
+- Issue where names would not be added when creating Tokens from contracts.
+- Issue where pools with zero balance would not be filtered by PoolFinder.
+
 ## [0.3.1] - 2020-11-07
 ### Added
 - Add logging to file. Logging rotated between 5 1mb files.
