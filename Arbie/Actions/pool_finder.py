@@ -19,34 +19,36 @@ def check_and_get_price(balances) -> Tuple[bool, float]:
     return False, balances[0] / balances[1]
 
 
-def add_token_to_set(token_set, pair, price, uoa):
+def create_token(pair, price, uoa):
     t0 = pair.get_token0()
     t1 = pair.get_token1()
     if uoa.address == t0.get_address():
-        token_set.add(t1.create_token(price))
+        return t1.create_token(price)
     elif uoa.address == t1.get_address():
-        token_set.add(t0.create_token(1 / price))
+        return t0.create_token(1 / price)
+    return None
+
+
+def create_and_check_token(pair, uoa):
+    logger.info(f"Creating tokens from {pair.get_address()}")
+    balances = None
+    try:
+        balances = pair.get_balances()
+    except IERC20TokenError:
+        return None
+
+    is_zero, price = check_and_get_price(balances)
+    if is_zero:
+        return None
+
+    return create_token(pair, price, uoa)
 
 
 def create_tokens(uniswap_pairs: List[UniswapPair], uoa: Token) -> List[Token]:
-    token_set = set()
-    token_set.add(uoa)
-    for pair in uniswap_pairs:
-        logger.info(
-            f"Creating token {uniswap_pairs.index(pair)} of {len(uniswap_pairs)}"
-        )
-        balances = None
-        try:
-            balances = pair.get_balances()
-        except IERC20TokenError:
-            continue
-
-        is_zero, price = check_and_get_price(balances)
-        if is_zero:
-            continue
-
-        add_token_to_set(token_set, pair, price, uoa)
-
+    tokens = list(map(lambda p: create_and_check_token(p, uoa), uniswap_pairs))
+    tokens.append(uoa)
+    token_set = set(tokens)
+    token_set.discard(None)
     return list(token_set)
 
 
