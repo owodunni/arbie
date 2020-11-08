@@ -1,5 +1,7 @@
 """Utility functions for interacting with Tokens."""
 
+import logging
+
 from Arbie.Contracts.contract import Contract
 from Arbie.Variables import Address, BigNumber, Token
 
@@ -51,5 +53,15 @@ class GenericToken(IERC20Token):
     def __repr__(self):
         return self.__str__()
 
-    def get_name(self):
-        return self.contract.functions.name().call()
+    def get_name(self) -> str:
+        return str(self.contract.functions.name().call())
+
+    def create_token(self, price=0):
+        try:
+            name = self.get_name()
+        except Exception:
+            name = ""
+            logging.getLogger().warning(
+                f"Token: {self.get_address()} dosn't have a name."
+            )
+        return Token(name, price, self.get_address())
