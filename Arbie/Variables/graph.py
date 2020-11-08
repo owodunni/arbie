@@ -58,7 +58,16 @@ class TradingGraph(Graph):
 
         for start_node in pool.tokens:
             for end_node in pool.tokens:
-                weight = pool.spot_price(start_node, end_node)
+                try:
+                    weight = pool.spot_price(start_node, end_node)
+                except ZeroDivisionError:
+                    raise ZeroDivisionError(
+                        f"""Zero division error in
+                    pool: {pool}
+                    between token {repr(start_node)} and {repr(end_node)}
+                    """
+                    )
+
                 self._add_edge(start_node, end_node, weight, pool)
 
 
