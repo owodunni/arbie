@@ -1,5 +1,6 @@
 """Path finder contains Actions for finding paths between nodes."""
 
+import logging
 from typing import List
 
 import networkx as nx
@@ -36,7 +37,8 @@ class CycleFinder(object):
     taking a cycle. This is useful for sorting the cycles after trade value.
     """
 
-    def __init__(self, graph: nx.DiGraph, start_node: Token):
+    def __init__(self, graph: nx.DiGraph, start_node: Token, max_depth):
+        self.max_depth = max_depth
         self.graph = graph
         self.start_node = Node(start_node)
 
@@ -68,10 +70,15 @@ class CycleFinder(object):
         if current_node == self.start_node:
             # We have come back to start. Append cycle to result
             found_cycles.append(Cycle(visited + [current_node], ratio_to_current_node))
+            logging.getLogger(f"Found cycle {len(found_cycles)}!")
             return
 
         if current_node in visited:
             # We have found a cycle back to the current node. Stop
+            return
+
+        if len(visited) > self.max_depth:
+            # We have gone to deap lets stop.
             return
 
         self._visit_neighbours(
@@ -98,6 +105,7 @@ class PathFinder(Action):
         pools: pools
         unit_of_account: None
         min_liquidity: 1
+        max_depth: 5
     output:
         cycles: all_cycles
         trades: all_trades
@@ -105,7 +113,7 @@ class PathFinder(Action):
 
     def on_next(self, data):
         graph = FilteredTradingGraph(TradingGraph(data.pools()), data.min_liquidity())
-        finder = CycleFinder(graph.graph, data.unit_of_account())
+        finder = CycleFinder(graph.graph, data.unit_of_account(), data.max_depth())
         cycles = sorted(finder.find_all_cycles(), key=lambda x: x.ratio)
         data.cycles(cycles)
         trades = []
