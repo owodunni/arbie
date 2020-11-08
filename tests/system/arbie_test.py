@@ -66,6 +66,7 @@ def pool_factory(
             to_big_number(wbtc, large / 10020),
         ],
     )
+
     return factory
 
 
@@ -98,6 +99,7 @@ def pair_factory(
         [to_big_number(weth, large / 300), to_big_number(wbtc, large / 10000)],
     )
     factory.create_pair(weth, bad)
+    factory.create_pair(weth, yam)
     return factory
 
 

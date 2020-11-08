@@ -1,6 +1,7 @@
 """Unittest of pool."""
 import pytest
 
+from Arbie import PoolValueError
 from Arbie.Variables import Address, Pool, Token
 
 
@@ -24,7 +25,7 @@ class TestPool(object):
         assert pool.spot_price(new_tokens[2], new_tokens[1]) == 100000
 
     def test_init_fee_raises(self, tokens):
-        with pytest.raises(ValueError):
+        with pytest.raises(PoolValueError):
             Pool(tokens, [400, 1], [0.75, 0.25], fee=2)
 
     def test_init_fee(self, tokens):
@@ -33,7 +34,7 @@ class TestPool(object):
         assert pool.address == address
 
     def test_pool_bad_weights(self, tokens):
-        with pytest.raises(ValueError):
+        with pytest.raises(PoolValueError):
             Pool(tokens, [400, 1], [0.7, 0.25])
 
     def test_spot_price(self, pool, dai, eth):
