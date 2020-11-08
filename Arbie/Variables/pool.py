@@ -4,6 +4,7 @@ from typing import List, NewType, Tuple
 
 from sympy import symbols
 
+from Arbie import PoolValueError
 from Arbie.Variables.address import Address
 from Arbie.Variables.token import Balance, Balances, Token, Tokens
 
@@ -42,13 +43,15 @@ class Pool(object):
             self.address = Address()
 
         if not isclose(sum(weights), 1, abs_tol=1e-3):  # noqa: WPS432
-            raise ValueError(
-                f"Weights are not normalized, sum is {sum(weights)} for contract {self.address}"
+            raise PoolValueError(
+                f"Weights are not normalized, sum is {sum(weights)} for pool {self.address}"
             )
 
+        self._check_balances()
+
         if self.fee > 1 or self.fee < 0:
-            raise ValueError(
-                f"Fee: {self.fee}, should be between 0 and 1. Fee is {self.fee}, for contract {self.address}"
+            raise PoolValueError(
+                f"Fee: {self.fee}, should be between 0 and 1. Fee is {self.fee}, for pool {self.address}"
             )
 
     def __str__(self):
@@ -105,6 +108,11 @@ Pool(
     def out_given_in(self, token_in: Token, token_out: Token, amount: float) -> float:
         expr = self.out_given_in_expr(token_in, token_out)
         return expr.subs(x, amount)
+
+    def _check_balances(self):
+        for balance in self.balances:
+            if isclose(balance.value, 0, abs_tol=1e-3):  # noqa: WPS432
+                raise PoolValueError(f"Balance {balance} ~ 0 for pool {self.address}")
 
 
 Pools = NewType("Pools", List[Pool])
