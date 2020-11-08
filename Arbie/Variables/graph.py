@@ -54,10 +54,11 @@ class TradingGraph(Graph):
     def _add_nodes(self, tokens: List[Token]):
         self.graph.add_nodes_from(tokens)
 
-    def _add_edges(self, pool: Pool):
-
+    def _add_edges(self, pool: Pool):  # noqa: WPS231
         for start_node in pool.tokens:
             for end_node in pool.tokens:
+                if start_node == end_node:
+                    continue
                 try:
                     weight = pool.spot_price(start_node, end_node)
                 except ZeroDivisionError:
