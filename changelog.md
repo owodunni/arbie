@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 ### Fixed
+- Issue where names would not be added when creating Tokens from contracts.
 
 ## [0.3.1] - 2020-11-07
 ### Added
