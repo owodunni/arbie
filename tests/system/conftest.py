@@ -14,6 +14,11 @@ def web3_server(request):
 
 
 @pytest.fixture
+def redis_server(request):
+    return request.config.getoption("--redis_server")
+
+
+@pytest.fixture
 def w3(web3_server):
     return Web3(Web3.HTTPProvider(web3_server))
 

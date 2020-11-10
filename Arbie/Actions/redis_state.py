@@ -3,6 +3,13 @@
 import redis
 
 
+def init_redis(address):
+    host_and_port = address.split(":")
+    if len(host_and_port) != 2:
+        raise ValueError(f"Invalid Address to redis server: {address}")
+    return redis.Redis(host=host_and_port[0], port=host_and_port[1], db=0)
+
+
 class RedisState(object):
     """A bridge to access the state stored in redis.
 
@@ -28,8 +35,8 @@ class RedisState(object):
     this would be the address of that token.
     """
 
-    def __init__(self, host, namespace, port="6379"):
-        self.r = redis.Redis(host=host, port=port, db=0)
+    def __init__(self, host, namespace):
+        self.r = init_redis(host)
         self.r.ping()
         self.namespace = namespace
         self.local_state = {}
