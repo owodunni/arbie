@@ -1,7 +1,6 @@
 """A store object that uses redis for backend."""
 
 import redis
-import re
 
 
 class RedisState(object):
@@ -22,7 +21,7 @@ class RedisState(object):
 
     Category contains information regarding what keys are available. If we store
     a list of Tokens then the category would contain the names of the tokens. So
-    to get the token we first get the category to figure out which tokens are 
+    to get the token we first get the category to figure out which tokens are
     available.
 
     Identifier contains the identifier of the actuall data. In case of a Token
@@ -35,8 +34,34 @@ class RedisState(object):
         self.namespace = namespace
         self.local_state = {}
 
-    # def __getitem__(self, key):
-    #    parts = key.split(".")
-    #    if len(parts) == 1:
-    #        return local_state[key]
-    #    elif len(parts) ==
+    def __getitem__(self, key):
+        if self._is_collection(key):
+            return self._get_collection(key)
+        elif self._is_item(key):
+            return self._get_item(key)
+        return self.local_state[key]
+
+    def __setitem__(self, key, value):
+        if self._is_collection(key):
+            self._add_collection(value)
+        elif self._is_item(key):
+            self._add_item(key, value)
+        self.local_state[key] = value
+
+    def _is_collection(self, key):
+        return len(key.split(".")) == 3
+
+    def _is_item(self, key):
+        return len(key.split(".")) == 4
+
+    def _get_collection(self, key):
+        raise NotImplementedError()
+
+    def _get_item(self, key):
+        raise NotImplementedError()
+
+    def _add_collection(self, key, value):
+        raise NotImplementedError()
+
+    def _add_item(self, key, value):
+        raise NotImplementedError()
