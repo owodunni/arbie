@@ -101,8 +101,11 @@ class Store(object):
     It also makes it possible for actions to export state.
     """
 
-    def __init__(self):
-        self.state = {}
+    def __init__(self, state=None):
+        if state is None:
+            self.state = {}
+        else:
+            self.state = state
 
     def __getitem__(self, key):
         return self.state[key]
