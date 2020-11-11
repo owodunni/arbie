@@ -9,7 +9,7 @@ class IERC20TokenError(Exception):
     """Raised when a IErc20 token is not Erc20 compliant."""
 
 
-class PoolValueError(Exception):
+class PoolValueError(ValueError):
     """Raised when a Pool is not initialized properly.
 
     This can hapen when a pool dosn't have atleast 2 tokens.
