@@ -70,9 +70,7 @@ class RedisState(object):
 
     def _get_collection(self, key):
         collection_items = []
-        collection = self.r.get(key)
-        if collection is None:
-            raise KeyError(f"key: {key} was not found in Redis")
+        collection = self._get(key)
         for item in collection:
             item_key = f"{key}.{item}"
             collection_items.append(self._get_item(item_key))
