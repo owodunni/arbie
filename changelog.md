@@ -6,14 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-
+- Add settings to Path Finder for choosing depth, when searching for cycles.
+  So that we don't have to wait untill the heat death of the universe.
 ### Changed
 
 ### Removed
 
 ### Fixed
-- Issue where names would not be added when creating Tokens from contracts.
-- Issue where pools with zero balance would not be filtered by PoolFinder.
 
 ## [0.3.2] - 2020-11-08
 ### Fixed
