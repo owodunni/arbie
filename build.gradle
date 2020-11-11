@@ -113,5 +113,14 @@ task startJupyter(type: KonsoleTask) {
 }
 
 task startGanache(type: KonsoleTask) {
-    command = "docker-compose up ganache"
+    command = "docker-compose up --force-recreate ganache"
+}
+
+
+task startRedis(type: KonsoleTask) {
+    command = "docker-compose up --force-recreate redis"
+}
+
+task develop{
+  dependsOn startRedis, startGanache
 }
