@@ -163,6 +163,7 @@ class TestApp(object):
         assert len(app.store.state.keys()) == 3
         return app
 
+    @pytest.mark.slow
     def test_run(self, app):
         app.run()
         assert len(app.store.state.keys()) == 5
@@ -170,6 +171,7 @@ class TestApp(object):
         tokens = app.store.get("all_tokens")
         assert len(tokens) == 3
 
+    @pytest.mark.slow
     def test_full_pipeline(self, full_config):
         config = yaml.safe_load(full_config)
         app = App(config)
