@@ -14,7 +14,7 @@ def patch_redis(mocker: MockerFixture) -> MagicMock:
     mocker.patch("Arbie.Actions.redis_state.redis.Redis", return_value=mock)
     return mock
 
-
+false_collection_key = "pool_finder.1.unit_of_account"
 collection_key = "pool_finder.1.pools"
 item_key = "pool_finder.1.pools.0xAb12C"
 
@@ -24,7 +24,7 @@ class TestRedisState(object):
         mock = patch_redis(mocker)
         mock.ping.side_effect = redis.exceptions.ConnectionError
         with pytest.raises(redis.exceptions.ConnectionError):
-            RedisState("http://bad.host.org:1337", "namespace")
+            RedisState("bad.host.org:1337", "namespace")
         assert mock.ping.called
 
     @pytest.fixture
@@ -48,6 +48,7 @@ class TestRedisState(object):
         assert mock_collection.called
         assert isinstance(redis_state[item_key], MagicMock)
         assert mock_item.called
+        assert isinstance(redis_state[false_collection_key], MagicMock)
 
     def test_add(self, redis_state, mocker: MockerFixture):
         mock_collection = mocker.patch.object(RedisState, "_add_collection")
