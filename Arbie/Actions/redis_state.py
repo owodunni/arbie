@@ -29,7 +29,8 @@ class RedisState(object):
     Category contains information regarding what keys are available. If we store
     a list of Tokens then the category would contain the names of the tokens. So
     to get the token we first get the category to figure out which tokens are
-    available.
+    available. A category containing a list of items ends with an s. A categaroy
+    is of redis type set.
 
     Identifier contains the identifier of the actuall data. In case of a Token
     this would be the address of that token.
@@ -56,10 +57,14 @@ class RedisState(object):
         self.local_state[key] = value
 
     def _is_collection(self, key):
-        return len(key.split(".")) == 3
+        parts = key.split(".")
+        return len(parts) == 3 and parts[2].endswith("s")
 
     def _is_item(self, key):
-        return len(key.split(".")) == 4
+        parts = key.split(".")
+        if len(parts) == 3 and not self._is_collection(key):
+            return True
+        return len(parts) == 4
 
     def _get_collection(self, key):
         raise NotImplementedError()
