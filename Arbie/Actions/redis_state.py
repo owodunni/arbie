@@ -70,9 +70,13 @@ class RedisState(object):
 
     def _get_collection(self, key):
         collection_items = []
-        collection = self._get(key)
+        collection = self.r.smembers(key)
+        if not collection:
+            raise KeyError(f"key: {key} returned a empty set.")
+
         for item in collection:
-            item_key = f"{key}.{item}"
+            item_name = item.decode("utf-8")
+            item_key = f"{key}.{item_name}"
             collection_items.append(self._get_item(item_key))
         return collection_items
 
