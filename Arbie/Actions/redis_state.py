@@ -1,5 +1,7 @@
 """A store object that uses redis for backend."""
 
+import pickle  # noqa: S403
+
 import redis
 
 
@@ -67,10 +69,23 @@ class RedisState(object):
         return len(parts) == 4
 
     def _get_collection(self, key):
-        raise NotImplementedError()
+        collection_items = []
+        collection = self.r.get(key)
+        if collection is None:
+            raise KeyError(f"key: {key} was not found in Redis")
+        for item in collection:
+            item_key = f"{key}.{item}"
+            collection_items.append(self._get_item(item_key))
+        return collection_items
+
+    def _get(self, key):
+        item = self.r.get(key)
+        if item is None:
+            raise KeyError(f"key: {key} was not found in Redis")
+        return item
 
     def _get_item(self, key):
-        raise NotImplementedError()
+        return pickle.loads(self._get(key))  # noqa: S301
 
     def _add_collection(self, key, value):
         raise NotImplementedError()

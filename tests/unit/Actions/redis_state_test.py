@@ -14,6 +14,7 @@ def patch_redis(mocker: MockerFixture) -> MagicMock:
     mocker.patch("Arbie.Actions.redis_state.redis.Redis", return_value=mock)
     return mock
 
+
 false_collection_key = "pool_finder.1.unit_of_account"
 collection_key = "pool_finder.1.pools"
 item_key = "pool_finder.1.pools.0xAb12C"

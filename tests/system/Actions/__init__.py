@@ -1,1 +1,1 @@
-"""System tests for Actions"""
+"""System tests for Actions."""

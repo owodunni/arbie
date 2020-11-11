@@ -14,6 +14,6 @@ class TestRedisState(object):
 
     def test_get(self, redis_state):
         with pytest.raises(KeyError):
-            redis_state[""]  # noqa: WPS428
-        assert isinstance(redis_state[collection_key], list)
-        assert redis_state[item_key] is None
+            redis_state[collection_key]
+        with pytest.raises(KeyError):
+            redis_state[item_key]
