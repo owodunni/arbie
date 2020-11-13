@@ -59,11 +59,13 @@ class RedisState(object):
         self.local_state[key] = value
 
     def delete(self, key):
+        pipe = self.r.pipeline()
         if self._is_collection(key):
             collection = self.r.smembers(key)
             for item in collection:
-                self.r.delete(f"{key}.{item}")
-        self.r.delete(key)
+                pipe.delete(f"{key}.{item}")
+        pipe.delete(key)
+        pipe.execute()
 
     def _is_collection(self, key):
         parts = key.split(".")
@@ -75,17 +77,20 @@ class RedisState(object):
             return True
         return len(parts) == 4
 
-    def _get_collection(self, key):
-        collection_items = []
+    def _get_members(self, key):
         collection = self.r.smembers(key)
         if not collection:
             raise KeyError(f"key: {key} returned a empty set.")
+        return collection
 
-        for item in collection:
+    def _get_collection(self, key):
+        pipe = self.r.pipeline()
+        for item in self._get_members(key):
             item_name = item.decode("utf-8")
             item_key = f"{key}.{item_name}"
-            collection_items.append(self._get_item(item_key))
-        return collection_items
+            pipe.get(item_key)
+        raw_items = pipe.execute()
+        return list(map(lambda i: pickle.loads(i), raw_items))  # noqa: S301
 
     def _get(self, key):
         item = self.r.get(key)
@@ -97,10 +102,12 @@ class RedisState(object):
         return pickle.loads(self._get(key))  # noqa: S301
 
     def _add_collection(self, collection_key, collection):
+        pipe = self.r.pipeline()
         for item in collection:
             item_key = f"{collection_key}.{item}"
-            self.r.set(item_key, pickle.dumps(item))
-            self.r.sadd(collection_key, str(item))
+            pipe.set(item_key, pickle.dumps(item))
+            pipe.sadd(collection_key, str(item))
+        pipe.execute()
 
     def _add_item(self, key, value):
         self.r.set(key, pickle.dumps(value))
