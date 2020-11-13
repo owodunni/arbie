@@ -2,18 +2,10 @@
 from unittest.mock import MagicMock
 
 import pytest
-import redis
 from pytest_mock.plugin import MockerFixture
 
 from Arbie.Actions import Store
 from Arbie.Actions.redis_state import RedisState
-
-
-def patch_redis(mocker: MockerFixture) -> MagicMock:
-    mock = MagicMock()
-    mocker.patch("Arbie.Actions.redis_state.redis.Redis", return_value=mock)
-    return mock
-
 
 false_collection_key = "pool_finder.1.unit_of_account"
 collection_key = "pool_finder.1.pools"
@@ -21,20 +13,6 @@ item_key = "pool_finder.1.pools.0xAb12C"
 
 
 class TestRedisState(object):
-    def test_bad_host(self, mocker: MockerFixture):
-        mock = patch_redis(mocker)
-        mock.ping.side_effect = redis.exceptions.ConnectionError
-        with pytest.raises(redis.exceptions.ConnectionError):
-            RedisState("bad.host.org:1337")
-        assert mock.ping.called
-
-    @pytest.fixture
-    def redis_state(self, mocker: MockerFixture):
-        mock = patch_redis(mocker)
-        state = RedisState("good.host.org:1337")
-        assert mock.ping.called
-        return state
-
     def test_get(self, redis_state, mocker: MockerFixture):
         mock_collection = mocker.patch.object(
             RedisState, "_get_collection", return_value=[]

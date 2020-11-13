@@ -57,6 +57,11 @@ class RedisState(object):
             self._add_item(key, value)
         self.local_state[key] = value
 
+    def __contains__(self, item) -> bool:
+        if item in self.local_state:
+            return True
+        return self.r.exists(item) == 1
+
     def keys(self):
         return self.local_state.keys()
 
