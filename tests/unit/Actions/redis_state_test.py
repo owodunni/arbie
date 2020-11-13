@@ -25,13 +25,13 @@ class TestRedisState(object):
         mock = patch_redis(mocker)
         mock.ping.side_effect = redis.exceptions.ConnectionError
         with pytest.raises(redis.exceptions.ConnectionError):
-            RedisState("bad.host.org:1337", "namespace")
+            RedisState("bad.host.org:1337")
         assert mock.ping.called
 
     @pytest.fixture
     def redis_state(self, mocker: MockerFixture):
         mock = patch_redis(mocker)
-        state = RedisState("good.host.org:1337", "namespace")
+        state = RedisState("good.host.org:1337")
         assert mock.ping.called
         return state
 

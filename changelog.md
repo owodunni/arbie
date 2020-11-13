@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Removed
+- No longer possible to save and load store state to disk. We now use redis for
+  keeping track of the state.
 
 ### Fixed
 

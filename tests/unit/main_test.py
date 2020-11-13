@@ -28,9 +28,11 @@ def store() -> Store:
     return store
 
 
-def setup_mocks(mocker):
+def setup_mocks(mocker, config_file):
     mocker.patch("Arbie.__main__.handlers.RotatingFileHandler")
     mocker.patch("Arbie.__main__.logging.getLogger")
+    if config_file is not None:
+        mocker.patch("builtins.open", mocker.mock_open(read_data=config_file))
 
 
 def run_main():
@@ -39,43 +41,27 @@ def run_main():
 
 class TestMain(object):
     def test_config_not_found(self, mocker: MockerFixture):
-        setup_mocks(mocker)
+        setup_mocks(mocker, None)
         with pytest.raises(FileNotFoundError):
             run_main()
 
     def test_setup_and_run(self, config_file: str, store: Store, mocker: MockerFixture):
-        setup_mocks(mocker)
-        mocker.patch("builtins.open", mocker.mock_open(read_data=config_file))
-        mocker.patch("Arbie.__main__.path.isfile", return_value=True)
-        load_mock = mocker.patch("Arbie.arbie.pickle.load", return_value=store)
-        dump_mock = mocker.patch("Arbie.arbie.pickle.dump")
+        setup_mocks(mocker, config_file)
         run_mock = mocker.patch("Arbie.arbie.ActionTree.run")
 
         run_main()
-        assert dump_mock.called
-        assert load_mock.called
         assert run_mock.called
 
     def test_fail_on_run(self, config_file: str, store: Store, mocker: MockerFixture):
-        setup_mocks(mocker)
-        mocker.patch("builtins.open", mocker.mock_open(read_data=config_file))
-        mocker.patch("Arbie.__main__.path.isfile", return_value=True)
-        load_mock = mocker.patch("Arbie.arbie.pickle.load", return_value=store)
-        dump_mock = mocker.patch("Arbie.arbie.pickle.dump")
+        setup_mocks(mocker, config_file)
         run_mock = mocker.patch("Arbie.arbie.ActionTree.run")
         run_mock.side_effect = ValueError("Failed to run action")
 
         with pytest.raises(ValueError):
             run_main()
-        assert not dump_mock.called
-        assert load_mock.called
 
     def test_key_not_in_store(self, config_file: str, mocker: MockerFixture):
-        setup_mocks(mocker)
-        mocker.patch("builtins.open", mocker.mock_open(read_data=config_file))
-        mocker.patch("Arbie.__main__.path.isfile", return_value=False)
-        dump_mock = mocker.patch("Arbie.arbie.pickle.dump")
+        setup_mocks(mocker, config_file)
 
         with pytest.raises(ValueError):
             run_main()
-        assert not dump_mock.called

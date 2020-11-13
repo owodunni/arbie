@@ -38,10 +38,9 @@ class RedisState(object):
     this would be the address of that token.
     """
 
-    def __init__(self, host, namespace):
+    def __init__(self, host):
         self.r = init_redis(host)
         self.r.ping()
-        self.namespace = namespace
         self.local_state = {}
 
     def __getitem__(self, key):
@@ -57,6 +56,9 @@ class RedisState(object):
         elif self._is_item(key):
             self._add_item(key, value)
         self.local_state[key] = value
+
+    def keys(self):
+        return self.local_state.keys()
 
     def delete(self, key):
         pipe = self.r.pipeline()

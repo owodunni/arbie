@@ -3,17 +3,12 @@
 Arbie is configured through a Yaml file.
 
 Usage:
-  Arbie -f config.yml [-o arbie.bin] [-i arbie.bin] [-l arbie.log.txt]
+  Arbie -f config.yml [-l arbie.log.txt]
   Arbie (-h | --help)
   Arbie (-v | --version)
 
 Options:
   -f --file=config.yml  Load configuration file.
-  -o --save=arbie.bin   Save state to out path when exiting,
-                        will save on crash [default: arbie.bin]
-
-  -i --load=arbie.bin   Load state from in path when starting
-                        arbie [default: arbie.bin]
 
   -l --log=arbie.log    Path to log files [default: arbie.log]
 
@@ -23,7 +18,6 @@ Options:
 """
 import logging
 from logging import handlers
-from os import path
 
 import yaml
 from docopt import docopt
@@ -50,12 +44,6 @@ def setup_logging(log_file: str, severity=logging.INFO):
     root_logger.addHandler(file_handler)
 
 
-def setup_app(config, load_path) -> App:
-    if path.isfile(load_path):
-        return App(config, load_path=load_path)
-    return App(config)
-
-
 def main(argv=None):
     arguments = docopt(__doc__, argv, version=Arbie.__version__)  # noqa: WPS609
 
@@ -68,11 +56,10 @@ def main(argv=None):
     with open(config_path, "r") as config_file:
         config = yaml.safe_load(config_file)
 
-    app = setup_app(config, str(arguments["--load"]))
+    app = App(config)
 
     try:
         app.run()
     except Exception as ex:
         logging.getLogger().error(ex)
         raise ex
-    app.save(str(arguments["--save"]))
