@@ -53,10 +53,17 @@ class RedisState(object):
 
     def __setitem__(self, key, value):
         if self._is_collection(key):
-            self._add_collection(value)
+            self._add_collection(key, value)
         elif self._is_item(key):
             self._add_item(key, value)
         self.local_state[key] = value
+
+    def delete(self, key):
+        if self._is_collection(key):
+            collection = self.r.smembers(key)
+            for item in collection:
+                self.r.delete(f"{key}.{item}")
+        self.r.delete(key)
 
     def _is_collection(self, key):
         parts = key.split(".")
@@ -89,8 +96,11 @@ class RedisState(object):
     def _get_item(self, key):
         return pickle.loads(self._get(key))  # noqa: S301
 
-    def _add_collection(self, key, value):
-        raise NotImplementedError()
+    def _add_collection(self, collection_key, collection):
+        for item in collection:
+            item_key = f"{collection_key}.{item}"
+            self.r.set(item_key, pickle.dumps(item))
+            self.r.sadd(collection_key, str(item))
 
     def _add_item(self, key, value):
-        raise NotImplementedError()
+        self.r.set(key, pickle.dumps(value))

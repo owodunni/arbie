@@ -30,18 +30,13 @@ class TestRedisState(object):
     def redis_item(self, redis_state, address):
         redis_state.r.set(item_key, pickle.dumps(address))
         yield None
-        redis_state.r.delete(item_key)
+        redis_state.delete(item_key)
 
     @pytest.fixture
     def redis_collection(self, redis_state: RedisState, addresses: List[Address]):
-        for address in addresses:
-            item_key = f"{collection_key}.{address}"
-            redis_state.r.set(item_key, pickle.dumps(address))
-            redis_state.r.sadd(collection_key, str(address))
+        redis_state[collection_key] = addresses
         yield None
-        for address in addresses:  # noqa: WPS440
-            redis_state.r.delete(f"{collection_key}.{address}")  # noqa: WPS441
-        redis_state.r.delete(collection_key)
+        redis_state.delete(collection_key)
 
     def test_get_empty_state(self, redis_state):
         with pytest.raises(KeyError):
@@ -59,3 +54,9 @@ class TestRedisState(object):
 
         for address in addresses:
             collection.index(address)
+
+    def test_add_and_get(self, redis_state: RedisState, address):
+        redis_state[item_key] = address
+        address_round_trip = redis_state[item_key]
+        redis_state.delete(item_key)
+        assert address_round_trip == address
