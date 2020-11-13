@@ -24,7 +24,7 @@ def addresses():
 class TestRedisState(object):
     @pytest.fixture
     def redis_state(self, redis_server):
-        return RedisState(redis_server, "arbie_test")
+        return RedisState(redis_server)
 
     @pytest.fixture
     def redis_item(self, redis_state, address):

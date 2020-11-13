@@ -1,11 +1,10 @@
 """Main application."""
 
 import logging
-import pickle  # noqa: S403
 
 from web3 import Web3
 
-from Arbie.Actions import ActionTree, Store
+from Arbie.Actions import ActionTree, RedisState, Store
 from Arbie.Contracts import (
     BalancerFactory,
     ContractFactory,
@@ -17,7 +16,18 @@ from Arbie.Variables import Address
 
 
 class App(object):
-    """App is used for configuring and running Arbie."""
+    """App is used for configuring and running Arbie.
+
+    It is configured with a yaml file.
+    The yaml file can have the following properties.
+
+    web3_address: url:port
+    redis_address: host_name:port
+    weth_address: ethereum address to token
+    uniswap_address: ethereum address to uniswap factory
+    balancer_address: ethereum address to balancer factory
+
+    """
 
     uni_key = "uniswap_factory"
     bal_key = "balancer_factory"
@@ -26,8 +36,8 @@ class App(object):
         self.config = config
         if "store" in kwargs:
             self.store = kwargs.get("store")
-        elif "load_path" in kwargs:
-            self._load(kwargs.get("load_path"))
+        elif self._get_config("redis_address"):
+            self.store = Store(state=RedisState(self.config["redis_address"]))
         else:
             self.store = Store()
         actions = self._get_config("actions")
@@ -42,16 +52,6 @@ class App(object):
             logging.getLogger().warning("No actions given in configuration")
             return
         self.action_tree.run()
-
-    def save(self, save_path):
-        self.store.state.pop(self.uni_key, None)
-        self.store.state.pop(self.bal_key, None)
-        with open(save_path, "wb") as save_file:
-            pickle.dump(self.store, save_file)
-
-    def _load(self, load_path):
-        with open(load_path, "rb") as load_file:
-            self.store = pickle.load(load_file)  # noqa: S301
 
     def _set_up(self):
         address = self._get_config("web3_address")
