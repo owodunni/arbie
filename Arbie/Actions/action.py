@@ -33,16 +33,15 @@ class Action(object):
     by parsing their __doc__ and comparing with the settings that
     have been given when starting Arbie.
 
-    [Settings]
     Everything bellow the settings section is parsed as yaml.
     There are two lists that need to be configured. The input
     list and the output list. These are then mapped to the items
     that can be read to the store.
-
+    [Settings]
     input:
-        key: default value | variable name
+        key_name: 1  # default_value
     output:
-        key: variable name
+        key_name: variable_name
     """
 
     input_key = "input"
