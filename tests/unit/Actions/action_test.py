@@ -14,6 +14,33 @@ def redis_store(redis_state):
     return Store(redis_state)
 
 
+class TestAction(object):
+
+
+    in_variable_name = "pools"
+    out_variable_name = "tokens"
+
+    in_settings = {in_variable_name: "uniswap"}
+    out_settings = {out_variable_name: "good_tokens"}
+
+    def test_get_input_settings(self, mocker):
+        mocker.patch(
+            "Arbie.Actions.action.yaml.safe_load",
+            return_value = {
+                Action.input_key: TestAction.in_settings,
+                Action.output_key: TestAction.out_settings})
+        input_settings = Action().get_input_settings()
+        assert TestAction.in_settings == input_settings
+
+    def test_get_output_settings(self, mocker):
+        assert False
+
+    def test_on_next(self, mocker):
+       with pytest.raises(NotImplementedError):
+            Action().on_next(None)
+
+
+
 class DummyAction(Action):
     """Dummy action used to test store.
 
