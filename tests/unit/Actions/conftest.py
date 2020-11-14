@@ -7,15 +7,15 @@ from pytest_mock.plugin import MockerFixture
 from Arbie.Actions import RedisState
 
 
-def patch_redis(mocker: MockerFixture) -> MagicMock:
+@pytest.fixture
+def redis_mock(mocker: MockerFixture) -> MagicMock:
     mock = MagicMock()
     mocker.patch("Arbie.Actions.redis_state.redis.Redis", return_value=mock)
     return mock
 
 
 @pytest.fixture
-def redis_state(mocker: MockerFixture):
-    mock = patch_redis(mocker)
+def redis_state(redis_mock):
     state = RedisState("good.host.org:1337")
-    assert mock.ping.called
+    assert redis_mock.ping.called
     return state
