@@ -12,6 +12,18 @@ def init_redis(address):
     return redis.Redis(host=host_and_port[0], port=host_and_port[1], db=0)
 
 
+def _is_collection(key):
+    parts = key.split(".")
+    return len(parts) == 3 and parts[2].endswith("s")
+
+
+def _is_item(key):
+    parts = key.split(".")
+    if len(parts) == 3 and not _is_collection(key):
+        return True
+    return len(parts) == 4
+
+
 class RedisState(object):
     """A bridge to access the state stored in redis.
 
@@ -44,20 +56,22 @@ class RedisState(object):
         self.local_state = {}
 
     def __getitem__(self, key):
-        if self._is_collection(key):
+        if _is_collection(key):
             return self._get_collection(key)
-        elif self._is_item(key):
+        elif _is_item(key):
             return self._get_item(key)
         return self.local_state[key]
 
     def __setitem__(self, key, value):
-        if self._is_collection(key):
+        if _is_collection(key):
             self._add_collection(key, value)
-        elif self._is_item(key):
+        elif _is_item(key):
             self._add_item(key, value)
         self.local_state[key] = value
 
     def __contains__(self, item) -> bool:
+        if item is None:
+            return False
         if item in self.local_state:
             return True
         return self.r.exists(item) == 1
@@ -67,32 +81,17 @@ class RedisState(object):
 
     def delete(self, key):
         pipe = self.r.pipeline()
-        if self._is_collection(key):
+        if _is_collection(key):
             collection = self.r.smembers(key)
             for item in collection:
                 pipe.delete(f"{key}.{item}")
         pipe.delete(key)
         pipe.execute()
 
-    def _is_collection(self, key):
-        parts = key.split(".")
-        return len(parts) == 3 and parts[2].endswith("s")
-
-    def _is_item(self, key):
-        parts = key.split(".")
-        if len(parts) == 3 and not self._is_collection(key):
-            return True
-        return len(parts) == 4
-
-    def _get_members(self, key):
-        collection = self.r.smembers(key)
-        if not collection:
-            raise KeyError(f"key: {key} returned a empty set.")
-        return collection
-
     def _get_collection(self, key):
+        self._exist_or_raise(key)
         pipe = self.r.pipeline()
-        for item in self._get_members(key):
+        for item in self.r.smembers(key):
             item_name = item.decode("utf-8")
             item_key = f"{key}.{item_name}"
             pipe.get(item_key)
@@ -100,10 +99,8 @@ class RedisState(object):
         return list(map(lambda i: pickle.loads(i), raw_items))  # noqa: S301
 
     def _get(self, key):
-        item = self.r.get(key)
-        if item is None:
-            raise KeyError(f"key: {key} was not found in Redis")
-        return item
+        self._exist_or_raise(key)
+        return self.r.get(key)
 
     def _get_item(self, key):
         return pickle.loads(self._get(key))  # noqa: S301
@@ -118,3 +115,7 @@ class RedisState(object):
 
     def _add_item(self, key, value):
         self.r.set(key, pickle.dumps(value))
+
+    def _exist_or_raise(self, key):
+        if not self.__contains__(key):
+            raise KeyError(f"key: {key} was not found in Redis")
