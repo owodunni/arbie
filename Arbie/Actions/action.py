@@ -16,6 +16,9 @@ class Argument(object):
         else:
             self.value = default_value
 
+    def __eq__(self, other):
+        return self.name == other.name and self.value == other.value
+
 
 def parse_settings(settings: Dict):
     if settings is None:

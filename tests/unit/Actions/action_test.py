@@ -2,6 +2,7 @@
 import pytest
 
 from Arbie.Actions import Action, Store
+from Arbie.Actions.action import Argument
 
 
 @pytest.fixture
@@ -16,29 +17,34 @@ def redis_store(redis_state):
 
 class TestAction(object):
 
-
     in_variable_name = "pools"
+    in_constant_name = "amount"
     out_variable_name = "tokens"
 
-    in_settings = {in_variable_name: "uniswap"}
+    in_settings = {in_variable_name: "uniswap",
+            in_constant_name: 1337}
     out_settings = {out_variable_name: "good_tokens"}
 
     def test_get_input_settings(self, mocker):
         mocker.patch(
             "Arbie.Actions.action.yaml.safe_load",
-            return_value = {
+            return_value={
                 Action.input_key: TestAction.in_settings,
-                Action.output_key: TestAction.out_settings})
-        input_settings = Action().get_input_settings()
-        assert TestAction.in_settings == input_settings
-
-    def test_get_output_settings(self, mocker):
-        assert False
+                Action.output_key: TestAction.out_settings,
+            },
+        )
+        action = Action()
+        assert {
+            TestAction.in_variable_name: Argument("uniswap"),
+            TestAction.in_constant_name: Argument(1337)
+        } == action.get_input_settings()
+        assert {
+            TestAction.out_variable_name: Argument("good_tokens")
+        } == action.get_output_settings()
 
     def test_on_next(self, mocker):
-       with pytest.raises(NotImplementedError):
+        with pytest.raises(NotImplementedError):
             Action().on_next(None)
-
 
 
 class DummyAction(Action):
