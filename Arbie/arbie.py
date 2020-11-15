@@ -17,17 +17,7 @@ from Arbie.Contracts.contract import to_network  # noqa: WPS347
 class App(object):
     """App is used for configuring and running Arbie.
 
-    It is configured with a yaml file.
-    The yaml file can have the following properties.
-
-    web3_address: url:port
-    redis_address: host_name:port
-    weth_address: ethereum address to token
-    uniswap_address: ethereum address to uniswap factory
-    balancer_address: ethereum address to balancer factory
-
     """
-
     uni_key = "uniswap_factory"
     bal_key = "balancer_factory"
 
