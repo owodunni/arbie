@@ -12,7 +12,7 @@ def config_file() -> str:
     actions:
         PathFinder:
             input:
-                unit_of_account: weth
+                weth: weth
                 min_liquidity: 4
             output:
                 cycles: found_cycles
@@ -47,14 +47,14 @@ class TestMain(object):
 
     def test_setup_and_run(self, config_file: str, store: Store, mocker: MockerFixture):
         setup_mocks(mocker, config_file)
-        run_mock = mocker.patch("Arbie.arbie.ActionTree.run")
+        run_mock = mocker.patch("Arbie.settings_parser.ActionTree.run")
 
         run_main()
         assert run_mock.called
 
     def test_fail_on_run(self, config_file: str, store: Store, mocker: MockerFixture):
         setup_mocks(mocker, config_file)
-        run_mock = mocker.patch("Arbie.arbie.ActionTree.run")
+        run_mock = mocker.patch("Arbie.settings_parser.ActionTree.run")
         run_mock.side_effect = ValueError("Failed to run action")
 
         with pytest.raises(ValueError):

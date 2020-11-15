@@ -106,12 +106,21 @@ def pair_factory(
 @pytest.fixture
 def base_config(web3_server, redis_server, weth, pool_factory, pair_factory):
     return f"""
+    store:
+        address: {redis_server}
+    web3:
+        address: {web3_server}
 
-    web3_address: {web3_server}
-    redis_address: {redis_server}
-    weth_address: '{weth.get_address()}'
-    uniswap_address: '{pair_factory.get_address()}'
-    balancer_address: '{pool_factory.get_address()}'
+    variables:
+        weth:
+            type: Token
+            address: '{weth.get_address()}'
+        uniswap_factory:
+            type: UniswapFactory
+            address: '{pair_factory.get_address()}'
+        balancer_factory:
+            type: BalancerFactory
+            address: '{pool_factory.get_address()}'
     """
 
 
@@ -143,7 +152,7 @@ def full_config(base_config):
         PathFinder:
             input:
                 pools: arbie.version.pools
-                unit_of_account: weth
+                weth: weth
             output:
                 trades: trades
         Arbitrage:

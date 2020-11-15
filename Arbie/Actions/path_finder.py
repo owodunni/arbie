@@ -103,7 +103,7 @@ class PathFinder(Action):
     [Settings]
     input:
         pools: pools
-        unit_of_account: None
+        weth: None
         min_liquidity: 1
         max_depth: 5
     output:
@@ -113,7 +113,7 @@ class PathFinder(Action):
 
     def on_next(self, data):
         graph = FilteredTradingGraph(TradingGraph(data.pools()), data.min_liquidity())
-        finder = CycleFinder(graph.graph, data.unit_of_account(), data.max_depth())
+        finder = CycleFinder(graph.graph, data.weth(), data.max_depth())
         cycles = sorted(finder.find_all_cycles(), key=lambda x: x.ratio)
         data.cycles(cycles)
         trades = []

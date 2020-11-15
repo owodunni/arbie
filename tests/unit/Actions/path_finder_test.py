@@ -2,6 +2,7 @@
 import pytest
 import yaml
 
+from Arbie import SettingsParser
 from Arbie.Actions import Store
 from Arbie.arbie import App
 
@@ -12,7 +13,7 @@ def config_file():
     actions:
         PathFinder:
             input:
-                unit_of_account: eth
+                weth: eth
                 min_liquidity: 4
             output:
                 cycles: found_cycles
@@ -29,9 +30,11 @@ def store(pools, eth) -> Store:
 
 
 class TestPathFinder(object):
-    def test_run(self, store, config_file):
+    def test_run(self, store, config_file, mocker):
+        mocker.patch.object(SettingsParser, "setup_store", return_value=store)
+
         config = yaml.safe_load(config_file)
-        app = App(config, store=store)
+        app = App(config)
         assert len(app.action_tree.actions) == 2
         app.run()
         assert len(store["found_cycles"]) == 5
