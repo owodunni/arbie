@@ -3,6 +3,7 @@ from typing import List
 
 import pytest
 
+from Arbie.address import dummy_token_generator
 from Arbie.Variables import Pool, Token
 
 small = 10000
@@ -12,22 +13,22 @@ large = 100000000
 
 @pytest.fixture
 def eth() -> Token:
-    return Token("eth", 1)
+    return dummy_token_generator("eth", 1)
 
 
 @pytest.fixture
 def dai() -> Token:
-    return Token("dai", 300)
+    return dummy_token_generator("dai", 300)
 
 
 @pytest.fixture
 def btc() -> Token:
-    return Token("btc", 3.0 / 100)
+    return dummy_token_generator("btc", 3.0 / 100)
 
 
 @pytest.fixture
 def yam() -> Token:
-    return Token("yam", 3000)
+    return dummy_token_generator("yam", 3000)
 
 
 @pytest.fixture

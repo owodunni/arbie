@@ -3,7 +3,7 @@
 import logging
 
 from Arbie.Contracts.contract import Contract
-from Arbie.Variables import Address, BigNumber, Token
+from Arbie.Variables import BigNumber, Token
 
 
 class IERC20Token(Contract):
@@ -17,23 +17,23 @@ class IERC20Token(Contract):
     def decimals(self) -> int:
         return self.contract.functions.decimals().call()
 
-    def balance_of(self, owner: Address) -> BigNumber:
-        value = self.contract.functions.balanceOf(owner.value).call()
+    def balance_of(self, owner: str) -> BigNumber:
+        value = self.contract.functions.balanceOf(owner).call()
         return BigNumber.from_value(value, self.decimals())
 
-    def transfer(self, to: Address, bg_number: BigNumber) -> bool:
-        transaction = self.contract.functions.transfer(to.value, bg_number.value)
+    def transfer(self, to: str, bg_number: BigNumber) -> bool:
+        transaction = self.contract.functions.transfer(to, bg_number.value)
         return self._transact_status(transaction)
 
-    def approve(self, spender: Address, bg_number: BigNumber) -> bool:
-        transaction = self.contract.functions.approve(spender.value, bg_number.value)
+    def approve(self, spender: str, bg_number: BigNumber) -> bool:
+        transaction = self.contract.functions.approve(spender, bg_number.value)
         return self._transact_status(transaction)
 
     def approve_owner(self):
         return self.approve(self.owner_address, self.balance_of(self.owner_address))
 
     def create_token(self, price=0):
-        return Token("", price, self.get_address())
+        return Token("", self.get_address(), price)
 
 
 class BadERC20Token(IERC20Token):
@@ -48,7 +48,7 @@ class GenericToken(IERC20Token):
     abi = "erc20"
 
     def __str__(self):
-        return f"GenericToken, name: {self.get_name()}, address: {self.get_address().value}"
+        return f"GenericToken, name: {self.get_name()}, address: {self.get_address()}"
 
     def __repr__(self):
         return self.__str__()
@@ -64,4 +64,4 @@ class GenericToken(IERC20Token):
             logging.getLogger().warning(
                 f"Token: {self.get_address()} dosn't have a name."
             )
-        return Token(name, price, self.get_address())
+        return Token(name, self.get_address(), price)

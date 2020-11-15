@@ -8,7 +8,7 @@ from Arbie.Contracts.circuit_breaker import CircuitBreaker
 from Arbie.Contracts.contract import Contract, ContractFactory
 from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.Contracts.tokens import GenericToken
-from Arbie.Variables import Address, BigNumber
+from Arbie.Variables import BigNumber
 
 logger = logging.getLogger()
 
@@ -21,8 +21,8 @@ class UniswapPair(PoolContract):
     fee = 0.003
     weight = 0.5
 
-    def mint(self, address: Address) -> bool:
-        transaction = self.contract.functions.mint(address.value)
+    def mint(self, address: str) -> bool:
+        transaction = self.contract.functions.mint(address)
         return self._transact_status(transaction)
 
     def get_token0(self) -> GenericToken:
@@ -56,7 +56,7 @@ class UniswapPair(PoolContract):
     def _get_token(self, function) -> GenericToken:
         cf = ContractFactory(self.w3, GenericToken)
         token_address = function.call()
-        return cf.load_contract(self.owner_address, address=Address(token_address))
+        return cf.load_contract(self.owner_address, address=token_address)
 
 
 class UniswapFactory(Contract):
@@ -67,8 +67,8 @@ class UniswapFactory(Contract):
     def all_pairs_length(self) -> int:
         return self.contract.functions.allPairsLength().call()
 
-    def get_pair_address(self, index) -> Address:
-        return Address(self.contract.functions.allPairs(index).call())
+    def get_pair_address(self, index) -> str:
+        return self.contract.functions.allPairs(index).call()
 
     def all_pairs(self, sleep=0) -> List[UniswapPair]:
         pairs = []
@@ -79,7 +79,7 @@ class UniswapFactory(Contract):
 
     def create_pair(self, token_a: GenericToken, token_b: GenericToken) -> UniswapPair:
         transaction = self.contract.functions.createPair(
-            token_a.get_address().value, token_b.get_address().value
+            token_a.get_address(), token_b.get_address()
         )
 
         if not self._transact_status(transaction):

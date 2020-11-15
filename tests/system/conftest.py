@@ -5,7 +5,7 @@ from web3 import Web3
 
 from Arbie.Contracts.contract import ContractFactory
 from Arbie.Contracts.tokens import BadERC20Token, GenericToken
-from Arbie.Variables import Address, BigNumber
+from Arbie.Variables import BigNumber
 
 
 @pytest.fixture
@@ -24,15 +24,13 @@ def w3(web3_server):
 
 
 @pytest.fixture
-def deploy_address(w3) -> Address:
-    deploy_address = w3.eth.accounts[0]
-    return Address(deploy_address)
+def deploy_address(w3) -> str:
+    return w3.eth.accounts[0]
 
 
 @pytest.fixture
-def dummy_address(w3) -> Address:
-    address = w3.eth.accounts[1]
-    return Address(address)
+def dummy_address(w3) -> str:
+    return w3.eth.accounts[1]
 
 
 @pytest.fixture

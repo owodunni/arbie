@@ -5,7 +5,6 @@ from typing import List, NewType, Tuple
 from sympy import symbols
 
 from Arbie import PoolValueError
-from Arbie.Variables.address import Address
 from Arbie.Variables.token import Balance, Balances, Token, Tokens
 
 x = symbols("x")
@@ -37,10 +36,9 @@ class Pool(object):
         self.weights = Balance.create(tokens, weights)
         self.fee = fee
 
+        self.address = None
         if "address" in kwargs:
             self.address = kwargs.get("address")
-        else:
-            self.address = Address()
 
         if not isclose(sum(weights), 1, abs_tol=1e-3):  # noqa: WPS432
             raise PoolValueError(
@@ -61,7 +59,7 @@ Pool(
   Balances: {self.balances},
   Weights: {self.weights},
   Fee: {self.fee}
-  Address: {self.address.value})"""
+  Address: {self.address})"""
 
     def __repr__(self):
         return self.__str__()

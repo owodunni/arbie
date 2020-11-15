@@ -12,7 +12,6 @@ from Arbie.Contracts import (
     UniswapFactory,
 )
 from Arbie.Contracts.contract import to_network  # noqa: WPS347
-from Arbie.Variables import Address
 
 
 class App(object):
@@ -86,15 +85,15 @@ class App(object):
                 bal_factory.load_contract(network=to_network(network)),
             )
         else:
-            uni_address = Address(self.config["uniswap_address"])
-            bal_address = Address(self.config["balancer_address"])
+            uni_address = self.config["uniswap_address"]
+            bal_address = self.config["balancer_address"]
             self.store.add(self.uni_key, uni_factory.load_contract(address=uni_address))
             self.store.add(self.bal_key, bal_factory.load_contract(address=bal_address))
 
     def _set_up_weth(self):
         weth_factory = ContractFactory(self.w3, IERC20Token)
 
-        weth_address = Address(self.config["weth_address"])
+        weth_address = self.config["weth_address"]
         self.store.add(
             "weth", weth_factory.load_contract(address=weth_address).create_token(1)
         )
