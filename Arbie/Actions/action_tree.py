@@ -24,14 +24,22 @@ def create_action(name, config, extra_actions):
             return action_cls(config)
     raise ValueError(f"Action: {name} not found.")
 
+class EventHandler(object):
+
+    def register(self, function):
+        self.function = function
+
+
 
 class ActionTree(object):
     def __init__(self, store: Store):
         self.store = store
         self.actions = []
+        self.event_handler = EventHandler()
+        self.event_handler.register(self.run)
 
-    def setup_event(self):
-        return None
+    def register_event(self, triggers):
+        self.event_handler.add(triggers)
 
     @classmethod
     def create(cls, action_configs: Dict, store: Store, extra_actions=None):

@@ -41,7 +41,7 @@ def config():
             event:
                 - once
                 - new_block
-                - key : arbie.1.pools
+                - redis : arbie.1.pools
             actions:
                 PathFinder:
                     input:
