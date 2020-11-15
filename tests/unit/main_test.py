@@ -9,14 +9,15 @@ from Arbie.Actions import Store
 @pytest.fixture
 def config_file() -> str:
     return """
-    actions:
-        PathFinder:
-            input:
-                weth: weth
-                min_liquidity: 4
-            output:
-                cycles: found_cycles
-        Arbitrage:
+    action_tree:
+        actions:
+            PathFinder:
+                input:
+                    weth: weth
+                    min_liquidity: 4
+                output:
+                    cycles: found_cycles
+            Arbitrage:
     """
 
 

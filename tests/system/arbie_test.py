@@ -129,10 +129,11 @@ def config_file(base_config):
     return (
         base_config
         + """
-    actions:
-        PoolFinder:
-            input:
-                balancer_start: 0
+    action_tree:
+        actions:
+            PoolFinder:
+                input:
+                    balancer_start: 0
     """
     )
 
@@ -142,24 +143,24 @@ def full_config(base_config):
     return (
         base_config
         + """
-    actions:
-        PoolFinder:
-            input:
-                balancer_start: 0
-            output:
-                pools: arbie.version.pools
-                tokens: tokens
-        PathFinder:
-            input:
-                pools: arbie.version.pools
-                weth: weth
-            output:
-                trades: trades
-        Arbitrage:
-            input:
-                trades: trades
-            output:
-
+    action_tree:
+        actions:
+            PoolFinder:
+                input:
+                    balancer_start: 0
+                output:
+                    pools: arbie.version.pools
+                    tokens: tokens
+            PathFinder:
+                input:
+                    pools: arbie.version.pools
+                    weth: weth
+                output:
+                    trades: trades
+            Arbitrage:
+                input:
+                    trades: trades
+                output:
     """
     )
 

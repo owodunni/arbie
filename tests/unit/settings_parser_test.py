@@ -37,12 +37,17 @@ def config():
                 type: str
                 value: ethereum
 
-        actions:
-            PathFinder:
-                input:
-                    weth: my_weth_token
-                output:
-                    trades: all_trades
+        action_tree:
+            event:
+                - once
+                - new_block
+                - key : arbie.1.pools
+            actions:
+                PathFinder:
+                    input:
+                        weth: my_weth_token
+                    output:
+                        trades: all_trades
         """
     return yaml.safe_load(raw_conf)
 
