@@ -31,6 +31,7 @@ class ActionTree(object):
         self.store = store
         self.actions = []
         self.channel = None
+        self.is_stopped = False
 
     def register_event(self, event_channel):
         self.channel = self.store.subscribe(event_channel)
@@ -48,10 +49,14 @@ class ActionTree(object):
 
     def run(self):
         if self.channel is not None:
-            for new_message in self.channel.listen():
-                logging.getLogger().info(f"New message {new_message}")
-                self._run_once()
+            self._run_continous()
         else:
+            self._run_once()
+
+    def _run_continous(self):
+        while not self.is_stopped:
+            new_message = self.channel.get_message()
+            logging.getLogger().info(f"New message {new_message}")
             self._run_once()
 
     def _run_once(self):
