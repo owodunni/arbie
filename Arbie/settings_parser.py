@@ -112,10 +112,13 @@ class SettingsParser(object):
 
     def action_tree(self, store):
         if Keys.action_tree in self.config:
-            action_tree_conf = self.config[Keys.action_tree]
-            tree = ActionTree.create(action_tree_conf[Keys.actions], store)
-            tree.setup_event()
-            return tree
+            return self._setup_action_tree(store, self.config[Keys.action_tree])
+
+    def _setup_action_tree(self, store, config):
+        tree = ActionTree.create(config[Keys.actions], store)
+        if Keys.event in config:
+            tree.register_event(config[Keys.event])
+        return tree
 
     def _add_variables(self, store):
         variable_parser = VariableParser(
