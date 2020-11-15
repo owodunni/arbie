@@ -4,10 +4,11 @@ import pytest
 
 from Arbie.Actions import ActionTree, Store
 from Arbie.Actions.arbitrage import Arbitrage, ArbitrageFinder
-from Arbie.Variables import ArbitrageOpportunity, Pool, Token, Trade
+from Arbie.address import dummy_token_generator
+from Arbie.Variables import ArbitrageOpportunity, Pool, Trade
 
-dai = Token("dai", 300.0)
-eth = Token("eth", 1)
+dai = dummy_token_generator("dai", 300.0)
+eth = dummy_token_generator("eth", 1)
 tokens = [dai, eth]
 
 
@@ -56,7 +57,7 @@ class TestArbitrage(object):
     def test_find_arbitrage_wrong_token(self):
         pool1 = Pool(tokens, [400, 1], [0.9, 0.1])
         pool2 = Pool(tokens, [410, 1], [0.1, 0.9])
-        sai = Token("sai", 300.0)
+        sai = dummy_token_generator("sai", 300.0)
         trade = [Trade(pool1, dai, sai), Trade(pool2, sai, dai)]
 
         with pytest.raises(ValueError):

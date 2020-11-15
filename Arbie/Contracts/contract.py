@@ -6,8 +6,6 @@ from typing import Tuple
 
 from pkg_resources import resource_string
 
-from Arbie.Variables import Address
-
 
 class Network(Enum):
     mainnet = 0
@@ -23,11 +21,11 @@ def to_network(string: str) -> Network:
     return Network.ropsten
 
 
-def transact(w3, address: Address, transaction):
+def transact(w3, address: str, transaction):
     """Transact a transaction and return transaction receipt."""
     tx_hash = transaction.transact(
         {
-            "from": address.value,
+            "from": address,
             "gas": 48814000,
         }
     )
@@ -38,13 +36,13 @@ def transact(w3, address: Address, transaction):
 class Contract(object):
     """Base class for contracts."""
 
-    def __init__(self, w3, owner_address: Address, contract):
+    def __init__(self, w3, owner_address: str, contract):
         self.w3 = w3
         self.owner_address = owner_address
         self.contract = contract
 
-    def get_address(self) -> Address:
-        return Address(self.contract.address)
+    def get_address(self) -> str:
+        return self.contract.address
 
     def _transact(self, transaction):
         return transact(self.w3, self.owner_address, transaction)
@@ -52,9 +50,9 @@ class Contract(object):
     def _transact_status(self, transaction) -> bool:
         return self._transact(transaction).status
 
-    def _transact_status_and_contract(self, transaction) -> Tuple[bool, Address]:
+    def _transact_status_and_contract(self, transaction) -> Tuple[bool, str]:
         tx_receipt = self._transact(transaction)
-        return tx_receipt.status, Address(tx_receipt.logs[1].address)
+        return tx_receipt.status, tx_receipt.logs[1].address
 
 
 class ContractFactory(object):
@@ -69,18 +67,18 @@ class ContractFactory(object):
             raise ValueError(f"{factory_class} dose not contain default parameters")
         self.factory_class = factory_class
 
-    def load_contract(self, owner_address: Address = None, **kwargs) -> Contract:
+    def load_contract(self, owner_address: str = None, **kwargs) -> Contract:
         """Load contract require address or network to be passed in kwargs."""
         address = self._read_address(**kwargs)
         contract = self._load_contract(address)
         return self.factory_class(self.w3, owner_address, contract)
 
-    def deploy_contract(self, owner_address: Address, *args) -> Contract:
+    def deploy_contract(self, owner_address: str, *args) -> Contract:
         contract_address = self._deploy_contract(owner_address, *args)
         contract = self._load_contract(contract_address)
         return self.factory_class(self.w3, owner_address, contract)
 
-    def _deploy_contract(self, deploy_address: Address, *args) -> Address:
+    def _deploy_contract(self, deploy_address: str, *args) -> str:
         """Deploy contract and pass on args to contract abi constructor."""
         contract = self.w3.eth.contract(
             abi=self._read_abi(), bytecode=self._read_bytecode()
@@ -89,7 +87,7 @@ class ContractFactory(object):
         transaction = contract.constructor(*args)
         tx_receipt = transact(self.w3, deploy_address, transaction)
 
-        return Address(tx_receipt.contractAddress)
+        return tx_receipt.contractAddress
 
     def _read_resource(self, path: str, filename: str) -> str:
         if path is None:
@@ -103,11 +101,9 @@ class ContractFactory(object):
     def _get_address(self, network: Network):
         json_data = json.loads(self._read_resource(None, "contract_addresses.json"))
 
-        address = json_data[self.factory_class.protocol][self.factory_class.abi][
+        return json_data[self.factory_class.protocol][self.factory_class.abi][
             network.name
         ]
-
-        return Address(address)
 
     def _read_abi(self):
         return self._read_resource(
@@ -128,5 +124,5 @@ class ContractFactory(object):
 
         raise NameError("kwargs does not contain network or address")
 
-    def _load_contract(self, address: Address):
-        return self.w3.eth.contract(address=address.value, abi=self._read_abi())
+    def _load_contract(self, address: str):
+        return self.w3.eth.contract(address=address, abi=self._read_abi())

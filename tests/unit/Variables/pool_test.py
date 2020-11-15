@@ -2,7 +2,8 @@
 import pytest
 
 from Arbie import PoolValueError
-from Arbie.Variables import Address, Pool, Token
+from Arbie.address import dummy_address_generator, dummy_token_generator
+from Arbie.Variables import Pool
 
 
 @pytest.fixture
@@ -17,7 +18,7 @@ def pool(tokens):
 
 class TestPool(object):
     def test_init_multi(self, tokens):
-        new_tokens = tokens + [Token("sai", 100)]
+        new_tokens = tokens + [dummy_token_generator("sai", 100)]
         pool = Pool(
             new_tokens, [4e3, 10, 10e5], [1 / 3.0, 1 / 3.0, 1 / 3.0]  # noqa: WPS221
         )  # noqa: WPS221
@@ -29,7 +30,7 @@ class TestPool(object):
             Pool(tokens, [400, 1], [0.75, 0.25], fee=2)
 
     def test_init_fee(self, tokens):
-        address = Address()
+        address = dummy_address_generator()
         pool = Pool(tokens, [400, 1], [0.75, 0.25], address=address)
         assert pool.address == address
 

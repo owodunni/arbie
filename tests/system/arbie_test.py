@@ -81,7 +81,7 @@ def pair_factory(
     deploy_address,
 ) -> UniswapFactory:
     factory = ContractFactory(w3, UniswapFactory).deploy_contract(
-        deploy_address, deploy_address.value
+        deploy_address, deploy_address
     )
 
     factory.setup_pair(

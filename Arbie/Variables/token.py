@@ -1,18 +1,14 @@
 """Basic token representation."""
 from typing import List, NewType
 
-from Arbie.Variables.address import Address
-
 
 class Token(object):
     """Token is a light weight representation of a ERC20 token."""
 
-    def __init__(self, name: str, price: float = None, address: Address = None):
+    def __init__(self, name: str, address: str, price: float = None):
         self.name = name
         self.price = price
         self.address = address
-        if self.address is None:
-            self.address = Address()
 
     def __str__(self):
         return self.name

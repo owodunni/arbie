@@ -8,7 +8,7 @@ from Arbie.Contracts.circuit_breaker import CircuitBreaker
 from Arbie.Contracts.contract import Contract, ContractFactory
 from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.Contracts.tokens import GenericToken
-from Arbie.Variables import Address, BigNumber
+from Arbie.Variables import BigNumber
 
 logger = logging.getLogger()
 
@@ -28,7 +28,7 @@ class BalancerPool(PoolContract):
             map(
                 (
                     lambda a: cf.load_contract(
-                        owner_address=self.owner_address, address=Address(a)
+                        owner_address=self.owner_address, address=a
                     )
                 ),
                 token_addresses,
@@ -39,7 +39,7 @@ class BalancerPool(PoolContract):
         tokens = self.get_tokens()
         balances = []
         for token in tokens:
-            b = self.contract.functions.getBalance(token.get_address().value).call()
+            b = self.contract.functions.getBalance(token.get_address()).call()
             try:
                 balances.append(BigNumber.from_value(b, token.decimals()))
             except Exception:
@@ -51,7 +51,7 @@ class BalancerPool(PoolContract):
             map(
                 (
                     lambda t: self.contract.functions.getNormalizedWeight(
-                        t.get_address().value
+                        t.get_address()
                     ).call()
                 ),
                 self.get_tokens(),
@@ -65,12 +65,12 @@ class BalancerPool(PoolContract):
             self.contract.functions.getSwapFee().call()
         ).to_number()
 
-    def bind(self, address: Address, balance: BigNumber, denorm_weight: int) -> bool:
+    def bind(self, address: str, balance: BigNumber, denorm_weight: int) -> bool:
         if denorm_weight < 1:
             raise ValueError("Weight should be larger than 1")
         eth_safe_weight = BigNumber(denorm_weight)
         transaction = self.contract.functions.bind(
-            address.value, balance.value, eth_safe_weight.value
+            address, balance.value, eth_safe_weight.value
         )
         return self._transact_status(transaction)
 
@@ -130,9 +130,7 @@ class BalancerFactory(Contract):
         factory = ContractFactory(self.w3, BalancerPool)
 
         for event in new_pool_event:
-            pool = factory.load_contract(
-                self.owner_address, address=Address(event.args.pool)
-            )
+            pool = factory.load_contract(self.owner_address, address=event.args.pool)
             pools.append(pool)
         return pools
 

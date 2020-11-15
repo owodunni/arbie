@@ -13,7 +13,7 @@ bg5 = BigNumber(5)
 @pytest.fixture
 def factory(deploy_address, w3) -> UniswapFactory:
     return ContractFactory(w3, UniswapFactory).deploy_contract(
-        deploy_address, deploy_address.value
+        deploy_address, deploy_address
     )
 
 
