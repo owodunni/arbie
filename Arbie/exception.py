@@ -15,3 +15,7 @@ class PoolValueError(ValueError):
     This can hapen when a pool dosn't have atleast 2 tokens.
     Or when the token weights dosn't add to one.
     """
+
+
+class StateError(Exception):
+    """Raised when there is an issue with the state."""

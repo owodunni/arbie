@@ -1,6 +1,7 @@
 """ActionTree is a set of Actions."""
 
 import inspect
+import logging
 import sys
 from typing import Dict, List, Tuple
 
@@ -24,22 +25,15 @@ def create_action(name, config, extra_actions):
             return action_cls(config)
     raise ValueError(f"Action: {name} not found.")
 
-class EventHandler(object):
-
-    def register(self, function):
-        self.function = function
-
-
 
 class ActionTree(object):
     def __init__(self, store: Store):
         self.store = store
         self.actions = []
-        self.event_handler = EventHandler()
-        self.event_handler.register(self.run)
+        self.channel = None
 
-    def register_event(self, triggers):
-        self.event_handler.add(triggers)
+    def register_event(self, event_channel):
+        self.channel = self.store.subscribe(event_channel)
 
     @classmethod
     def create(cls, action_configs: Dict, store: Store, extra_actions=None):
@@ -53,6 +47,14 @@ class ActionTree(object):
         self.actions.append(action)
 
     def run(self):
+        if self.channel is not None:
+            for new_message in self.channel.listen():
+                logging.getLogger().info(f"New message {new_message}")
+                self._run_once()
+        else:
+            self._run_once()
+
+    def _run_once(self):
         for action in self.actions:
             data = self.store.create_input(action)
             action.on_next(data)

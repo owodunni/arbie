@@ -4,6 +4,7 @@ from Arbie.exception import (  # noqa: F401
     DeployContractError,
     IERC20TokenError,
     PoolValueError,
+    StateError,
 )
 from Arbie.settings_parser import SettingsParser  # noqa: F401
 

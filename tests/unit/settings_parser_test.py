@@ -4,6 +4,7 @@ from unittest.mock import MagicMock
 import pytest
 import yaml
 
+from Arbie import StateError
 from Arbie.settings_parser import Keys, SettingsParser
 
 
@@ -39,9 +40,7 @@ def config():
 
         action_tree:
             event:
-                - once
-                - new_block
-                - redis : arbie.1.pools
+                arbie.1.pools
             actions:
                 PathFinder:
                     input:
@@ -50,6 +49,10 @@ def config():
                         trades: all_trades
         """
     return yaml.safe_load(raw_conf)
+
+
+def mock_web3(mocker):
+    mocker.patch("Arbie.settings_parser.Web3")
 
 
 class TestSettingsParser(object):
@@ -68,7 +71,7 @@ class TestSettingsParser(object):
         assert isinstance(store.state, dict)
 
     def test_set_up_store(self, config, mocker):
-        mocker.patch("Arbie.settings_parser.Web3")
+        mock_web3(mocker)
         del config[Keys.store]  # noqa: WPS420
 
         sp = SettingsParser(config)
@@ -76,7 +79,7 @@ class TestSettingsParser(object):
         assert len(store.state) == 7
 
     def test_set_up_store_no_variables(self, config, mocker):
-        mocker.patch("Arbie.settings_parser.Web3")
+        mock_web3(mocker)
         del config[Keys.store]  # noqa: WPS420
         del config[Keys.variables]  # noqa: WPS420
 
@@ -85,10 +88,19 @@ class TestSettingsParser(object):
         assert not store.state
 
     def test_set_up_action_tree(self, config, mocker):
-        mocker.patch("Arbie.settings_parser.Web3")
-        del config[Keys.store]  # noqa: WPS420
+        mock_web3(mocker)
+        mocker.patch("Arbie.settings_parser.RedisState")
 
         sp = SettingsParser(config)
         store = sp.setup_store()
         tree = sp.action_tree(store)
         assert len(tree.actions) == 1
+
+    def test_subscribe_raises(self, config, mocker):
+        mock_web3(mocker)
+        del config[Keys.store]  # noqa: WPS420
+
+        sp = SettingsParser(config)
+        store = sp.setup_store()
+        with pytest.raises(StateError):
+            sp.action_tree(store)
