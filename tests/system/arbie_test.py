@@ -171,13 +171,13 @@ class TestApp(object):
         config = yaml.safe_load(config_file)
         app = App(config)
         assert len(app.action_tree.actions) == 1
-        assert len(app.store.state.keys()) == 3
+        assert len(app.store.state.keys()) == 4
         return app
 
     @pytest.mark.slow
     def test_run(self, app):
         app.run()
-        assert len(app.store.state.keys()) == 5
+        assert len(app.store.state.keys()) == 6
         assert len(app.store.get("all_pools")) == 6
         tokens = app.store.get("all_tokens")
         assert len(tokens) == 3

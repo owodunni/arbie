@@ -73,7 +73,7 @@ class TestSettingsParser(object):
 
         sp = SettingsParser(config)
         store = sp.setup_store()
-        assert len(store.state) == 6
+        assert len(store.state) == 7
 
     def test_set_up_store_no_variables(self, config, mocker):
         mocker.patch("Arbie.settings_parser.Web3")
