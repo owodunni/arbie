@@ -32,6 +32,8 @@ class Keys(object):
     value = "value"
     version = "version"
     web3 = "web3"
+    action_tree = "action_tree"
+    event = "event"
 
 
 class VariableParser(object):
@@ -108,8 +110,9 @@ class SettingsParser(object):
         return Store()
 
     def action_tree(self, store):
-        if Keys.actions in self.config:
-            return ActionTree.create(self.config[Keys.actions], store)
+        if Keys.action_tree in self.config:
+            action_tree_conf = self.config[Keys.action_tree]
+            return ActionTree.create(action_tree_conf[Keys.actions], store)
 
     def _add_variables(self, store):
         variable_parser = VariableParser(
