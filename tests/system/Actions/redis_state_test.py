@@ -1,4 +1,4 @@
-"""Unittest of redis state."""
+"""System tests for RedisState."""
 import pickle  # noqa: S403
 
 import pytest
@@ -21,10 +21,6 @@ def tokens():
 
 
 class TestRedisState(object):
-    @pytest.fixture
-    def redis_state(self, redis_server):
-        return RedisState(redis_server)
-
     @pytest.fixture
     def redis_item(self, redis_state, token):
         redis_state.r.set(item_key, pickle.dumps(token))
