@@ -30,6 +30,9 @@ class ActionTree(object):
         self.store = store
         self.actions = []
 
+    def setup_event(self):
+        return None
+
     @classmethod
     def create(cls, action_configs: Dict, store: Store, extra_actions=None):
         tree = cls(store)

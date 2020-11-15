@@ -46,6 +46,7 @@ class VariableParser(object):
     def add_variables(self, store):
         for name, variable_config in self.config.items():
             store.add(name, self._create_variable(variable_config))
+        store.add(Keys.web3, self.w3)
 
     def set_up_web3(self, config):
         address = config[Keys.address]
@@ -112,7 +113,9 @@ class SettingsParser(object):
     def action_tree(self, store):
         if Keys.action_tree in self.config:
             action_tree_conf = self.config[Keys.action_tree]
-            return ActionTree.create(action_tree_conf[Keys.actions], store)
+            tree = ActionTree.create(action_tree_conf[Keys.actions], store)
+            tree.setup_event()
+            return tree
 
     def _add_variables(self, store):
         variable_parser = VariableParser(
