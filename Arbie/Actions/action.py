@@ -87,7 +87,8 @@ class Action(object):
         for key, name in config.items():
             if key not in settings:
                 raise ValueError(
-                    f"Argument: {key} not found in action: {type(self).__name__}"
+                    f"""Argument: {key} is not a valid input/output for action {type(self).__name__},
+                        look over your configuration"""
                 )
             settings[key] = Argument(name)
 

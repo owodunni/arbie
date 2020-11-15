@@ -8,11 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Add settings to Path Finder for choosing depth, when searching for cycles.
   So that we don't have to wait untill the heat death of the universe.
+- Add possibility to specify variable creation in config.yaml.
 ### Changed
+- How contract factories, web3 and redis connections are created.
 
 ### Removed
 - No longer possible to save and load store state to disk. We now use redis for
   keeping track of the state.
+- Address() we now use str as address representation. This integrates better with
+  web3.py
 
 ### Fixed
 
