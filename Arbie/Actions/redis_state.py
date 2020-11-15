@@ -76,6 +76,11 @@ class RedisState(object):
             return True
         return self.r.exists(item) == 1
 
+    def subscribe(self, event_channel):
+        p = self.r.pubsub()
+        p.psubscribe(event_channel)
+        return p
+
     def keys(self):
         return self.local_state.keys()
 

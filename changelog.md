@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add settings to Path Finder for choosing depth, when searching for cycles.
   So that we don't have to wait untill the heat death of the universe.
 - Add possibility to specify variable creation in config.yaml.
+- Make it possible to run action tree by subscribing to redis channel.
 ### Changed
 - How contract factories, web3 and redis connections are created.
 

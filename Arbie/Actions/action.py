@@ -4,6 +4,8 @@ from typing import Dict
 
 import yaml
 
+from Arbie import StateError
+
 
 class Argument(object):
     def __init__(self, default_value):
@@ -118,6 +120,12 @@ class Store(object):
 
     def get(self, key):
         return self.state[key]
+
+    def subscribe(self, event_channel):
+        try:
+            self.state.subscribe(event_channel)
+        except Exception:
+            raise StateError("Redis state is required to subscribe to store.")
 
     def create_input(self, action):
         return self._create_data(
