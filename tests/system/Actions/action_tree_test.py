@@ -1,4 +1,6 @@
 """System tests for ActionTree."""
+import pytest
+import asyncio
 
 from Arbie.Actions import Action, ActionTree, Store
 
@@ -35,11 +37,20 @@ class ActionB(Action):
         data.times_ran(data.times_ran_old() + 1)
         data.my_result(data.someone_elses_result())
 
+@pytest.fixture
+def action_tree_a(redis_store: Store):
+    tree = ActionTree(redis_store)
+    tree.add_action(ActionA())
+    return tree
 
-class ActionTreeTest(object):
-    def test_subscribe_no_publisher(self):
+
+class TestActionTree(object):
+    @pytest.mark.asyncio
+    async def test_subscribe_no_publisher(self, action_tree_a, redis_store):
         # what happens if we never publish anything
-        return None
+        await action_tree_a.run()
+        await action_tree_a.run()
+        assert redis_store.get("actionA.1.times_ran") == 2
 
     def test_subscribe(self, redis_store: Store):
         tree = ActionTree(redis_store)

@@ -174,16 +174,18 @@ class TestApp(object):
         assert len(app.store.state.keys()) == 4
         return app
 
+    @pytest.mark.asyncio
     @pytest.mark.slow
-    def test_run(self, app):
-        app.run()
+    async def test_run(self, app):
+        await app.run()
         assert len(app.store.state.keys()) == 6
         assert len(app.store.get("all_pools")) == 6
         tokens = app.store.get("all_tokens")
         assert len(tokens) == 3
 
+    @pytest.mark.asyncio
     @pytest.mark.slow
-    def test_full_pipeline(self, full_config):
+    async def test_full_pipeline(self, full_config):
         config = yaml.safe_load(full_config)
         app = App(config)
-        app.run()
+        await app.run()
