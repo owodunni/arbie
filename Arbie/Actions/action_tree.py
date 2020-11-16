@@ -1,5 +1,6 @@
 """ActionTree is a set of Actions."""
 
+import asyncio
 import inspect
 import logging
 import sys
@@ -47,19 +48,24 @@ class ActionTree(object):
     def add_action(self, action: Action):
         self.actions.append(action)
 
-    def run(self):
+    async def run(self):
+        self.is_stopped = False
         if self.channel is not None:
-            self._run_continous()
+            await self._run_continous()
         else:
-            self._run_once()
+            await self._run_once()
 
-    def _run_continous(self):
+    def stop(self):
+        self.is_stopped = True
+
+    async def _run_continous(self):
         while not self.is_stopped:
             new_message = self.channel.get_message()
             logging.getLogger().info(f"New message {new_message}")
-            self._run_once()
+            await self._run_once()
+            await asyncio.sleep(0.1)
 
-    def _run_once(self):
+    async def _run_once(self):
         for action in self.actions:
             data = self.store.create_input(action)
             action.on_next(data)

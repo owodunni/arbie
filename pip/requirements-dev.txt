@@ -1,6 +1,7 @@
 pytest
 pytest-mock
 pytest-cov
+pytest-asyncio
 flake8
 autopep8
 wemake-python-styleguide

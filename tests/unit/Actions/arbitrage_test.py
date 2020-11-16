@@ -65,11 +65,12 @@ class TestArbitrage(object):
 
 
 class TestArbitrageAction(object):
-    def test_on_next(self, trade1, trade2):
+    @pytest.mark.asyncio
+    async def test_on_next(self, trade1, trade2):
         store = Store()
         store.add("all_trades", [trade1, trade2])
         tree = ActionTree(store)
         tree.add_action(Arbitrage())
-        tree.run()
+        await tree.run()
 
         assert len(store.get("filtered_trades")) == 2

@@ -13,8 +13,8 @@ class App(object):
         self.store = sp.setup_store()
         self.action_tree = sp.action_tree(self.store)
 
-    def run(self):
+    async def run(self):
         if self.action_tree is None:
             logging.getLogger().warning("No actions given in configuration")
             return
-        self.action_tree.run()
+        await self.action_tree.run()

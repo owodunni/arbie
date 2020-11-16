@@ -31,13 +31,14 @@ def store(pools, eth) -> Store:
 
 
 class TestPathFinder(object):
-    def test_run(self, store, config_file, mocker):
+    @pytest.mark.asyncio
+    async def test_run(self, store, config_file, mocker):
         mocker.patch.object(SettingsParser, "setup_store", return_value=store)
 
         config = yaml.safe_load(config_file)
         app = App(config)
         assert len(app.action_tree.actions) == 2
-        app.run()
+        await app.run()
         assert len(store["found_cycles"]) == 5
         trades = app.store["filtered_trades"]
         assert trades[0].profit == pytest.approx(1.47700668)

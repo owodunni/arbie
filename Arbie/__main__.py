@@ -44,7 +44,7 @@ def setup_logging(log_file: str, severity=logging.INFO):
     root_logger.addHandler(file_handler)
 
 
-def main(argv=None):
+async def main(argv=None):
     arguments = docopt(__doc__, argv, version=Arbie.__version__)  # noqa: WPS609
 
     logging.getLogger().info(f"arguments: {arguments}")
@@ -59,7 +59,7 @@ def main(argv=None):
     app = App(config)
 
     try:
-        app.run()
+        await app.run()
     except Exception as ex:
         logging.getLogger().error(ex)
         raise ex
