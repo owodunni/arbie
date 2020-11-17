@@ -67,7 +67,10 @@ class RedisState(object):
             self._add_collection(key, value)
         elif _is_item(key):
             self._add_item(key, value)
-        self.local_state[key] = value
+        else:
+            self.local_state[key] = value
+            return
+        self.publish(key, "updated")
 
     def __contains__(self, item) -> bool:
         if item is None:
@@ -80,6 +83,9 @@ class RedisState(object):
         p = self.r.pubsub()
         p.psubscribe(event_channel)
         return p
+
+    def publish(self, event_channel, message):
+        self.r.publish(event_channel, message)
 
     def keys(self):
         return self.local_state.keys()
