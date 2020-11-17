@@ -36,7 +36,6 @@ class ActionTree(object):
 
     def register_event(self, event_channel):
         self.channel = self.store.subscribe(event_channel)
-        self.channel.get_message()
 
     @classmethod
     def create(cls, action_configs: Dict, store: Store, extra_actions=None):
@@ -61,11 +60,12 @@ class ActionTree(object):
 
     async def _run_continous(self):
         while not self.is_stopped:
-            new_message = self.channel.get_message()
-            if new_message and new_message["type"] != "psubscribe":
+            new_message = self.channel.get_message(True)
+            if new_message:
                 logging.getLogger().info(f"New message {new_message}")
                 await self._run_once()
-            await asyncio.sleep(0.1)
+            else:
+                await asyncio.sleep(0.1)
 
     async def _run_once(self):
         for action in self.actions:
