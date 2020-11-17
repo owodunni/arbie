@@ -40,14 +40,15 @@ async def run_main():
     await main(["-f", "giberich.yml"])
 
 
+pytestmark = pytest.mark.asyncio
+
+
 class TestMain(object):
-    @pytest.mark.asyncio
     async def test_config_not_found(self, mocker: MockerFixture):
         setup_mocks(mocker, None)
         with pytest.raises(FileNotFoundError):
             await run_main()
 
-    @pytest.mark.asyncio
     async def test_setup_and_run(
         self, config_file: str, store: Store, mocker: MockerFixture
     ):
@@ -57,7 +58,6 @@ class TestMain(object):
         await run_main()
         assert run_mock.called
 
-    @pytest.mark.asyncio
     async def test_fail_on_run(
         self, config_file: str, store: Store, mocker: MockerFixture
     ):
@@ -68,7 +68,6 @@ class TestMain(object):
         with pytest.raises(ValueError):
             await run_main()
 
-    @pytest.mark.asyncio
     async def test_key_not_in_store(self, config_file: str, mocker: MockerFixture):
         setup_mocks(mocker, config_file)
 
