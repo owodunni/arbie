@@ -4,6 +4,7 @@ from unittest.mock import MagicMock
 import pytest
 from pytest_mock.plugin import MockerFixture
 
+from Arbie import StateError
 from Arbie.Actions import Action, RedisState, Store
 from Arbie.Actions.action import Argument
 
@@ -93,6 +94,18 @@ class TestStore(object):
     def test_create_input(self, local_store, mock_action):
         local_store.add("uniswap", 1337)
         local_store.create_input(mock_action)
+
+    def test_publish(self, local_store: Store):
+        with pytest.raises(StateError):
+            local_store.publish("random channel", "random message")
+
+    def test_subscribe(self, local_store: Store):
+        with pytest.raises(StateError):
+            local_store.subscribe("random channel")
+
+    def test_delete(self, local_store: Store):
+        with pytest.raises(StateError):
+            local_store.delete("random key")
 
 
 class TestRedisStore(object):
