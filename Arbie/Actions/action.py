@@ -121,11 +121,23 @@ class Store(object):
     def get(self, key):
         return self.state[key]
 
+    def delete(self, key):
+        try:
+            self.state.delete(key)
+        except AttributeError:
+            raise StateError("RedisState is required to remove keys from store.")
+
     def subscribe(self, event_channel):
         try:
-            self.state.subscribe(event_channel)
-        except Exception:
-            raise StateError("Redis state is required to subscribe to store.")
+            return self.state.subscribe(event_channel)
+        except AttributeError:
+            raise StateError("RedisState is required to subscribe to store.")
+
+    def publish(self, event_channel, message):
+        try:
+            self.state.publish(event_channel, message)
+        except AttributeError:
+            raise StateError("RedisState is required to publish event.")
 
     def create_input(self, action):
         return self._create_data(
