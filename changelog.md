@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+### Changed
+### Removed
+### Fixed
+
+## [0.4.0] The Pusher - 2020-11-17
+### Added
 - Add settings to Path Finder for choosing depth, when searching for cycles.
   So that we don't have to wait untill the heat death of the universe.
 - Add possibility to specify variable creation in config.yaml.
@@ -19,8 +25,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   keeping track of the state.
 - Address() we now use str as address representation. This integrates better with
   web3.py
-
-### Fixed
 
 ## [0.3.2] - 2020-11-08
 ### Fixed
