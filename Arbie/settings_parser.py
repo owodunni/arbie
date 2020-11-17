@@ -34,6 +34,7 @@ class Keys(object):
     web3 = "web3"
     action_tree = "action_tree"
     event = "event"
+    redis = "redis"
 
 
 class VariableParser(object):

@@ -21,6 +21,7 @@ def to_big_number(token: GenericToken, amount) -> BigNumber:
 
 class Result(object):
     pools = "arbie.1.pools"
+    trades = "filtered_trades"
 
 
 @pytest.fixture
@@ -109,6 +110,23 @@ def pair_factory(
     return factory
 
 
+pytestmark = pytest.mark.asyncio
+
+
+async def wait_and_stop(tree, key):
+    while True:
+        if key in tree.store.state:
+            tree.stop()
+            return
+        else:
+            await asyncio.sleep(0.1)
+
+
+async def wait_and_run(app):
+    await asyncio.sleep(0.2)
+    await app.run()
+
+
 class TestApp(object):
     @pytest.fixture
     def base_config(self, web3_server, redis_server, weth, pool_factory, pair_factory):
@@ -152,7 +170,7 @@ class TestApp(object):
             + f"""
         action_tree:
             event:
-                redis: {Result.pools}
+                {Result.pools}
             actions:
                 PathFinder:
                     input:
@@ -167,17 +185,7 @@ class TestApp(object):
         """
         )
 
-    async def wait_until_result(self, app, result):
-        while True:
-            try:
-                app.store.get(result)
-            except Exception:
-                await asyncio.sleep(0.1)
-                continue
-            app.stop()
-            return
-
-    @pytest.fixture()
+    @pytest.fixture
     def app(self, pool_config):
         config = yaml.safe_load(pool_config)
         app = App(config)
@@ -186,7 +194,6 @@ class TestApp(object):
         yield app
         app.store.delete(Result.pools)
 
-    @pytest.mark.asyncio
     @pytest.mark.slow
     async def test_run(self, app):
         await app.run()
@@ -195,15 +202,12 @@ class TestApp(object):
         tokens = app.store.get("all_tokens")
         assert len(tokens) == 3
 
-    @pytest.mark.asyncio
     @pytest.mark.slow
-    async def test_full_pipeline(self, pool_config, trade_config):
-        # pool_finder = App(yaml.safe_load(pool_config))
-        # trade_finder = App(yaml.safe_load(trade_config))
-        # await asyncio.gather(
-        #    pool_finder.run(),
-        #    trade_finder.run(),
-        #    self.wait_until_result(trade_finder, "filtered_trades"),
-        # )
-        raise AssertionError()
-        # assert len(trade_finder.store.get("filtered_trades")) == 3
+    async def test_full_pipeline(self, app, trade_config):
+        trade_finder = App(yaml.safe_load(trade_config))
+        await asyncio.gather(
+            wait_and_run(app),
+            trade_finder.run(),
+            wait_and_stop(trade_finder, Result.trades),
+        )
+        assert len(trade_finder.store.get(Result.trades)) == 3
