@@ -18,3 +18,6 @@ class App(object):
             logging.getLogger().warning("No actions given in configuration")
             return
         await self.action_tree.run()
+
+    def stop(self):
+        self.action_tree.stop()
