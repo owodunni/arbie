@@ -25,19 +25,24 @@ def test_equals(dai, token_factory):
     assert dai == dai2
 
 
-def test_decimals(dai: GenericToken):
-    assert dai.decimals() == 18
+@pytest.mark.asyncio
+async def test_decimals(dai: GenericToken):
+    assert await dai.decimals() == 18
 
 
 def test_approve(dai: GenericToken, deploy_address):
     assert dai.approve(deploy_address, bg10)
 
 
-def test_transfer(dai: GenericToken, deploy_address, dummy_address):
+@pytest.mark.asyncio
+async def test_transfer(dai: GenericToken, deploy_address, dummy_address):
     dai.approve(deploy_address, bg10)
     dai.transfer(dummy_address, bg10)
-    assert dai.balance_of(dummy_address).to_number() == 10
+    bg = await dai.balance_of(dummy_address)
+    assert bg.to_number() == 10
 
 
-def test_name(dai: GenericToken):
-    assert dai.get_name() == "Dai"
+@pytest.mark.asyncio
+async def test_name(dai: GenericToken):
+    name = await dai.get_name()
+    assert name == "Dai"

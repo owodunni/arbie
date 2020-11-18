@@ -1,5 +1,6 @@
 """Utility functions for interacting with smart contracts."""
 
+import asyncio
 import json
 from enum import Enum
 from typing import Tuple
@@ -45,6 +46,11 @@ class Contract(object):
     def _transact_status_and_contract(self, transaction) -> Tuple[bool, str]:
         tx_receipt = self._transact(transaction)
         return tx_receipt.status, tx_receipt.logs[1].address
+
+    async def _call_async(self, function):
+        loop = asyncio.get_running_loop()
+
+        return await loop.run_in_executor(None, function.call)
 
 
 class ContractFactory(object):

@@ -1,5 +1,6 @@
 """Utility functions for interacting with Tokens."""
 
+import asyncio
 import logging
 
 from Arbie.Contracts.contract import Contract
@@ -14,12 +15,14 @@ class IERC20Token(Contract):
     def __eq__(self, other):
         return self.get_address() == other.get_address()
 
-    def decimals(self) -> int:
-        return self.contract.functions.decimals().call()
+    async def decimals(self) -> int:
+        return await self._call_async(self.contract.functions.decimals())
 
-    def balance_of(self, owner: str) -> BigNumber:
-        value = self.contract.functions.balanceOf(owner).call()
-        return BigNumber.from_value(value, self.decimals())
+    async def balance_of(self, owner: str) -> BigNumber:
+        result = await asyncio.gather(
+            self._call_async(self.contract.functions.balanceOf(owner)), self.decimals()
+        )
+        return BigNumber.from_value(result[0], result[1])
 
     def transfer(self, to: str, bg_number: BigNumber) -> bool:
         transaction = self.contract.functions.transfer(to, bg_number.value)
@@ -48,20 +51,25 @@ class GenericToken(IERC20Token):
     abi = "erc20"
 
     def __str__(self):
-        return f"GenericToken, name: {self.get_name()}, address: {self.get_address()}"
+        return (
+            f"GenericToken, name: {self._name().call()} address: {self.get_address()}"
+        )
 
     def __repr__(self):
         return self.__str__()
 
-    def get_name(self) -> str:
-        return str(self.contract.functions.name().call())
+    async def get_name(self) -> str:
+        return await self._call_async(self._name())
 
-    def create_token(self, price=0):
+    async def create_token(self, price=0):
         try:
-            name = self.get_name()
+            name = await self.get_name()
         except Exception:
             name = ""
             logging.getLogger().warning(
                 f"Token: {self.get_address()} dosn't have a name."
             )
         return Token(name, self.get_address(), price)
+
+    def _name(self):
+        return self.contract.functions.name()
