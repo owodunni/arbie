@@ -32,8 +32,9 @@ class IERC20Token(Contract):
         transaction = self.contract.functions.approve(spender, bg_number.value)
         return self._transact_status(transaction)
 
-    def approve_owner(self):
-        return self.approve(self.owner_address, self.balance_of(self.owner_address))
+    async def approve_owner(self):
+        bg = await self.balance_of(self.owner_address)
+        return self.approve(self.owner_address, bg)
 
     def create_token(self, price=0):
         return Token("", self.get_address(), price)
