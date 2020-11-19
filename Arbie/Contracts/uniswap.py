@@ -1,7 +1,9 @@
 """Utility functions for interacting with Uniswap."""
-
 import logging
-from typing import List
+from typing import List, Tuple
+
+from asyncstdlib.builtins import list as alist
+from asyncstdlib.builtins import map as amap
 
 from Arbie import DeployContractError, IERC20TokenError
 from Arbie.Contracts.circuit_breaker import CircuitBreaker
@@ -11,6 +13,15 @@ from Arbie.Contracts.tokens import GenericToken
 from Arbie.Variables import BigNumber
 
 logger = logging.getLogger()
+
+
+async def create_reserve(result: Tuple[float, GenericToken]):
+    (value, token) = result
+    try:
+        exp = await token.decimals()
+    except Exception:
+        raise IERC20TokenError("Token doesn't contain decimals.")
+    return BigNumber.from_value(value, exp)
 
 
 class UniswapPair(PoolContract):
@@ -34,18 +45,10 @@ class UniswapPair(PoolContract):
     def get_tokens(self) -> List[GenericToken]:
         return [self.get_token0(), self.get_token1()]
 
-    def get_balances(self) -> List[BigNumber]:
-        reserves = self.contract.functions.getReserves().call()
-
-        bg_reservers = []
-        for reserve, token in zip(reserves, self.get_tokens()):
-            try:
-                exp = token.decimals()
-            except Exception:
-                raise IERC20TokenError("Token doesn't contain decimals.")
-            bg_reservers.append(BigNumber.from_value(reserve, exp))
-
-        return bg_reservers
+    async def get_balances(self) -> List[BigNumber]:
+        tokens = self.get_tokens()
+        reserves = await self._get_reserves()
+        return await alist(amap(create_reserve, zip(reserves, tokens)))
 
     def get_fee(self) -> float:
         return self.fee
@@ -57,6 +60,9 @@ class UniswapPair(PoolContract):
         cf = ContractFactory(self.w3, GenericToken)
         token_address = function.call()
         return cf.load_contract(self.owner_address, address=token_address)
+
+    async def _get_reserves(self):
+        return await self._call_async(self.contract.functions.getReserves())
 
 
 class UniswapFactory(Contract):

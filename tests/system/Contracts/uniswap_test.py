@@ -1,4 +1,6 @@
 """Test uniswap contracts."""
+import asyncio
+
 import pytest
 
 from Arbie.Contracts import ContractFactory
@@ -41,28 +43,33 @@ def pair(factory_with_pair) -> UniswapPair:
     return pairs[0]
 
 
-def test_get_weights(pair):
-    assert pair.get_balances() == [0, 0]
+@pytest.mark.asyncio
+async def test_get_weights(pair):
+    assert await pair.get_balances() == [0, 0]
 
 
-def test_mint(pair: UniswapPair, dai: GenericToken, weth: GenericToken, deploy_address):
-
+@pytest.mark.asyncio
+async def test_mint(
+    pair: UniswapPair, dai: GenericToken, weth: GenericToken, deploy_address
+):
     assert dai.transfer(pair.get_address(), bg10)
     assert weth.transfer(pair.get_address(), bg10)
     assert pair.mint(deploy_address)
-    assert pair.get_balances() == [bg10, bg10]
+    assert await pair.get_balances() == [bg10, bg10]
 
 
-def test_create_pool(
+@pytest.mark.asyncio
+async def test_create_pool(
     pair: UniswapPair, dai: GenericToken, weth: GenericToken, deploy_address
 ):
 
     dai.transfer(pair.get_address(), bg5)
     weth.transfer(pair.get_address(), bg10)
     pair.mint(deploy_address)
-    pool = pair.create_pool()
+    pool = await pair.create_pool()
+    tokens = await asyncio.gather(weth.create_token(), dai.create_token())
 
-    assert pool.spot_price(weth.create_token(), dai.create_token()) == 2
-    balances = pool.get_balances(weth.create_token(), dai.create_token())
+    assert pool.spot_price(tokens[0], tokens[1]) == 2
+    balances = pool.get_balances(tokens[0], tokens[1])
     assert balances[0] == 10
     assert balances[1] == 5
