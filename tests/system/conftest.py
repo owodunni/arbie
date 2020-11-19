@@ -42,11 +42,11 @@ large_number = BigNumber(10e14)
 
 
 @pytest.fixture
-def dai(deploy_address, token_factory) -> GenericToken:
+async def dai(deploy_address, token_factory) -> GenericToken:
     token = token_factory.deploy_contract(
         deploy_address, "Dai", "DAI", large_number.value
     )
-    token.approve_owner()
+    await token.approve_owner()
     return token
 
 

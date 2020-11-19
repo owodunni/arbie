@@ -35,18 +35,20 @@ class BalancerPool(PoolContract):
             )
         )
 
-    def get_balances(self) -> List[BigNumber]:
+    async def get_balances(self) -> List[BigNumber]:
         tokens = self.get_tokens()
         balances = []
         for token in tokens:
             b = self.contract.functions.getBalance(token.get_address()).call()
+            decimals = await token.decimals()
             try:
-                balances.append(BigNumber.from_value(b, token.decimals()))
+                balances.append(BigNumber.from_value(b, decimals))
             except Exception:
                 raise IERC20TokenError("Bad token in balancer pool")
         return balances
 
     def get_weights(self) -> List[float]:
+        tokens = self.get_tokens()
         weights = list(
             map(
                 (
@@ -54,7 +56,7 @@ class BalancerPool(PoolContract):
                         t.get_address()
                     ).call()
                 ),
-                self.get_tokens(),
+                tokens,
             )
         )
         sum_of_weights = sum(weights)

@@ -44,17 +44,22 @@ def pool_with_tokens(
     return pool_factory.setup_pool([dai, weth], [weight, weight], [bg5, bg10])
 
 
-def test_bind_token_to_pool(pool_with_tokens: BalancerPool):
+@pytest.mark.asyncio
+async def test_bind_token_to_pool(pool_with_tokens: BalancerPool):
     tokens = pool_with_tokens.get_tokens()
     assert len(tokens) == 2
-    assert pool_with_tokens.get_balances() == [bg5, bg10]
+    balances = await pool_with_tokens.get_balances()
+    assert balances == [bg5, bg10]
     assert pool_with_tokens.get_weights() == [0.5, 0.5]
 
 
-def test_create_pool(
+@pytest.mark.asyncio
+async def test_create_pool(
     pool_with_tokens: BalancerPool, dai: GenericToken, weth: GenericToken
 ):
-    pool = pool_with_tokens.create_pool()
-    assert pool.spot_price(weth.create_token(), dai.create_token()) == 2
+    pool = await pool_with_tokens.create_pool()
+    weth_token = await weth.create_token()
+    dai_token = await dai.create_token()
+    assert pool.spot_price(weth_token, dai_token) == 2
     assert pool.balances[0].value == 5
     assert pool.balances[1].value == 10
