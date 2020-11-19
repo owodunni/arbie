@@ -17,7 +17,7 @@ class ActionA(Action):
         my_result: actionA.1.result
     """
 
-    def on_next(self, data):
+    async def on_next(self, data):
         data.times_ran(data.times_ran_old() + 1)
         data.my_result(1337)
 
@@ -34,7 +34,7 @@ class ActionB(Action):
         my_result: result
     """
 
-    def on_next(self, data):
+    async def on_next(self, data):
         data.times_ran(data.times_ran_old() + 1)
         data.my_result(data.someone_elses_result() + 1)
 

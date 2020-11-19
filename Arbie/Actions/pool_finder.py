@@ -1,7 +1,11 @@
 """Pool finder is responsible for finding all pools."""
+import asyncio
 import logging
 from math import isclose
 from typing import List, Tuple
+
+from asyncstdlib.builtins import list as alist
+from asyncstdlib.builtins import map as amap
 
 from Arbie import IERC20TokenError, PoolValueError
 from Arbie.Actions.action import Action
@@ -19,40 +23,42 @@ def check_and_get_price(balances) -> Tuple[bool, float]:
     return False, balances[0] / balances[1]
 
 
-def create_token(pair, price, uoa):
-    t0 = pair.get_token0()
-    t1 = pair.get_token1()
-    if uoa.address == t0.get_address():
-        return t1.create_token(price)
-    elif uoa.address == t1.get_address():
-        return t0.create_token(1 / price)
-    return None
+class TokenFinder(object):
+    def __init__(self, uoa):
+        self.uoa = uoa
 
-
-def create_and_check_token(pair, uoa):
-    logger.info(f"Creating tokens from {pair.get_address()}")
-    balances = None
-    try:
-        balances = pair.get_balances()
-    except IERC20TokenError:
+    async def create_token(self, pair, price):
+        t0 = pair.get_token0()
+        t1 = pair.get_token1()
+        if self.uoa.address == t0.get_address():
+            return await t1.create_token(price)
+        elif self.uoa.address == t1.get_address():
+            return await t0.create_token(1 / price)
         return None
 
-    is_zero, price = check_and_get_price(balances)
-    if is_zero:
-        return None
+    async def create_and_check_token(self, pair):
+        logger.info(f"Creating tokens from {pair.get_address()}")
+        balances = None
+        try:
+            balances = await pair.get_balances()
+        except IERC20TokenError:
+            return None
 
-    return create_token(pair, price, uoa)
+        is_zero, price = check_and_get_price(balances)
+        if is_zero:
+            return None
+
+        return await self.create_token(pair, price)
+
+    async def create_tokens(self, uniswap_pairs: List[UniswapPair]) -> List[Token]:
+        tokens = await alist(amap(self.create_and_check_token, uniswap_pairs))
+        tokens.append(self.uoa)
+        token_set = set(tokens)
+        token_set.discard(None)
+        return list(token_set)
 
 
-def create_tokens(uniswap_pairs: List[UniswapPair], uoa: Token) -> List[Token]:
-    tokens = list(map(lambda p: create_and_check_token(p, uoa), uniswap_pairs))
-    tokens.append(uoa)
-    token_set = set(tokens)
-    token_set.discard(None)
-    return list(token_set)
-
-
-def create_and_filter_pools(
+async def create_and_filter_pools(
     pool_contracts: List[PoolContract], tokens: List[Tokens]
 ) -> Pools:
     pools = []
@@ -61,7 +67,7 @@ def create_and_filter_pools(
             f"Filtering contract {pool_contracts.index(contract)} of {len(pool_contracts)}"
         )
         try:
-            pool = contract.create_pool()
+            pool = await contract.create_pool()
         except IERC20TokenError as e:
             logger.warning(f"Failed to create pool, bad token. {e}")
             continue
@@ -94,16 +100,17 @@ class PoolFinder(Action):
         tokens: all_tokens
     """
 
-    def on_next(self, data):
+    async def on_next(self, data):
         weth = data.weth()
 
         uniswap_pairs = data.uniswap_factory().all_pairs()
         balancer_pools = data.balancer_factory().all_pools(data.balancer_start(), 100)
-        tokens = create_tokens(uniswap_pairs, weth)
+        tokens = await TokenFinder(weth).create_tokens(uniswap_pairs)
 
-        pools = create_and_filter_pools(
-            uniswap_pairs, tokens
-        ) + create_and_filter_pools(balancer_pools, tokens)
+        pool_results = await asyncio.gather(
+            create_and_filter_pools(uniswap_pairs, tokens),
+            create_and_filter_pools(balancer_pools, tokens),
+        )
 
-        data.pools(pools)
+        data.pools(pool_results[0] + pool_results[1])
         data.tokens(tokens)

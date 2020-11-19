@@ -49,7 +49,6 @@ class Contract(object):
 
     async def _call_async(self, function):
         loop = asyncio.get_running_loop()
-
         return await loop.run_in_executor(None, function.call)
 
 

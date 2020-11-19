@@ -3,8 +3,9 @@ import asyncio
 
 import pytest
 
+from Arbie import IERC20TokenError
 from Arbie.Contracts import ContractFactory
-from Arbie.Contracts.tokens import GenericToken
+from Arbie.Contracts.tokens import BadERC20Token, GenericToken
 from Arbie.Contracts.uniswap import UniswapFactory, UniswapPair
 from Arbie.Variables import BigNumber
 
@@ -62,7 +63,6 @@ async def test_mint(
 async def test_create_pool(
     pair: UniswapPair, dai: GenericToken, weth: GenericToken, deploy_address
 ):
-
     dai.transfer(pair.get_address(), bg5)
     weth.transfer(pair.get_address(), bg10)
     pair.mint(deploy_address)
@@ -73,3 +73,12 @@ async def test_create_pool(
     balances = pool.get_balances(tokens[0], tokens[1])
     assert balances[0] == 10
     assert balances[1] == 5
+
+
+@pytest.mark.asyncio
+async def test_create_bad_pool(
+    factory: UniswapFactory, bad: BadERC20Token, dai: GenericToken
+):
+    pair = factory.create_pair(bad, dai)
+    with pytest.raises(IERC20TokenError):
+        await pair.create_pool()

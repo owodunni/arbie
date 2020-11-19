@@ -15,17 +15,13 @@ medium = 10e6
 large = 10e8
 
 
-def to_big_number(token: GenericToken, amount) -> BigNumber:
-    return BigNumber(amount, token.decimals())
-
-
 class Result(object):
     pools = "arbie.1.pools"
     trades = "filtered_trades"
 
 
 @pytest.fixture
-def pool_factory(
+async def pool_factory(
     dai: GenericToken,
     weth: GenericToken,
     yam: GenericToken,
@@ -40,9 +36,9 @@ def pool_factory(
         [weth, dai, yam],
         [5, 5, 5],
         [
-            to_big_number(weth, small / 303.0),
-            to_big_number(dai, small / 0.9),
-            to_big_number(yam, small / 0.1),
+            BigNumber(small / 303.0),
+            BigNumber(small / 0.9),
+            BigNumber(small / 0.1),
         ],
     )
     factory.setup_pool(
@@ -50,7 +46,7 @@ def pool_factory(
         [5, 5, 5],
         [
             BigNumber(100),
-            to_big_number(dai, small / 0.9),
+            BigNumber(small / 0.9),
         ],
         approve_owner=False,
     )
@@ -60,17 +56,17 @@ def pool_factory(
         [weth, wbtc],
         [5, 1],
         [
-            to_big_number(weth, 5 * large / 301.0),
-            to_big_number(wbtc, large / 10000),
+            BigNumber(5 * large / 301.0),
+            BigNumber(large / 10000),
         ],  # noqa: WPS221
     )
     factory.setup_pool(
         [weth, dai, wbtc],
         [2, 1, 1],
         [
-            to_big_number(weth, 2 * medium / 301.0),
-            to_big_number(dai, medium / 1.1),
-            to_big_number(wbtc, large / 10020),
+            BigNumber(2 * medium / 301.0),
+            BigNumber(medium / 1.1),
+            BigNumber(large / 10020),
         ],
     )
 
@@ -78,7 +74,7 @@ def pool_factory(
 
 
 @pytest.fixture
-def pair_factory(
+async def pair_factory(
     dai: GenericToken,
     weth: GenericToken,
     yam: GenericToken,
@@ -94,16 +90,20 @@ def pair_factory(
     factory.setup_pair(
         [dai, yam],
         [
-            to_big_number(dai, small / 1.1),
-            to_big_number(yam, small / 0.1),
+            BigNumber(small / 1.1),
+            BigNumber(small / 0.1),
         ],  # noqa: WPS221
     )
     factory.setup_pair(
-        [weth, dai], [to_big_number(weth, large / 300), to_big_number(dai, large)]
+        [weth, dai],
+        [BigNumber(large / 300), BigNumber(large)],
     )
     factory.setup_pair(
         [weth, wbtc],
-        [to_big_number(weth, large / 300), to_big_number(wbtc, large / 10000)],
+        [
+            BigNumber(large / 300),
+            BigNumber(large / 10000),
+        ],
     )
     factory.create_pair(weth, bad)
     factory.create_pair(weth, yam)
