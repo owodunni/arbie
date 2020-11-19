@@ -70,4 +70,4 @@ class ActionTree(object):
     async def _run_once(self):
         for action in self.actions:
             data = self.store.create_input(action)
-            action.on_next(data)
+            await action.on_next(data)

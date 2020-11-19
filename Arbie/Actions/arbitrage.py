@@ -85,7 +85,7 @@ class Arbitrage(Action):
         out_trades: filtered_trades
     """
 
-    def on_next(self, data):
+    async def on_next(self, data):
         trades = []
         for arbitrage_opportunity in data.trades():
             amount_in = None

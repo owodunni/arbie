@@ -1,9 +1,10 @@
 """Test balancer contracts."""
 import pytest
 
+from Arbie import IERC20TokenError
 from Arbie.Contracts import ContractFactory
 from Arbie.Contracts.balancer import BalancerFactory, BalancerPool
-from Arbie.Contracts.tokens import GenericToken
+from Arbie.Contracts.tokens import BadERC20Token, GenericToken
 from Arbie.Variables import BigNumber
 
 bg10 = BigNumber(10)
@@ -44,6 +45,15 @@ def pool_with_tokens(
     return pool_factory.setup_pool([dai, weth], [weight, weight], [bg5, bg10])
 
 
+@pytest.fixture
+def factory_with_bad_token(
+    pool_factory: BalancerFactory, dai: GenericToken, bad: BadERC20Token
+):
+    weight = 5
+    pool_factory.setup_pool([bad, dai], [weight, weight], [bg5, bg10])
+    return pool_factory
+
+
 @pytest.mark.asyncio
 async def test_bind_token_to_pool(pool_with_tokens: BalancerPool):
     tokens = pool_with_tokens.get_tokens()
@@ -63,3 +73,10 @@ async def test_create_pool(
     assert pool.spot_price(weth_token, dai_token) == 2
     assert pool.balances[0].value == 5
     assert pool.balances[1].value == 10
+
+
+@pytest.mark.asyncio
+async def test_create_bad_pool(factory_with_bad_token: BalancerFactory):
+    pools = factory_with_bad_token.all_pools()
+    with pytest.raises(IERC20TokenError):
+        await pools[0].create_pool()

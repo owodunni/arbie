@@ -111,7 +111,7 @@ class PathFinder(Action):
         trades: all_trades
     """
 
-    def on_next(self, data):
+    async def on_next(self, data):
         graph = FilteredTradingGraph(TradingGraph(data.pools()), data.min_liquidity())
         finder = CycleFinder(graph.graph, data.weth(), data.max_depth())
         cycles = sorted(finder.find_all_cycles(), key=lambda x: x.ratio)
