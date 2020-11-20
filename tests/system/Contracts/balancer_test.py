@@ -40,19 +40,21 @@ def test_bind_weight(pool_factory):
 
 
 @pytest.fixture
-def pool_with_tokens(
+async def pool_with_tokens(
     pool_factory: BalancerFactory, dai: GenericToken, weth: GenericToken
 ) -> BalancerPool:
     weight = 5
-    return pool_factory.setup_pool([dai, weth], [weight, weight], [bg5, bg10])
+    return await pool_factory.setup_pool([dai, weth], [weight, weight], [bg5, bg10])
 
 
 @pytest.fixture
-def factory_with_bad_token(
+async def factory_with_bad_token(
     pool_factory: BalancerFactory, dai: GenericToken, bad: BadERC20Token
 ):
     weight = 5
-    pool_factory.setup_pool([bad, dai], [weight, weight], [bg5, bg10])
+    await pool_factory.setup_pool(
+        [bad, dai], [weight, weight], [bg5, bg10], approve_owner=False
+    )
     return pool_factory
 
 
