@@ -51,29 +51,29 @@ async def dai(deploy_address, token_factory) -> GenericToken:
 
 
 @pytest.fixture
-def weth(deploy_address, token_factory) -> GenericToken:
+async def weth(deploy_address, token_factory) -> GenericToken:
     token = token_factory.deploy_contract(
         deploy_address, "Weth", "WETH", large_number.value
     )
-    token.approve_owner()
+    await token.approve_owner()
     return token
 
 
 @pytest.fixture
-def yam(deploy_address, token_factory) -> GenericToken:
+async def yam(deploy_address, token_factory) -> GenericToken:
     token = token_factory.deploy_contract(
         deploy_address, "yam", "YAM", large_number.value
     )
-    token.approve_owner()
+    await token.approve_owner()
     return token
 
 
 @pytest.fixture
-def wbtc(deploy_address, token_factory) -> GenericToken:
+async def wbtc(deploy_address, token_factory) -> GenericToken:
     token = token_factory.deploy_contract(
         deploy_address, "Wbtc", "WBTC", large_number.value
     )
-    token.approve_owner()
+    await token.approve_owner()
     return token
 
 

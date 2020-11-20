@@ -32,7 +32,7 @@ async def pool_factory(
 ) -> BalancerFactory:
     factory = ContractFactory(w3, BalancerFactory).deploy_contract(deploy_address)
 
-    factory.setup_pool(
+    f1 = factory.setup_pool(
         [weth, dai, yam],
         [5, 5, 5],
         [
@@ -41,9 +41,9 @@ async def pool_factory(
             BigNumber(small / 0.1),
         ],
     )
-    factory.setup_pool(
+    f2 = factory.setup_pool(
         [bad, dai],
-        [5, 5, 5],
+        [5, 5],
         [
             BigNumber(100),
             BigNumber(small / 0.9),
@@ -52,7 +52,7 @@ async def pool_factory(
     )
     factory.new_pool()
 
-    factory.setup_pool(
+    f3 = factory.setup_pool(
         [weth, wbtc],
         [5, 1],
         [
@@ -60,7 +60,7 @@ async def pool_factory(
             BigNumber(large / 10000),
         ],  # noqa: WPS221
     )
-    factory.setup_pool(
+    f4 = factory.setup_pool(
         [weth, dai, wbtc],
         [2, 1, 1],
         [
@@ -69,6 +69,8 @@ async def pool_factory(
             BigNumber(large / 10020),
         ],
     )
+
+    await asyncio.gather(f1, f2, f3, f4)
 
     return factory
 
