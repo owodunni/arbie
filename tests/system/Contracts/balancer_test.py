@@ -16,15 +16,17 @@ def pool_factory(deploy_address, w3) -> BalancerFactory:
     return ContractFactory(w3, BalancerFactory).deploy_contract(deploy_address)
 
 
-def test_create_new_pool(pool_factory):
+@pytest.mark.asyncio
+async def test_create_new_pool(pool_factory):
     pool_factory.new_pool()
-    assert len(pool_factory.all_pools()) == 1
+    assert len(await pool_factory.all_pools()) == 1
 
 
-def test_get_number_of_tokens(pool_factory):
+@pytest.mark.asyncio
+async def test_get_number_of_tokens(pool_factory):
     pool_factory.new_pool()
     pool_factory.new_pool()
-    pools = pool_factory.all_pools()
+    pools = await pool_factory.all_pools()
     assert len(pools) == 2
     assert pools[0].get_number_of_tokens() == 0
 
@@ -77,6 +79,6 @@ async def test_create_pool(
 
 @pytest.mark.asyncio
 async def test_create_bad_pool(factory_with_bad_token: BalancerFactory):
-    pools = factory_with_bad_token.all_pools()
+    pools = await factory_with_bad_token.all_pools()
     with pytest.raises(IERC20TokenError):
         await pools[0].create_pool()

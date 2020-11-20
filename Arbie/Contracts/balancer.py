@@ -4,8 +4,8 @@ import logging
 from typing import List
 
 from Arbie import DeployContractError, IERC20TokenError
-from Arbie.Contracts.circuit_breaker import CircuitBreaker
 from Arbie.Contracts.contract import Contract, ContractFactory
+from Arbie.Contracts.event_filter import EventFilter
 from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.Contracts.tokens import GenericToken
 from Arbie.Variables import BigNumber
@@ -114,18 +114,10 @@ class BalancerFactory(Contract):
             self.owner_address, address=address
         )
 
-    def all_pools(self, start=0, steps=100) -> List[BalancerPool]:
+    async def all_pools(self, start=0, steps=100) -> List[BalancerPool]:
         last_block = self.w3.eth.blockNumber
-        events = []
-        for from_block in range(start, last_block, steps):
-            to_block = from_block + steps - 1
-            if to_block > last_block:
-                to_block = last_block
-            logger.info(
-                f"Searching for Pools in block range [{from_block}:{to_block}], total pools found: {len(events)}"
-            )
-            events.extend(self._get_pool_events(from_block, to_block))
-        return self._create_pools(events)
+        bf = EventFilter(self.contract.events.LOG_NEW_POOL, start, last_block, steps)
+        return self._create_pools(await bf.find_events())
 
     def _create_pools(self, new_pool_event):
         pools = []
@@ -135,10 +127,3 @@ class BalancerFactory(Contract):
             pool = factory.load_contract(self.owner_address, address=event.args.pool)
             pools.append(pool)
         return pools
-
-    def _get_pool_events(self, from_block, to_block):
-        func = self.contract.events.LOG_NEW_POOL.createFilter(
-            fromBlock=int(from_block), toBlock=int(to_block)
-        ).get_all_entries
-        breaker = CircuitBreaker(3, 10, func)
-        return breaker.safe_call()

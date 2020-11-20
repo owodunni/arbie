@@ -104,7 +104,9 @@ class PoolFinder(Action):
         weth = data.weth()
 
         uniswap_pairs = data.uniswap_factory().all_pairs()
-        balancer_pools = data.balancer_factory().all_pools(data.balancer_start(), 100)
+        balancer_pools = await data.balancer_factory().all_pools(
+            data.balancer_start(), 100
+        )
         tokens = await TokenFinder(weth).create_tokens(uniswap_pairs)
 
         pool_results = await asyncio.gather(
