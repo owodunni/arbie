@@ -68,6 +68,8 @@ class UniswapFactory(Contract):
     protocol = "uniswap"
     abi = "factory_v2"
 
+    print_divider = 20  # noqa: WPS432
+
     async def all_pairs_length(self) -> int:
         return await self._call_async(self.contract.functions.allPairsLength())
 
@@ -104,7 +106,8 @@ class UniswapFactory(Contract):
         return pair
 
     async def _create_pair_index(self, index) -> UniswapPair:
-        logger.info(f"Creating pair number {index}")
+        if index % UniswapFactory.print_divider == 0:
+            logger.info(f"Creating pair number {index}")
         cf = ContractFactory(self.w3, UniswapPair)
         address = await self.get_pair_address(index)
         return cf.load_contract(self.owner_address, address=address)
