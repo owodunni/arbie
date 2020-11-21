@@ -2,8 +2,7 @@
 import asyncio
 import logging
 
-from asyncstdlib.builtins import list as alist
-from asyncstdlib.builtins import map as amap
+from Arbie.async_helpers import async_map
 
 
 class EventFilter(object):
@@ -15,7 +14,8 @@ class EventFilter(object):
 
     async def find_events(self):
         nmb_event_chunks = int((self.to_block - self.from_block) / self.steps) + 1
-        results = await alist(amap(self._get_entries, range(nmb_event_chunks)))
+        results = await async_map(self._get_entries, range(nmb_event_chunks))
+
         # results is a list of lists, that we need to flatten
         # https://stackoverflow.com/questions/952914/how-to-make-a-flat-list-out-of-list-of-lists
         return [item for sublist in results for item in sublist]

@@ -3,12 +3,11 @@ import logging
 from typing import List, Tuple
 
 from Arbie import DeployContractError, IERC20TokenError
+from Arbie.async_helpers import async_map
 from Arbie.Contracts.contract import Contract, ContractFactory
 from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.Contracts.tokens import GenericToken
 from Arbie.Variables import BigNumber
-from asyncstdlib.builtins import list as alist
-from asyncstdlib.builtins import map as amap
 
 logger = logging.getLogger()
 
@@ -46,7 +45,7 @@ class UniswapPair(PoolContract):
     async def get_balances(self) -> List[BigNumber]:
         tokens = self.get_tokens()
         reserves = await self._get_reserves()
-        return await alist(amap(create_reserve, zip(reserves, tokens)))
+        return await async_map(create_reserve, zip(reserves, tokens))
 
     def get_fee(self) -> float:
         return self.fee
@@ -78,7 +77,7 @@ class UniswapFactory(Contract):
 
     async def all_pairs(self, sleep=0) -> List[UniswapPair]:
         number_of_pairs = await self.all_pairs_length()
-        return await alist(amap(self._create_pair_index, range(number_of_pairs)))
+        return await async_map(self._create_pair_index, range(number_of_pairs))
 
     async def create_pair(
         self, token_a: GenericToken, token_b: GenericToken

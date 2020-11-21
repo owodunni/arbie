@@ -6,11 +6,10 @@ from typing import List, Tuple
 
 from Arbie import IERC20TokenError, PoolValueError
 from Arbie.Actions.action import Action
+from Arbie.async_helpers import async_map
 from Arbie.Contracts import BalancerFactory, GenericToken, UniswapFactory, UniswapPair
 from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.Variables import Pools, Token, Tokens
-from asyncstdlib.builtins import list as alist
-from asyncstdlib.builtins import map as amap
 
 logger = logging.getLogger()
 
@@ -50,7 +49,7 @@ class TokenFinder(object):
         return await self.create_token(pair, price)
 
     async def create_tokens(self, uniswap_pairs: List[UniswapPair]) -> List[Token]:
-        tokens = await alist(amap(self.create_and_check_token, uniswap_pairs))
+        tokens = await async_map(self.create_and_check_token, uniswap_pairs)
         tokens.append(self.uoa)
         token_set = set(tokens)
         token_set.discard(None)

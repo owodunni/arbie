@@ -6,4 +6,3 @@ pyyaml
 docopt
 redis
 hiredis
-asyncstdlib
