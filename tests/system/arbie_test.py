@@ -76,7 +76,7 @@ async def pool_factory(
 
 
 @pytest.fixture
-async def pair_factory(
+async def pair_factory(  # noqa: WPS210
     dai: GenericToken,
     weth: GenericToken,
     yam: GenericToken,
@@ -89,26 +89,26 @@ async def pair_factory(
         deploy_address, deploy_address
     )
 
-    factory.setup_pair(
+    await factory.setup_pair(
         [dai, yam],
         [
             BigNumber(small / 1.1),
             BigNumber(small / 0.1),
         ],  # noqa: WPS221
     )
-    factory.setup_pair(
+    await factory.setup_pair(
         [weth, dai],
         [BigNumber(large / 300), BigNumber(large)],
     )
-    factory.setup_pair(
+    await factory.setup_pair(
         [weth, wbtc],
         [
             BigNumber(large / 300),
             BigNumber(large / 10000),
         ],
     )
-    factory.create_pair(weth, bad)
-    factory.create_pair(weth, yam)
+    await factory.create_pair(weth, bad)
+    await factory.create_pair(weth, yam)
     return factory
 
 

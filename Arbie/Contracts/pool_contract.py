@@ -3,13 +3,12 @@
 from math import isclose
 from typing import List
 
-from asyncstdlib.builtins import list as alist
-from asyncstdlib.builtins import map as amap
-
 from Arbie import PoolValueError
 from Arbie.Contracts.contract import Contract
 from Arbie.Contracts.tokens import GenericToken
 from Arbie.Variables import BigNumber, Pool, Token
+from asyncstdlib.builtins import list as alist
+from asyncstdlib.builtins import map as amap
 
 
 async def create_token(token_contract: GenericToken):
