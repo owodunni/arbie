@@ -4,11 +4,10 @@ from math import isclose
 from typing import List
 
 from Arbie import PoolValueError
+from Arbie.async_helpers import async_map
 from Arbie.Contracts.contract import Contract
 from Arbie.Contracts.tokens import GenericToken
 from Arbie.Variables import BigNumber, Pool, Token
-from asyncstdlib.builtins import list as alist
-from asyncstdlib.builtins import map as amap
 
 
 async def create_token(token_contract: GenericToken):
@@ -29,7 +28,7 @@ class PoolContract(Contract):
         raise NotImplementedError()
 
     async def create_tokens(self) -> List[Token]:
-        return await alist(amap(create_token, self.get_tokens()))
+        return await async_map(create_token, self.get_tokens())
 
     async def create_pool(self) -> Pool:
         tokens = await self.create_tokens()
