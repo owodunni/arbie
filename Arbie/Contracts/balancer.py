@@ -100,6 +100,11 @@ class BalancerFactory(Contract):
     protocol = "balancer"
     abi = "pool_factory"
 
+
+    def __init__(self, w3, owner_address: str, contract):
+        self.cf = ContractFactory(w3, BalancerPool)
+        super(BalancerFactory, self).__init__(w3, owner_address, contract)
+
     async def setup_pool(
         self,
         tokens: List[GenericToken],
@@ -125,7 +130,7 @@ class BalancerFactory(Contract):
         if not status:
             raise DeployContractError("Failed to deploy BalancerPool.")
 
-        return ContractFactory(self.w3, BalancerPool).load_contract(
+        return self.cf.load_contract(
             self.owner_address, address=address
         )
 
@@ -141,6 +146,5 @@ class BalancerFactory(Contract):
         return await bf.find_events()
 
     def _create_pools(self, new_pool_events):
-        factory = ContractFactory(self.w3, BalancerPool)
-        loader = BalancerLoader(factory, self.owner_address)
+        loader = BalancerLoader(self.cf, self.owner_address)
         return loader.load_from_event(new_pool_events)
