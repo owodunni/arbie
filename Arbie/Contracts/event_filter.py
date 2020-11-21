@@ -2,8 +2,7 @@
 import asyncio
 import logging
 
-from Arbie.async_helpers import async_map
-
+from Arbie.async_helpers import async_map, run_async
 
 class EventFilter(object):
     def __init__(self, event, from_block, to_block, steps):
@@ -23,18 +22,15 @@ class EventFilter(object):
     async def _get_entries(self, index):
         from_block = index * self.steps + self.from_block
         to_block = from_block + self.steps - 1
-        if index % 10 == 0:
-            logging.getLogger().info(
-                f"Searching for Pools in block range [{from_block}:{to_block}]"
-            )
         if to_block > self.to_block:
             to_block = self.to_block
+        logging.getLogger().info(
+            f"Searching for Pools in block range [{from_block}:{to_block}]"
+        )
         return await self._get_entries_range(from_block, to_block)
 
     async def _get_entries_range(self, from_block, to_block):
         event_filter = self.event.createFilter(
             fromBlock=int(from_block), toBlock=int(to_block)
         )
-
-        loop = asyncio.get_running_loop()
-        return await loop.run_in_executor(None, event_filter.get_all_entries)
+        return await run_async(event_filter.get_all_entries)
