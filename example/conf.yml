@@ -1,6 +1,23 @@
-web3_address: 'http://gluteus:8545'
-weth_address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'
-network: mainnet
+store:
+  address: 'gluteus:6379'
 
-actions:
-  PoolFinder:
+web3:
+  address: 'http://gluteus:8545'
+
+variables:
+  weth:
+    type: Token
+    address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'
+  uniswap_factory:
+      type: UniswapFactory
+      network: mainnet
+  balancer_factory:
+      type: BalancerFactory
+      network: mainnet
+
+action_tree:
+  actions:
+    PoolFinder:
+      output:
+        pools: 'PoolFinder.1.pools'
+        tokens: 'PoolFinder.1.tokens'

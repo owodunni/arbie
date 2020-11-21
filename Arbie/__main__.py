@@ -16,6 +16,7 @@ Options:
   -v --version          Show version.
 
 """
+import asyncio
 import logging
 from logging import handlers
 
@@ -44,7 +45,7 @@ def setup_logging(log_file: str, severity=logging.INFO):
     root_logger.addHandler(file_handler)
 
 
-async def main(argv=None):
+def main(argv=None):
     arguments = docopt(__doc__, argv, version=Arbie.__version__)  # noqa: WPS609
 
     logging.getLogger().info(f"arguments: {arguments}")
@@ -59,7 +60,7 @@ async def main(argv=None):
     app = App(config)
 
     try:
-        await app.run()
+        asyncio.run(app.run())
     except Exception as ex:
         logging.getLogger().error(ex)
         raise ex
