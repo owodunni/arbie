@@ -2,6 +2,8 @@
 
 import logging
 
+from requests import Session
+from requests.adapters import HTTPAdapter
 from web3 import Web3
 
 from Arbie.Actions import ActionTree, RedisState, Store
@@ -51,7 +53,15 @@ class VariableParser(object):
 
     def set_up_web3(self, config):
         address = config[Keys.address]
-        w3 = Web3(Web3.HTTPProvider(address))
+
+        adapter = HTTPAdapter(
+            pool_connections=20, pool_maxsize=20, max_retries=10  # noqa: WPS432
+        )  # noqa: WPS432
+        session = Session()
+        session.mount("http://", adapter)
+        session.mount("https://", adapter)
+
+        w3 = Web3(Web3.HTTPProvider(address, session=session))
 
         if not w3.isConnected():
             raise ConnectionError("Web3 is not connected")
