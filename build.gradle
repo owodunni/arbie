@@ -48,7 +48,7 @@ task test(type: Exec) {
             "--cov-report", "xml:$testResultDir/cov/coverage.xml",
             "--junitxml=$testResultDir/surefire-reports/TEST-report.xml",
             "--cov=$sorceDir",  "--web3_server", "$web3_server",
-            "--redis_server", "$redis_server", "--run_slow", "--profile"
+            "--redis_server", "$redis_server", "--run_slow"
 }
 
 task systemTest(type: Exec) {
