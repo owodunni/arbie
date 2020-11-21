@@ -12,6 +12,8 @@ from Arbie.Variables import BigNumber
 bg10 = BigNumber(10)
 bg5 = BigNumber(5)
 
+pytestmark = pytest.mark.asyncio
+
 
 @pytest.fixture
 def factory(deploy_address, w3) -> UniswapFactory:
@@ -21,35 +23,33 @@ def factory(deploy_address, w3) -> UniswapFactory:
 
 
 @pytest.fixture
-def factory_with_pair(factory, dai, weth) -> UniswapFactory:
-    factory.create_pair(dai, weth)
+async def factory_with_pair(factory, dai, weth) -> UniswapFactory:
+    await factory.create_pair(dai, weth)
     return factory
 
 
-def test_get_all_pairs_length(factory):
-    assert factory.all_pairs_length() == 0
+async def test_get_all_pairs_length(factory):
+    assert await factory.all_pairs_length() == 0
 
 
-def test_create_pair(factory_with_pair):
-    assert factory_with_pair.all_pairs_length() == 1
+async def test_create_pair(factory_with_pair):
+    assert await factory_with_pair.all_pairs_length() == 1
 
 
-def test_get_all_pairs(factory_with_pair):
-    assert len(factory_with_pair.all_pairs()) == 1
+async def test_get_all_pairs(factory_with_pair):
+    assert len(await factory_with_pair.all_pairs()) == 1
 
 
 @pytest.fixture
-def pair(factory_with_pair) -> UniswapPair:
-    pairs = factory_with_pair.all_pairs()
+async def pair(factory_with_pair) -> UniswapPair:
+    pairs = await factory_with_pair.all_pairs()
     return pairs[0]
 
 
-@pytest.mark.asyncio
 async def test_get_weights(pair):
     assert await pair.get_balances() == [0, 0]
 
 
-@pytest.mark.asyncio
 async def test_mint(
     pair: UniswapPair, dai: GenericToken, weth: GenericToken, deploy_address
 ):
@@ -59,7 +59,6 @@ async def test_mint(
     assert await pair.get_balances() == [bg10, bg10]
 
 
-@pytest.mark.asyncio
 async def test_create_pool(
     pair: UniswapPair, dai: GenericToken, weth: GenericToken, deploy_address
 ):
@@ -75,10 +74,9 @@ async def test_create_pool(
     assert balances[1] == 5
 
 
-@pytest.mark.asyncio
 async def test_create_bad_pool(
     factory: UniswapFactory, bad: BadERC20Token, dai: GenericToken
 ):
-    pair = factory.create_pair(bad, dai)
+    pair = await factory.create_pair(bad, dai)
     with pytest.raises(IERC20TokenError):
         await pair.create_pool()

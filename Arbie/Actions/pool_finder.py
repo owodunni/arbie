@@ -4,14 +4,13 @@ import logging
 from math import isclose
 from typing import List, Tuple
 
-from asyncstdlib.builtins import list as alist
-from asyncstdlib.builtins import map as amap
-
 from Arbie import IERC20TokenError, PoolValueError
 from Arbie.Actions.action import Action
 from Arbie.Contracts import UniswapPair
 from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.Variables import Pools, Token, Tokens
+from asyncstdlib.builtins import list as alist
+from asyncstdlib.builtins import map as amap
 
 logger = logging.getLogger()
 
@@ -103,7 +102,7 @@ class PoolFinder(Action):
     async def on_next(self, data):
         weth = data.weth()
 
-        uniswap_pairs = data.uniswap_factory().all_pairs()
+        uniswap_pairs = await data.uniswap_factory().all_pairs()
         balancer_pools = await data.balancer_factory().all_pools(
             data.balancer_start(), 100
         )

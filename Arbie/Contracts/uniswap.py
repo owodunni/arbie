@@ -2,15 +2,13 @@
 import logging
 from typing import List, Tuple
 
-from asyncstdlib.builtins import list as alist
-from asyncstdlib.builtins import map as amap
-
 from Arbie import DeployContractError, IERC20TokenError
-from Arbie.Contracts.circuit_breaker import CircuitBreaker
 from Arbie.Contracts.contract import Contract, ContractFactory
 from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.Contracts.tokens import GenericToken
 from Arbie.Variables import BigNumber
+from asyncstdlib.builtins import list as alist
+from asyncstdlib.builtins import map as amap
 
 logger = logging.getLogger()
 
@@ -70,42 +68,43 @@ class UniswapFactory(Contract):
     protocol = "uniswap"
     abi = "factory_v2"
 
-    def all_pairs_length(self) -> int:
-        return self.contract.functions.allPairsLength().call()
+    async def all_pairs_length(self) -> int:
+        return await self._call_async(self.contract.functions.allPairsLength())
 
-    def get_pair_address(self, index) -> str:
-        return self.contract.functions.allPairs(index).call()
+    async def get_pair_address(self, index) -> str:
+        return await self._call_async(self.contract.functions.allPairs(index))
 
-    def all_pairs(self, sleep=0) -> List[UniswapPair]:
-        pairs = []
-        for i in range(0, self.all_pairs_length()):
-            logger.info(f"Adding pair number {i}")
-            pairs.append(self._create_pair_index(i))
-        return pairs
+    async def all_pairs(self, sleep=0) -> List[UniswapPair]:
+        number_of_pairs = await self.all_pairs_length()
+        return await alist(amap(self._create_pair_index, range(number_of_pairs)))
 
-    def create_pair(self, token_a: GenericToken, token_b: GenericToken) -> UniswapPair:
+    async def create_pair(
+        self, token_a: GenericToken, token_b: GenericToken
+    ) -> UniswapPair:
         transaction = self.contract.functions.createPair(
             token_a.get_address(), token_b.get_address()
         )
 
         if not self._transact_status(transaction):
             raise DeployContractError("Failed to deploy UniswapPair")
+        pair_nmb = await self.all_pairs_length()
+        return await self._create_pair_index(pair_nmb - 1)
 
-        return self._create_pair_index(self.all_pairs_length() - 1)
-
-    def setup_pair(
+    async def setup_pair(
         self, tokens: List[GenericToken], amounts: List[BigNumber]
     ) -> UniswapPair:
-        pair = self.create_pair(tokens[0], tokens[1])
+        pair = await self.create_pair(tokens[0], tokens[1])
 
         for token, amount in zip(tokens, amounts):
             token.transfer(pair.get_address(), amount)
-
-        pair.mint(self.owner_address)
+        try:
+            pair.mint(self.owner_address)
+        except Exception:
+            raise ValueError(f"Failed to mint tokens {tokens[0]},{tokens[1]}")
         return pair
 
-    def _create_pair_index(self, index) -> UniswapPair:
+    async def _create_pair_index(self, index) -> UniswapPair:
+        logger.info(f"Creating pair number {index}")
         cf = ContractFactory(self.w3, UniswapPair)
-        breaker = CircuitBreaker(3, 10, self.get_pair_address)
-        address = breaker.safe_call(index)
+        address = await self.get_pair_address(index)
         return cf.load_contract(self.owner_address, address=address)
