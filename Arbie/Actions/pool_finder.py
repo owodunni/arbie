@@ -6,7 +6,7 @@ from typing import List, Tuple
 
 from Arbie import IERC20TokenError, PoolValueError
 from Arbie.Actions.action import Action
-from Arbie.Contracts import UniswapPair
+from Arbie.Contracts import BalancerFactory, GenericToken, UniswapFactory, UniswapPair
 from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.Variables import Pools, Token, Tokens
 from asyncstdlib.builtins import list as alist
@@ -102,16 +102,33 @@ class PoolFinder(Action):
     async def on_next(self, data):
         weth = data.weth()
 
-        uniswap_pairs = await data.uniswap_factory().all_pairs()
-        balancer_pools = await data.balancer_factory().all_pools(
-            data.balancer_start(), 100
-        )
-        tokens = await TokenFinder(weth).create_tokens(uniswap_pairs)
+        uni_coro = self._get_pairs_and_tokens(data.uniswap_factory(), weth)
+        bal_coro = data.balancer_factory().all_pools(data.balancer_start(), 100)
 
-        pool_results = await asyncio.gather(
-            create_and_filter_pools(uniswap_pairs, tokens),
-            create_and_filter_pools(balancer_pools, tokens),
+        pools, tokens = await self._get_pools_and_tokens(
+            *await self._get_results(uni_coro, bal_coro),
         )
 
-        data.pools(pool_results[0] + pool_results[1])
+        data.pools(pools)
         data.tokens(tokens)
+
+    async def _get_pools_and_tokens(self, pool_contracts, pair_contracts, tokens):
+        result = await asyncio.gather(
+            create_and_filter_pools(pair_contracts, tokens),
+            create_and_filter_pools(pool_contracts, tokens),
+        )
+        return result[0] + result[1], tokens
+
+    async def _get_results(
+        self, uni_coro, bal_coro
+    ) -> Tuple[List[BalancerFactory], List[UniswapFactory], List[GenericToken]]:
+        results = await asyncio.gather(uni_coro, bal_coro)
+        pools = results[1]
+        pairs = results[0][0]
+        tokens = results[0][1]
+        return pools, pairs, tokens
+
+    async def _get_pairs_and_tokens(self, factory: UniswapFactory, weth):
+        pairs = await factory.all_pairs()
+        tokens = await TokenFinder(weth).create_tokens(pairs)
+        return pairs, tokens
