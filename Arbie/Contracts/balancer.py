@@ -9,7 +9,6 @@ from Arbie.Contracts.event_filter import EventFilter
 from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.Contracts.tokens import GenericToken
 from Arbie.Variables import BigNumber
-from Arbie.async_helpers import async_map, run_async
 
 logger = logging.getLogger()
 
@@ -82,16 +81,18 @@ class BalancerPool(PoolContract):
 
 
 class BalancerLoader(object):
-
     def __init__(self, factory: ContractFactory, address):
         self.factory = factory
         self.address = address
 
-    async def load_from_event(self, event):
-        address = event.args.pool
-        logger.info(f"Loading pool {address}")
-        run_async(self.factory.load_contract,)
-        return self.factory.load_contract(owner_address=self.address, address=address)
+    def load_from_event(self, events):
+        logger.info(f"Loading pool contracts in events {events}")
+        return [
+            self.factory.load_contract(
+                owner_address=self.address, address=event.args.pool
+            )
+            for event in events
+        ]
 
 
 class BalancerFactory(Contract):
@@ -100,11 +101,11 @@ class BalancerFactory(Contract):
     abi = "pool_factory"
 
     async def setup_pool(
-            self,
-            tokens: List[GenericToken],
-            weights: List[float],
-            amounts: List[BigNumber],
-            approve_owner=True,
+        self,
+        tokens: List[GenericToken],
+        weights: List[float],
+        amounts: List[BigNumber],
+        approve_owner=True,
     ) -> BalancerPool:
         pool = self.new_pool()
 
@@ -130,12 +131,16 @@ class BalancerFactory(Contract):
 
     async def all_pools(self, start=0, steps=100) -> List[BalancerPool]:
         last_block = self.w3.eth.blockNumber
-        bf = EventFilter(self.contract.events.LOG_NEW_POOL, start, last_block, steps)
-        events = await bf.find_events()
-        logger.info("All balancer events found.")
-        return await self._create_pools(events)
+        bf = EventFilter(
+            self.contract.events.LOG_NEW_POOL,
+            self._create_pools,
+            start,
+            last_block,
+            steps,
+        )
+        return await bf.find_events()
 
-    async def _create_pools(self, new_pool_events):
+    def _create_pools(self, new_pool_events):
         factory = ContractFactory(self.w3, BalancerPool)
         loader = BalancerLoader(factory, self.owner_address)
-        return await async_map(loader.load_from_event, new_pool_events)
+        return loader.load_from_event(new_pool_events)
