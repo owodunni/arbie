@@ -129,5 +129,6 @@ class PoolFinder(Action):
 
     async def _get_pairs_and_tokens(self, factory: UniswapFactory, weth):
         pairs = await factory.all_pairs()
+        logging.getLogger().info("Found all uniswap pairs, filtering tokens.")
         tokens = await TokenFinder(weth).create_tokens(pairs)
         return pairs, tokens
