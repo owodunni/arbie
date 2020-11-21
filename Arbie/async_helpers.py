@@ -1,7 +1,6 @@
 """Helper functions for working with async."""
 
 import asyncio
-
 from concurrent.futures import ThreadPoolExecutor
 
 thread_pool = ThreadPoolExecutor(max_workers=15)  # noqa: WPS432
