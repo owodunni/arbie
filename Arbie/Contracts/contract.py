@@ -2,11 +2,13 @@
 
 import asyncio
 import json
+from concurrent.futures import ThreadPoolExecutor
 from enum import Enum
 from typing import Tuple
 
 from pkg_resources import resource_string
 
+from Arbie.Contracts.circuit_breaker import CircuitBreaker
 
 class Network(Enum):
     mainnet = 0
@@ -24,6 +26,9 @@ def transact(w3, address: str, transaction):
     )
     # wait for the transaction to be mined
     return w3.eth.waitForTransactionReceipt(tx_hash, 180)  # noqa: WPS432
+
+
+thread_pool = ThreadPoolExecutor(max_workers=15)  # noqa: WPS432
 
 
 class Contract(object):
@@ -49,7 +54,7 @@ class Contract(object):
 
     async def _call_async(self, function):
         loop = asyncio.get_running_loop()
-        return await loop.run_in_executor(None, function.call)
+        return await loop.run_in_executor(thread_pool, CircuitBreaker(3, 1, function.call).safe_call)
 
 
 class ContractFactory(object):
