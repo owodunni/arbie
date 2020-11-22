@@ -21,8 +21,10 @@ class BalancerPool(PoolContract):
     def get_number_of_tokens(self):
         return self.contract.functions.getNumTokens().call()
 
-    def get_tokens(self) -> List[GenericToken]:
-        token_addresses = self.contract.functions.getCurrentTokens().call()
+    async def get_tokens(self) -> List[GenericToken]:
+        token_addresses = await self._call_async(
+            self.contract.functions.getCurrentTokens()
+        )
         cf = ContractFactory(self.w3, GenericToken)
         return list(
             map(
@@ -36,7 +38,7 @@ class BalancerPool(PoolContract):
         )
 
     async def get_balances(self) -> List[BigNumber]:
-        tokens = self.get_tokens()
+        tokens = await self.get_tokens()
         balances = []
         for token in tokens:
             b = self.contract.functions.getBalance(token.get_address()).call()
@@ -47,8 +49,8 @@ class BalancerPool(PoolContract):
             balances.append(BigNumber.from_value(b, decimals))
         return balances
 
-    def get_weights(self) -> List[float]:
-        tokens = self.get_tokens()
+    async def get_weights(self) -> List[float]:
+        tokens = await self.get_tokens()
         weights = list(
             map(
                 (
@@ -62,10 +64,9 @@ class BalancerPool(PoolContract):
         sum_of_weights = sum(weights)
         return list(map((lambda x: x / sum_of_weights), weights))
 
-    def get_fee(self) -> float:
-        return BigNumber.from_value(
-            self.contract.functions.getSwapFee().call()
-        ).to_number()
+    async def get_fee(self) -> float:
+        fee = await self._call_async(self.contract.functions.getSwapFee())
+        return BigNumber.from_value(fee).to_number()
 
     def bind(self, address: str, balance: BigNumber, denorm_weight: int) -> bool:
         if denorm_weight < 1:
