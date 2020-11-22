@@ -4,7 +4,7 @@ import logging
 from typing import List, Tuple
 
 from Arbie import DeployContractError, IERC20TokenError
-from Arbie.async_helpers import async_map
+from Arbie.async_helpers import async_map, run_async
 from Arbie.Contracts.contract import Contract, ContractFactory
 from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.Contracts.tokens import GenericToken
@@ -67,8 +67,6 @@ class UniswapFactory(Contract):
     protocol = "uniswap"
     abi = "factory_v2"
 
-    print_divider = 20  # noqa: WPS432
-
     def __init__(self, w3, owner_address: str, contract):
         self.cf = ContractFactory(w3, UniswapPair)
         super().__init__(w3, owner_address, contract)
@@ -110,6 +108,8 @@ class UniswapFactory(Contract):
 
     async def _create_pair_index(self, index) -> UniswapPair:
         address = await self.get_pair_address(index)
-        if index % UniswapFactory.print_divider == 0:
-            logger.info(f"Creating pair number {index}")
-        return self.cf.load_contract(owner_address=self.owner_address, address=address)
+        logger.info(f"Creating pair number {index}")
+        return await run_async(self._load_pair, address)
+
+    def _load_pair(self, address):
+        return self.cf.load_contract(self.owner_address, address=address)
