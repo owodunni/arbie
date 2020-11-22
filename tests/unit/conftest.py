@@ -63,3 +63,13 @@ def pools(dai, eth, btc, yam) -> List[Pool]:
             0.001,
         ),
     ]
+
+
+@pytest.fixture
+def tokens(dai, eth, btc, yam):
+    return [dai, eth, btc, yam]
+
+
+@pytest.fixture
+def web3_mock():
+    return None
