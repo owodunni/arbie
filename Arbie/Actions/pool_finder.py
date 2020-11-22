@@ -25,9 +25,10 @@ class TokenFinder(object):
     def __init__(self, uoa):
         self.uoa = uoa
 
-    async def create_token(self, pair, price):
-        t0 = pair.get_token0()
-        t1 = pair.get_token1()
+    async def create_token(self, pair: UniswapPair, price):
+        tokens = await pair.get_tokens()
+        t0 = tokens[0]
+        t1 = tokens[1]
         if self.uoa.address == t0.get_address():
             return await t1.create_token(price)
         elif self.uoa.address == t1.get_address():

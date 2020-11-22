@@ -15,20 +15,21 @@ async def create_token(token_contract: GenericToken):
 
 
 class PoolContract(Contract):
-    def get_tokens(self) -> List[GenericToken]:
+    async def get_tokens(self) -> List[GenericToken]:
         raise NotImplementedError()
 
-    def get_balances(self) -> List[BigNumber]:
+    async def get_balances(self) -> List[BigNumber]:
         raise NotImplementedError()
 
-    def get_weights(self) -> List[float]:
+    async def get_weights(self) -> List[float]:
         raise NotImplementedError()
 
-    def get_fee(self) -> float:
+    async def get_fee(self) -> float:
         raise NotImplementedError()
 
     async def create_tokens(self) -> List[Token]:
-        return await async_map(create_token, self.get_tokens())
+        tokens = await self.get_tokens()
+        return await async_map(create_token, tokens)
 
     async def create_pool(self) -> Pool:
         tokens = await self.create_tokens()
@@ -43,7 +44,7 @@ class PoolContract(Contract):
                 f"Pool: {self.get_address}, balances {sum(balances)} == 0"
             )
 
-        weights = self.get_weights()
+        weights = await self.get_weights()
         if not isclose(sum(weights), 1, abs_tol=1e-3):  # noqa: WPS432
             raise PoolValueError(
                 f"Pool: {self.get_address}, weights {sum(weights)} != 1"
@@ -52,6 +53,6 @@ class PoolContract(Contract):
             tokens,
             balances,
             weights,
-            self.get_fee(),
+            await self.get_fee(),
             address=self.get_address(),
         )

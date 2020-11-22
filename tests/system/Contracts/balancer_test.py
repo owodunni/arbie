@@ -60,11 +60,11 @@ async def factory_with_bad_token(
 
 @pytest.mark.asyncio
 async def test_bind_token_to_pool(pool_with_tokens: BalancerPool):
-    tokens = pool_with_tokens.get_tokens()
+    tokens = await pool_with_tokens.get_tokens()
     assert len(tokens) == 2
     balances = await pool_with_tokens.get_balances()
     assert balances == [bg5, bg10]
-    assert pool_with_tokens.get_weights() == [0.5, 0.5]
+    assert await pool_with_tokens.get_weights() == [0.5, 0.5]
 
 
 @pytest.mark.asyncio

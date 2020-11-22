@@ -1,4 +1,5 @@
 """Utility functions for interacting with Uniswap."""
+import asyncio
 import logging
 from typing import List, Tuple
 
@@ -33,29 +34,28 @@ class UniswapPair(PoolContract):
         transaction = self.contract.functions.mint(address)
         return self._transact_status(transaction)
 
-    def get_token0(self) -> GenericToken:
-        return self._get_token(self.contract.functions.token0())
+    async def get_token0(self) -> GenericToken:
+        return await self._get_token(self.contract.functions.token0())
 
-    def get_token1(self) -> GenericToken:
-        return self._get_token(self.contract.functions.token1())
+    async def get_token1(self) -> GenericToken:
+        return await self._get_token(self.contract.functions.token1())
 
-    def get_tokens(self) -> List[GenericToken]:
-        return [self.get_token0(), self.get_token1()]
+    async def get_tokens(self) -> List[GenericToken]:
+        return await asyncio.gather(self.get_token0(), self.get_token1())
 
     async def get_balances(self) -> List[BigNumber]:
-        tokens = self.get_tokens()
-        reserves = await self._get_reserves()
-        return await async_map(create_reserve, zip(reserves, tokens))
+        result = await asyncio.gather(self._get_reserves(), self.get_tokens())
+        return await async_map(create_reserve, zip(result[0], result[1]))
 
-    def get_fee(self) -> float:
+    async def get_fee(self) -> float:
         return self.fee
 
-    def get_weights(self) -> List[float]:
+    async def get_weights(self) -> List[float]:
         return [self.weight, self.weight]
 
-    def _get_token(self, function) -> GenericToken:
+    async def _get_token(self, function) -> GenericToken:
+        token_address = await self._call_async(function)
         cf = ContractFactory(self.w3, GenericToken)
-        token_address = function.call()
         return cf.load_contract(self.owner_address, address=token_address)
 
     async def _get_reserves(self):
