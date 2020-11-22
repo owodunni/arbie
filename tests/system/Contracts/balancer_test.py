@@ -5,7 +5,7 @@ from Arbie import IERC20TokenError
 from Arbie.Contracts import ContractFactory
 from Arbie.Contracts.balancer import BalancerFactory, BalancerPool
 from Arbie.Contracts.tokens import BadERC20Token, GenericToken
-from Arbie.Variables import BigNumber
+from Arbie.Variables import BigNumber, PoolType
 
 bg10 = BigNumber(10)
 bg5 = BigNumber(5)
@@ -74,6 +74,7 @@ async def test_create_pool(
     pool = await pool_with_tokens.create_pool()
     weth_token = await weth.create_token()
     dai_token = await dai.create_token()
+    assert pool.pool_type == PoolType.balancer
     assert pool.spot_price(weth_token, dai_token) == 2
     assert pool.balances[0].value == 5
     assert pool.balances[1].value == 10

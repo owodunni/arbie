@@ -8,7 +8,7 @@ from Arbie.Contracts.contract import Contract, ContractFactory
 from Arbie.Contracts.event_filter import EventFilter
 from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.Contracts.tokens import GenericToken
-from Arbie.Variables import BigNumber
+from Arbie.Variables import BigNumber, PoolType
 
 logger = logging.getLogger()
 
@@ -17,6 +17,7 @@ class BalancerPool(PoolContract):
     name = "pool"
     protocol = "balancer"
     abi = "bpool"
+    pool_type = PoolType.balancer
 
     def get_number_of_tokens(self):
         return self.contract.functions.getNumTokens().call()
@@ -67,6 +68,9 @@ class BalancerPool(PoolContract):
     async def get_fee(self) -> float:
         fee = await self._call_async(self.contract.functions.getSwapFee())
         return BigNumber.from_value(fee).to_number()
+
+    def get_type(self) -> PoolType:
+        return BalancerPool.pool_type
 
     def bind(self, address: str, balance: BigNumber, denorm_weight: int) -> bool:
         if denorm_weight < 1:

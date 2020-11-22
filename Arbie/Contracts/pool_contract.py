@@ -7,7 +7,7 @@ from Arbie import PoolValueError
 from Arbie.async_helpers import async_map
 from Arbie.Contracts.contract import Contract
 from Arbie.Contracts.tokens import GenericToken
-from Arbie.Variables import BigNumber, Pool, Token
+from Arbie.Variables import BigNumber, Pool, PoolType, Token
 
 
 async def create_token(token_contract: GenericToken):
@@ -25,6 +25,9 @@ class PoolContract(Contract):
         raise NotImplementedError()
 
     async def get_fee(self) -> float:
+        raise NotImplementedError()
+
+    def get_type(self) -> PoolType:
         raise NotImplementedError()
 
     async def create_tokens(self) -> List[Token]:
@@ -53,6 +56,7 @@ class PoolContract(Contract):
             tokens,
             balances,
             weights,
+            self.get_type(),
             await self.get_fee(),
             address=self.get_address(),
         )
