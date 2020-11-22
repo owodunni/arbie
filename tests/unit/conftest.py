@@ -4,7 +4,7 @@ from typing import List
 import pytest
 
 from Arbie.address import dummy_token_generator
-from Arbie.Variables import Pool, Token
+from Arbie.Variables import Pool, PoolType, Token
 
 small = 10000
 medium = 1000000
@@ -38,14 +38,28 @@ def pools(dai, eth, btc, yam) -> List[Pool]:
             [eth, dai, yam],
             [small / 303.0, small / 0.9, small / 0.1],
             [1 / 3.0, 1 / 3.0, 1 / 3.0],
+            PoolType.uniswap,
             0.004,
         ),
-        Pool([eth, btc], [large / 305.0, large / 10000], [5 / 6, 1 / 6], 0.01),
+        Pool(
+            [eth, btc],
+            [large / 305.0, large / 10000],
+            [5 / 6, 1 / 6],
+            PoolType.uniswap,
+            0.01,
+        ),
         Pool(
             [eth, dai, btc],
             [medium / 301.0, medium / 1.1, medium / 10020],
             [1 / 2.0, 1 / 4.0, 1 / 4.0],
+            PoolType.uniswap,
             0.004,
         ),
-        Pool([dai, yam], [small / 1.1, small / 0.1], [1 / 2.0, 1 / 2.0], 0.001),
+        Pool(
+            [dai, yam],
+            [small / 1.1, small / 0.1],
+            [1 / 2.0, 1 / 2.0],
+            PoolType.balancer,
+            0.001,
+        ),
     ]

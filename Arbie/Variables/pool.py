@@ -1,4 +1,5 @@
 """Test class for setting up AMMs."""
+from enum import Enum
 from math import isclose
 from typing import List, NewType, Tuple
 
@@ -16,6 +17,12 @@ def get_value(values: Balances, token: Token) -> Balance:
             return v.value
 
 
+class PoolType(Enum):
+    balancer = (1,)
+    uniswap = (2,)
+    unknown = 99
+
+
 class Pool(object):
     """Pool can create a arbitrary AMM that can be used for testing.
 
@@ -27,6 +34,7 @@ class Pool(object):
         tokens: Tokens,
         balances: List[float],
         weights: List[float],
+        pool_type: PoolType = PoolType.unknown,
         fee: float = 0,
         **kwargs,
     ):  # noqa: WPS221
@@ -35,6 +43,7 @@ class Pool(object):
         self.balances = Balance.create(tokens, balances)
         self.weights = Balance.create(tokens, weights)
         self.fee = fee
+        self.pool_type = pool_type
 
         self.address = None
         if "address" in kwargs:

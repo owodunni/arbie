@@ -8,7 +8,7 @@ from Arbie.async_helpers import async_map, run_async
 from Arbie.Contracts.contract import Contract, ContractFactory
 from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.Contracts.tokens import GenericToken
-from Arbie.Variables import BigNumber
+from Arbie.Variables import BigNumber, PoolType
 
 logger = logging.getLogger()
 
@@ -30,6 +30,8 @@ class UniswapPair(PoolContract):
     fee = 0.003
     weight = 0.5
 
+    pool_type = PoolType.uniswap
+
     def mint(self, address: str) -> bool:
         transaction = self.contract.functions.mint(address)
         return self._transact_status(transaction)
@@ -49,6 +51,9 @@ class UniswapPair(PoolContract):
 
     async def get_fee(self) -> float:
         return self.fee
+
+    def get_type(self) -> PoolType:
+        return UniswapPair.pool_type
 
     async def get_weights(self) -> List[float]:
         return [self.weight, self.weight]

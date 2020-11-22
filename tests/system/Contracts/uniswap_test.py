@@ -7,7 +7,7 @@ from Arbie import IERC20TokenError
 from Arbie.Contracts import ContractFactory
 from Arbie.Contracts.tokens import BadERC20Token, GenericToken
 from Arbie.Contracts.uniswap import UniswapFactory, UniswapPair
-from Arbie.Variables import BigNumber
+from Arbie.Variables import BigNumber, PoolType
 
 bg10 = BigNumber(10)
 bg5 = BigNumber(5)
@@ -68,6 +68,7 @@ async def test_create_pool(
     pool = await pair.create_pool()
     tokens = await asyncio.gather(weth.create_token(), dai.create_token())
 
+    assert pool.pool_type == PoolType.uniswap
     assert pool.spot_price(tokens[0], tokens[1]) == 2
     balances = pool.get_balances(tokens[0], tokens[1])
     assert balances[0] == 10
