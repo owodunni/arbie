@@ -71,7 +71,7 @@ class UniswapFactory(Contract):
 
     def __init__(self, w3, owner_address: str, contract):
         self.cf = ContractFactory(w3, UniswapPair)
-        super(UniswapFactory, self).__init__(w3, owner_address, contract)
+        super().__init__(w3, owner_address, contract)
 
     async def all_pairs_length(self) -> int:
         return await self._call_async(self.contract.functions.allPairsLength())
@@ -112,4 +112,4 @@ class UniswapFactory(Contract):
         address = await self.get_pair_address(index)
         if index % UniswapFactory.print_divider == 0:
             logger.info(f"Creating pair number {index}")
-        return self.cf.load_contract(self.owner_address, address=address)
+        return self.cf.load_contract(owner_address=self.owner_address, address=address)

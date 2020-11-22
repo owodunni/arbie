@@ -100,10 +100,9 @@ class BalancerFactory(Contract):
     protocol = "balancer"
     abi = "pool_factory"
 
-
     def __init__(self, w3, owner_address: str, contract):
         self.cf = ContractFactory(w3, BalancerPool)
-        super(BalancerFactory, self).__init__(w3, owner_address, contract)
+        super().__init__(w3, owner_address, contract)
 
     async def setup_pool(
         self,
@@ -130,9 +129,7 @@ class BalancerFactory(Contract):
         if not status:
             raise DeployContractError("Failed to deploy BalancerPool.")
 
-        return self.cf.load_contract(
-            self.owner_address, address=address
-        )
+        return self.cf.load_contract(self.owner_address, address=address)
 
     async def all_pools(self, start=0, steps=100) -> List[BalancerPool]:
         last_block = self.w3.eth.blockNumber
