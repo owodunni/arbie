@@ -5,7 +5,7 @@ class DeployContractError(Exception):
     """Raised when a contract can not be deployed."""
 
 
-class IERC20TokenError(Exception):
+class IERC20TokenError(ValueError):
     """Raised when a IErc20 token is not Erc20 compliant."""
 
 
