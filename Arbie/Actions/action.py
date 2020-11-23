@@ -62,7 +62,7 @@ class Action(object):
     def get_output_settings(self):
         return self.settings[self.output_key]
 
-    def on_next(self, data):
+    async def on_next(self, data):
         raise NotImplementedError("Action does not have a on_next statement")
 
     def _create_settings(self):

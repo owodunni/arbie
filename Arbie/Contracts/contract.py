@@ -50,7 +50,7 @@ class Contract(object):
         return tx_receipt.status, tx_receipt.logs[1].address
 
     async def _call_async(self, function):
-        return await run_async(CircuitBreaker(3, 1, function.call).safe_call)
+        return await run_async(function.call)
 
 
 class ContractFactory(object):
