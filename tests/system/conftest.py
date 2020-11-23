@@ -171,10 +171,10 @@ async def pair_factory(  # noqa: WPS210
         [BigNumber(large / 300), BigNumber(large)],
     )
     await factory.setup_pair(
-        [weth, wbtc],
+        [wbtc, weth],
         [
-            BigNumber(large / 300),
             BigNumber(large / 10000),
+            BigNumber(large / 300),
         ],
     )
     await factory.create_pair(weth, bad)
