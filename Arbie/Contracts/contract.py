@@ -7,7 +7,6 @@ from typing import Tuple
 from pkg_resources import resource_string
 
 from Arbie.async_helpers import run_async
-from Arbie.Contracts.circuit_breaker import CircuitBreaker
 
 
 class Network(Enum):
