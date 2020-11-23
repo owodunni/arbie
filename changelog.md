@@ -6,11 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Add PoolUpdater action for updating pools
 ### Changed
 - ActionTree now runs actions async.
 - Optimize Contracts using async await.
 - Optimize PoolFinder using async await.
 ### Removed
+- Remove circuit breaker, trust retry on the request lib to keep us from failing.
 ### Fixed
 
 ## [0.4.0] The Pusher - 2020-11-17
