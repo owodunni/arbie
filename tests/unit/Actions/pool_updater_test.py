@@ -1,5 +1,7 @@
 """Unittest for pool updater."""
 
+from unittest.mock import MagicMock
+
 import pytest
 
 from Arbie.Actions import ActionTree, PoolUpdater, Store
@@ -7,12 +9,11 @@ from Arbie.Actions import ActionTree, PoolUpdater, Store
 
 class TestPoolUpdater(object):
     @pytest.mark.asyncio
-    async def test_on_next(self, web3_mock, pools, tokens):
+    async def test_on_next(self, pools):
         store = Store()
-        store.add("web3", web3_mock)
+        store.add("web3", MagicMock())
         store.add("all_pools", pools)
-        store.add("all_tokens", tokens)
         tree = ActionTree(store)
         tree.add_action(PoolUpdater())
-        with pytest.raises(NotImplementedError):
+        with pytest.raises(ValueError):
             await tree.run()

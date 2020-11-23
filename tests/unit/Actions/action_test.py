@@ -57,9 +57,10 @@ class TestAction(object):
         assert MockAction.in_settings_parsed == action.get_input_settings()
         assert MockAction.out_settings_parsed == action.get_output_settings()
 
-    def test_on_next(self):
+    @pytest.mark.asyncio
+    async def test_on_next(self):
         with pytest.raises(NotImplementedError):
-            Action().on_next(None)
+            await Action().on_next(None)
 
 
 @pytest.fixture
