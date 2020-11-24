@@ -7,6 +7,9 @@ import sys
 from typing import Dict, List, Tuple
 
 from Arbie.Actions.action import Action, Store
+from Arbie.prometheus import get_prometheus
+
+RUN_TIME = get_prometheus().summary("arbie_run", "Time spent running actions")
 
 
 def is_class_action(member):
@@ -49,11 +52,12 @@ class ActionTree(object):
         self.actions.append(action)
 
     async def run(self):
-        self.is_stopped = False
-        if self.channel is not None:
-            await self._run_continous()
-        else:
-            await self._run_once()
+        with RUN_TIME.time():
+            self.is_stopped = False
+            if self.channel is not None:
+                await self._run_continous()
+            else:
+                await self._run_once()
 
     def stop(self):
         self.is_stopped = True
@@ -70,4 +74,9 @@ class ActionTree(object):
     async def _run_once(self):
         for action in self.actions:
             data = self.store.create_input(action)
-            await action.on_next(data)
+            action_name = action.__class__.__name__
+            with get_prometheus().summary(
+                f"{action_name.lower()}_time",
+                f"Time taken to process action {action_name}",
+            ).time():
+                await action.on_next(data)
