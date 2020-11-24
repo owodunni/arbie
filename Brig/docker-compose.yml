@@ -1,0 +1,42 @@
+version: '3.8'
+services:
+  redis:
+    image: redis:alpine
+    volumes:
+      - redis-data:/var/lib/redis
+    ports:
+      - 6379:6379
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    networks:
+      - core
+
+  eth-node:
+    image: ethereum/client-go:stable
+    volumes:
+      - eth-data:/data
+    ports:
+      - 30303:30303/tcp
+      - 30304:30304/udp
+      - 8545:8545
+    command:
+      - --http
+      - --http.addr=0.0.0.0
+      - --http.vhosts=*
+      - --http.corsdomain=*
+      - --allow-insecure-unlock
+      - --metrics
+      - --metrics.expensive
+      - --pprof
+      - --pprof.addr=0.0.0.0
+      - --datadir=/data
+    networks:
+      - core
+
+volumes:
+  redis-data:
+  eth-data:
+
+networks:
+  core:
+    external: true
