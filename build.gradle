@@ -21,7 +21,10 @@ ext {
 
 task pip(type: Exec) {
     workingDir projectDir
-    def reqs = [file("$pipDir/requirements.txt"), file("$pipDir/requirements-dev.txt")]
+    def reqs = [
+      file("$pipDir/requirements.txt"),
+      file("$pipDir/requirements-dev.txt"),
+      file("$pipDir/requirements-tools.txt")]
 
     inputs.files reqs
 
