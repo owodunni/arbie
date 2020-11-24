@@ -5,6 +5,14 @@ from typing import Dict
 import yaml
 
 from Arbie import StateError
+from Arbie.prometheus import get_prometheus
+
+ADD_TIME = get_prometheus().summary(
+    "store_add_time", "Time spent adding items from store"
+)
+GET_TIME = get_prometheus().summary(
+    "store_get_time", "Time spent getting items from store"
+)
 
 
 class Argument(object):
@@ -115,9 +123,17 @@ class Store(object):
     def __getitem__(self, key):
         return self.state[key]
 
+    @ADD_TIME.time()
     def add(self, key, item):
+        if hasattr(item, "__len__"):  # noqa: WPS421
+            get_prometheus().gauge(
+                f"{key.lower()}_number", f"Number of {key}"
+            ).set(  # noqa: WPS221
+                len(item)
+            )  # noqa: WPS221
         self.state[key] = item
 
+    @GET_TIME.time()
     def get(self, key):
         return self.state[key]
 
