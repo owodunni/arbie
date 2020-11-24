@@ -6,3 +6,4 @@ pyyaml
 docopt
 redis
 hiredis
+prometheus_client
