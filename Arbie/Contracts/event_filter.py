@@ -2,6 +2,12 @@
 import logging
 
 from Arbie.async_helpers import async_map, run_async
+from Arbie.prometheus import get_prometheus
+from prometheus_async.aio import time
+
+GET_ENTRIES = get_prometheus().summary(
+    "event_filter_get_entries", "Time for getting entries"
+)
 
 
 class EventTransform(object):
@@ -40,6 +46,7 @@ class EventFilter(object):
         )
         return await self._get_entries_range(from_block, to_block)
 
+    @time(GET_ENTRIES)
     async def _get_entries_range(self, from_block, to_block):
         event_filter = self.event.createFilter(
             fromBlock=int(from_block), toBlock=int(to_block)

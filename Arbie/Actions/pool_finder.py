@@ -9,9 +9,15 @@ from Arbie.Actions.action import Action
 from Arbie.async_helpers import async_map
 from Arbie.Contracts import BalancerFactory, GenericToken, UniswapFactory, UniswapPair
 from Arbie.Contracts.pool_contract import PoolContract
+from Arbie.prometheus import get_prometheus
 from Arbie.Variables import Pools, Token, Tokens
+from prometheus_async.aio import time
 
 logger = logging.getLogger()
+
+CREATE_TOKEN_TIME = get_prometheus().summary(
+    "pool_finder_create_and_check_token", "Time for creating and checking a token"
+)
 
 
 def check_and_get_price(balances) -> Tuple[bool, float]:
@@ -35,8 +41,8 @@ class TokenFinder(object):
             return await t0.create_token(1 / price)
         return None
 
+    @time(CREATE_TOKEN_TIME)
     async def create_and_check_token(self, pair):
-        logger.info(f"Creating tokens from {pair.get_address()}")
         balances = None
         try:
             balances = await pair.get_balances()
@@ -47,7 +53,9 @@ class TokenFinder(object):
         if is_zero:
             return None
 
-        return await self.create_token(pair, price)
+        token = await self.create_token(pair, price)
+        logger.info(f"Finished creating token from {pair.get_address()}")
+        return token
 
     async def create_tokens(self, uniswap_pairs: List[UniswapPair]) -> List[Token]:
         tokens = await async_map(self.create_and_check_token, uniswap_pairs)

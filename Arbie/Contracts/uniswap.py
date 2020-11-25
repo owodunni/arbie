@@ -8,9 +8,15 @@ from Arbie.async_helpers import async_map, run_async
 from Arbie.Contracts.contract import Contract, ContractFactory
 from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.Contracts.tokens import GenericToken
+from Arbie.prometheus import get_prometheus
 from Arbie.Variables import BigNumber, PoolType
+from prometheus_async.aio import time
 
 logger = logging.getLogger()
+
+CREATE_PAIR = get_prometheus().summary(
+    "uniswap_factory_create_pair_index", "Time for creating a pair"
+)
 
 
 async def create_reserve(result: Tuple[float, GenericToken]):
@@ -111,6 +117,7 @@ class UniswapFactory(Contract):
             raise ValueError(f"Failed to mint tokens {tokens[0]},{tokens[1]}")
         return pair
 
+    @time(CREATE_PAIR)
     async def _create_pair_index(self, index) -> UniswapPair:
         address = await self.get_pair_address(index)
         logger.info(f"Creating pair number {index}")
