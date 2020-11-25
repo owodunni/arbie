@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.4.3 (2020-11-25)
+### Performance
+* Add prometheus to async functions ([`b5f462c`](https://github.com/owodunni/arbie/commit/b5f462c4fc33f99cb157e396cd6f76a07ca04229))
+
 ## v0.4.2 (2020-11-25)
 ### Fix
 * Remove version configuration ([`7ec1edd`](https://github.com/owodunni/arbie/commit/7ec1edd191c94c1efbd252242a75d8f9de9843f9))
