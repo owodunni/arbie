@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.4.2 (2020-11-25)
+### Fix
+* Remove version configuration ([`7ec1edd`](https://github.com/owodunni/arbie/commit/7ec1edd191c94c1efbd252242a75d8f9de9843f9))
+
 ## [0.4.1] - 2020-11-24
 ### Added
 - Add PoolUpdater action for updating pools
