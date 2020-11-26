@@ -53,7 +53,8 @@ class UniswapPair(PoolContract):
 
     async def get_balances(self) -> List[BigNumber]:
         result = await asyncio.gather(self._get_reserves(), self.get_tokens())
-        return await async_map(create_reserve, list(zip(result[0], result[1])))
+        ziped_result = list(zip(result[0], result[1]))
+        return await async_map(create_reserve, ziped_result)
 
     async def get_fee(self) -> float:
         return self.fee
