@@ -33,7 +33,8 @@ class PoolUpdater(Action):
         self.pool_factory = ContractFactory(web3, BalancerPool)
 
         pools = await self._update_pools(data.pools())
-        data.new_pools(pools)
+
+        data.new_pools(list(filter(None,pools)))
 
     def _get_contract(self, address, pool_type):
         if pool_type == PoolType.uniswap:
@@ -52,6 +53,7 @@ class PoolUpdater(Action):
             pool.update_balances(balances_numb)
         except PoolValueError as e:
             logger.warn(e)
+            return None
         logger.info(f"Updated Pool balance {pool.address}")
         return pool
 
