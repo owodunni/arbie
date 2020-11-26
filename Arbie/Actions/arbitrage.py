@@ -6,6 +6,7 @@ from sympy import nsolve, symbols
 
 from Arbie.Actions import Action
 from Arbie.Variables import ArbitrageOpportunity
+import logging
 
 x = symbols("x")
 
@@ -102,4 +103,7 @@ class Arbitrage(Action):
             trades.append(arbitrage_opportunity)
 
         sorted_trade = sorted(trades, key=lambda trade: trade.profit, reverse=True)
+        if len(sorted_trade) == 0:
+            return
+        logging.getLogger().info(f"Top trade has {sorted_trade[0].profit} was {sorted_trade[0].trades}")
         data.out_trades(sorted_trade)

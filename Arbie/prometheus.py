@@ -1,7 +1,7 @@
 """Helper for using prometheus_client."""
 
 from prometheus_client import Gauge, Summary, start_http_server
-
+import logging
 
 def singleton(class_):
     instances = {}
@@ -17,7 +17,11 @@ def singleton(class_):
 @singleton
 class Prometheus(object):
     def __init__(self):
-        start_http_server(8000)  # noqa: WPS432
+        try:
+            start_http_server(8000)  # noqa: WPS432
+        except OSError as e:
+            logging.getLogger().info(e)
+
         self.metric_store = {}
 
     def gauge(self, name, description):
