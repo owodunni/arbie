@@ -78,6 +78,7 @@ Pool(
 
     def update_balances(self, balances: List[float]):
         self.balances = Balance.create(self.tokens, balances)
+        self._check_balances()
 
     def get_weights(self, token_in: Token, token_out: Token) -> Tuple[float, float]:
         return (get_value(self.weights, token_in), get_value(self.weights, token_out))

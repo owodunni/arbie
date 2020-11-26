@@ -5,8 +5,9 @@ from Arbie.Actions import Action
 from Arbie.async_helpers import async_map, run_async
 from Arbie.Contracts import BalancerPool, ContractFactory, UniswapPair
 from Arbie.Variables import PoolType
+from Arbie import PoolValueError
 
-logging = logging.getLogger()
+logger = logging.getLogger()
 
 
 class PoolUpdater(Action):
@@ -47,10 +48,13 @@ class PoolUpdater(Action):
         )
         balances = await pool_contract.get_balances()
         balances_numb = [balance.to_number() for balance in balances]
-        pool.update_balances(balances_numb)
-        logging.info(f"Updated Pool balance {pool.address}")
+        try:
+            pool.update_balances(balances_numb)
+        except PoolValueError as e:
+            logger.warn(e)
+        logger.info(f"Updated Pool balance {pool.address}")
         return pool
 
     async def _update_pools(self, pools):
-        logging.info(f"Updating pools, total {len(pools)}")
+        logger.info(f"Updating pools, total {len(pools)}")
         return await async_map(self._update_pool, pools)
