@@ -38,9 +38,8 @@ class TokenFinder(object):
         t1 = tokens[1]
         if self.uoa.address == t0.get_address():
             return await t1.create_token(price)
-        elif self.uoa.address == t1.get_address():
+        if self.uoa.address == t1.get_address():
             return await t0.create_token(1 / price)
-        return None
 
     @time(CREATE_TOKEN_TIME)
     async def create_and_check_token(self, pair):
