@@ -112,9 +112,11 @@ class PathFinder(Action):
     """
 
     async def on_next(self, data):
+        logging.getLogger().info("Searching for path")
         graph = FilteredTradingGraph(TradingGraph(data.pools()), data.min_liquidity())
         finder = CycleFinder(graph.graph, data.weth(), data.max_depth())
         cycles = sorted(finder.find_all_cycles(), key=lambda x: x.ratio)
+        logging.getLogger().info(f"Found {len(cycles)} cycles")
         data.cycles(cycles)
         trades = []
         for cycle in cycles:

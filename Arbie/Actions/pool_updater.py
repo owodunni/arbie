@@ -1,11 +1,11 @@
 """Pool updater updates pools and tokens."""
 import logging
 
+from Arbie import PoolValueError
 from Arbie.Actions import Action
 from Arbie.async_helpers import async_map, run_async
 from Arbie.Contracts import BalancerPool, ContractFactory, UniswapPair
 from Arbie.Variables import PoolType
-from Arbie import PoolValueError
 
 logger = logging.getLogger()
 
@@ -34,7 +34,7 @@ class PoolUpdater(Action):
 
         pools = await self._update_pools(data.pools())
 
-        data.new_pools(list(filter(None,pools)))
+        data.new_pools(list(filter(None, pools)))
 
     def _get_contract(self, address, pool_type):
         if pool_type == PoolType.uniswap:

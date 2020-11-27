@@ -3,6 +3,8 @@ import asyncio
 import logging
 from typing import List, Tuple
 
+from prometheus_async.aio import time
+
 from Arbie import DeployContractError, IERC20TokenError
 from Arbie.async_helpers import async_map, run_async
 from Arbie.Contracts.contract import Contract, ContractFactory
@@ -10,7 +12,6 @@ from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.Contracts.tokens import GenericToken
 from Arbie.prometheus import get_prometheus
 from Arbie.Variables import BigNumber, PoolType
-from prometheus_async.aio import time
 
 logger = logging.getLogger()
 

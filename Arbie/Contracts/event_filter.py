@@ -1,9 +1,10 @@
 """Event filter is a helpter class for filtering events with asyncio."""
 import logging
 
+from prometheus_async.aio import time
+
 from Arbie.async_helpers import async_map, run_async
 from Arbie.prometheus import get_prometheus
-from prometheus_async.aio import time
 
 GET_ENTRIES = get_prometheus().summary(
     "event_filter_get_entries", "Time for getting entries"
