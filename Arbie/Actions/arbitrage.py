@@ -1,13 +1,14 @@
 """arbitrage can be used to find to arbitrage opertunity between two Pools."""
 
+import logging
 from typing import Tuple
 
 from sympy import nsolve, symbols
 
 from Arbie.Actions import Action
 from Arbie.Variables import ArbitrageOpportunity
-import logging
 
+logger = logging.getLogger()
 x = symbols("x")
 
 
@@ -74,6 +75,29 @@ class ArbitrageFinder(object):
         return expr.subs(x, value) - value
 
 
+def _update_oportunity(raw_trades, nmb_trades):
+    trades = []
+    for index, arb in enumerate(raw_trades):
+        amount_in = None
+        profit = None
+        try:
+            amount_in, profit = ArbitrageFinder(arb).find_arbitrage()
+        except (AssertionError, ValueError, TypeError):
+            continue
+
+        arb.amount_in = amount_in
+        arb.profit = profit
+        trades.append(arb)
+        logger.info(
+            f"Found oportunity {index}:{len(raw_trades)}"
+            + " with profit {arb.profit} for {arb.amount_in} eth"
+        )
+        if index > nmb_trades:
+            break
+
+    return trades
+
+
 class Arbitrage(Action):
     """Find optimal arbitrage opportunity for a list sorted trades.
 
@@ -82,28 +106,18 @@ class Arbitrage(Action):
     [Settings]
     input:
         trades: all_trades
+        nmb_trades: 100
     output:
         out_trades: filtered_trades
     """
 
     async def on_next(self, data):
-        trades = []
-        for arbitrage_opportunity in data.trades():
-            amount_in = None
-            profit = None
-            try:
-                amount_in, profit = ArbitrageFinder(
-                    arbitrage_opportunity
-                ).find_arbitrage()
-            except AssertionError:
-                continue
+        trades = _update_oportunity(data.trades(), data.nmb_trades())
 
-            arbitrage_opportunity.amount_in = amount_in
-            arbitrage_opportunity.profit = profit
-            trades.append(arbitrage_opportunity)
-
-        sorted_trade = sorted(trades, key=lambda trade: trade.profit, reverse=True)
-        if len(sorted_trade) == 0:
-            return
-        logging.getLogger().info(f"Top trade has {sorted_trade[0].profit} was {sorted_trade[0].trades}")
+        sorted_trade = sorted(
+            trades, key=lambda trade: trade.profit / trade.amount_in, reverse=True
+        )
+        logger.info(
+            f"Top trade has {sorted_trade[0].profit} was {sorted_trade[0].trades}"
+        )
         data.out_trades(sorted_trade)

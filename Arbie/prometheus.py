@@ -1,7 +1,9 @@
 """Helper for using prometheus_client."""
 
-from prometheus_client import Gauge, Summary, start_http_server
 import logging
+
+from prometheus_client import Gauge, Summary, start_http_server
+
 
 def singleton(class_):
     instances = {}

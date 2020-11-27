@@ -41,4 +41,4 @@ class TestPathFinder(object):
         await app.run()
         assert len(store["found_cycles"]) == 5
         trades = app.store["filtered_trades"]
-        assert trades[0].profit == pytest.approx(1.47700668)
+        assert trades[0].profit == pytest.approx(1.354642)
