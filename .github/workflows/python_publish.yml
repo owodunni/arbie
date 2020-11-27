@@ -14,8 +14,21 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Temporarily disable "include administrators" branch protection
+      uses: benjefferies/branch-protection-bot@master
+      if: always()
+      with:
+        access-token: ${{ secrets.ACCESS_TOKEN }}
+
     - name: Python Semantic Release
       uses: relekang/python-semantic-release@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         pypi_token: ${{ secrets.PYPI_TOKEN }}
+
+    - name: Enable "include administrators" branch protection
+      uses: benjefferies/branch-protection-bot@master
+      if: always()  # Force to always run this step to ensure "include administrators" is always turned back on
+      with:
+        access-token: ${{ secrets.ACCESS_TOKEN }}
+        enforce_admins: true
