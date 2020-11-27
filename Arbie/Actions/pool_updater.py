@@ -39,7 +39,7 @@ class PoolUpdater(Action):
     def _get_contract(self, address, pool_type):
         if pool_type == PoolType.uniswap:
             return self.pair_factory.load_contract(address=address)
-        elif pool_type == PoolType.balancer:
+        if pool_type == PoolType.balancer:
             return self.pool_factory.load_contract(address=address)
         raise ValueError("Cannot update pool with unknown type")
 
