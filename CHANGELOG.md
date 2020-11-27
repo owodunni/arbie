@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.4.4 (2020-11-27)
+### Fix
+* Prevent arbitrage finder from crashing on imaginary roots ([`9c0d314`](https://github.com/owodunni/arbie/commit/9c0d3146014ebf38bdeea951a8636d4cf89d72f4))
+* Remove empty pools ([`5279d8a`](https://github.com/owodunni/arbie/commit/5279d8ae5337963a09afb074597a6c162a175126))
+* Fix crash when multiple arbies are running ([`25fe810`](https://github.com/owodunni/arbie/commit/25fe810353acdc3cc3f9a48bf274b26d6f638c57))
+
 ## v0.4.3 (2020-11-25)
 ### Performance
 * Add prometheus to async functions ([`b5f462c`](https://github.com/owodunni/arbie/commit/b5f462c4fc33f99cb157e396cd6f76a07ca04229))
