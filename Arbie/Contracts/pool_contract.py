@@ -38,19 +38,19 @@ class PoolContract(Contract):
         tokens = await self.create_tokens()
         if len(tokens) < 2:
             raise PoolValueError(
-                f"Pool: {self.get_address}, has insufficient tokens: {len(tokens)}"
+                f"Pool: {self.get_address()}, has insufficient tokens: {len(tokens)}"
             )
         balances_bg = await self.get_balances()
         balances = list(map((lambda bg: bg.to_number()), balances_bg))
         if isclose(sum(balances), 0, abs_tol=1e-3):  # noqa: WPS432
             raise PoolValueError(
-                f"Pool: {self.get_address}, balances {sum(balances)} == 0"
+                f"Pool: {self.get_address()}, balances {sum(balances)} == 0"
             )
 
         weights = await self.get_weights()
         if not isclose(sum(weights), 1, abs_tol=1e-3):  # noqa: WPS432
             raise PoolValueError(
-                f"Pool: {self.get_address}, weights {sum(weights)} != 1"
+                f"Pool: {self.get_address()}, weights {sum(weights)} != 1"
             )
         return Pool(
             tokens,
