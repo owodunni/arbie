@@ -2,9 +2,9 @@
 import pytest
 import yaml
 
+from Arbie.app import App
 from Arbie import SettingsParser
 from Arbie.Actions import Store
-from Arbie.arbie import App
 
 
 @pytest.fixture

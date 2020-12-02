@@ -24,7 +24,7 @@ import yaml
 from docopt import docopt
 
 import Arbie
-from Arbie.arbie import App
+from Arbie.app import App
 
 max_log_size = int(10e6)  # noqa: WPS432
 
