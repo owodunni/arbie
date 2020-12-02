@@ -4,7 +4,6 @@ import asyncio
 import pytest
 
 from Arbie import IERC20TokenError
-from Arbie.Contracts import ContractFactory
 from Arbie.Contracts.tokens import BadERC20Token, GenericToken
 from Arbie.Contracts.uniswap import UniswapFactory, UniswapPair
 from Arbie.Variables import BigNumber, PoolType
@@ -13,13 +12,6 @@ bg10 = BigNumber(10)
 bg5 = BigNumber(5)
 
 pytestmark = pytest.mark.asyncio
-
-
-@pytest.fixture
-def factory(deploy_address, w3) -> UniswapFactory:
-    return ContractFactory(w3, UniswapFactory).deploy_contract(
-        deploy_address, deploy_address
-    )
 
 
 @pytest.fixture

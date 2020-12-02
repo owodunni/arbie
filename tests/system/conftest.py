@@ -146,7 +146,15 @@ async def pool_factory(
 
 
 @pytest.fixture
+def factory(deploy_address, w3) -> UniswapFactory:
+    return ContractFactory(w3, UniswapFactory).deploy_contract(
+        deploy_address, deploy_address
+    )
+
+
+@pytest.fixture
 async def pair_factory(  # noqa: WPS210
+    factory,
     dai: GenericToken,
     weth: GenericToken,
     yam: GenericToken,
@@ -155,9 +163,6 @@ async def pair_factory(  # noqa: WPS210
     w3,
     deploy_address,
 ) -> UniswapFactory:
-    factory = ContractFactory(w3, UniswapFactory).deploy_contract(
-        deploy_address, deploy_address
-    )
 
     await factory.setup_pair(
         [dai, yam],

@@ -18,8 +18,8 @@ def get_value(values: Balances, token: Token) -> Balance:
 
 
 class PoolType(Enum):
-    balancer = (1,)
-    uniswap = (2,)
+    uniswap = 0
+    balancer = 1
     unknown = 99
 
 
