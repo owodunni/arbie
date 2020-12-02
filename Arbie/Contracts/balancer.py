@@ -14,9 +14,8 @@ logger = logging.getLogger()
 
 
 class BalancerPool(PoolContract):
-    name = "pool"
+    name = "BPool"
     protocol = "balancer"
-    abi = "bpool"
     pool_type = PoolType.balancer
 
     def get_number_of_tokens(self):
@@ -101,9 +100,8 @@ class BalancerLoader(object):
 
 
 class BalancerFactory(Contract):
-    name = "pool_factory"
+    name = "BFactory"
     protocol = "balancer"
-    abi = "pool_factory"
 
     def __init__(self, w3, owner_address: str, contract):
         self.cf = ContractFactory(w3, BalancerPool)

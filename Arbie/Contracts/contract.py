@@ -56,11 +56,7 @@ class ContractFactory(object):
     def __init__(self, w3, factory_class: Contract):
         self.w3 = w3
 
-        if (
-            factory_class.name is None
-            or factory_class.abi is None
-            or factory_class.protocol is None
-        ):
+        if factory_class.name is None or factory_class.protocol is None:
             raise ValueError(f"{factory_class} dose not contain default parameters")
         self.factory_class = factory_class
 
@@ -103,13 +99,13 @@ class ContractFactory(object):
         ]
 
     def _read_abi(self):
-        return self._read_resource(
-            self.factory_class.protocol, "{0}_abi.json".format(self.factory_class.abi)
-        )
+        return self._read_json("abi")
 
     def _read_bytecode(self):
-        key = "bytecode"
-        filename = "{0}_{1}.json".format(self.factory_class.abi, key)
+        return self._read_json("bytecode")
+
+    def _read_json(self, key):
+        filename = f"{self.factory_class.name}.json"
         json_data = self._read_resource(self.factory_class.protocol, filename)
         return json.loads(json_data)[key]
 
