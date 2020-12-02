@@ -1,5 +1,5 @@
 name: Python Branch Workflow
-on: [push, pull_request]
+on: [push]
 
 jobs:
   build-python:
