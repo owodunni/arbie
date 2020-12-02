@@ -30,9 +30,8 @@ async def create_reserve(result: Tuple[float, GenericToken]):
 
 
 class UniswapPair(PoolContract):
-    name = "pair"
+    name = "UniswapV2Pair"
     protocol = "uniswap"
-    abi = "pair"
 
     fee = 0.003
     weight = 0.5
@@ -76,9 +75,8 @@ class UniswapPair(PoolContract):
 
 
 class UniswapFactory(Contract):
-    name = "factory_v2"
+    name = "UniswapV2Factory"
     protocol = "uniswap"
-    abi = "factory_v2"
 
     def __init__(self, w3, owner_address: str, contract):
         self.cf = ContractFactory(w3, UniswapPair)

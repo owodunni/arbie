@@ -8,9 +8,8 @@ from Arbie.Variables import BigNumber, Token
 
 
 class IERC20Token(Contract):
-    name = "ierc20"
+    name = "IERC20"
     protocol = "tokens"
-    abi = "ierc20"
 
     def __eq__(self, other):
         return self.get_address() == other.get_address()
@@ -41,15 +40,13 @@ class IERC20Token(Contract):
 
 
 class BadERC20Token(IERC20Token):
-    name = "baderc20"
+    name = "BadERC20"
     protocol = "tokens"
-    abi = "baderc20"
 
 
 class GenericToken(IERC20Token):
-    name = "erc20"
+    name = "ERC20"
     protocol = "tokens"
-    abi = "erc20"
 
     def __str__(self):
         return (
