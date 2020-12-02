@@ -5,7 +5,7 @@ import asyncio
 import pytest
 import yaml
 
-from Arbie.arbie import App
+from Arbie.app import App
 
 
 class Result(object):
@@ -21,8 +21,7 @@ async def wait_and_stop(tree, key):
         if key in tree.store.state:
             tree.stop()
             return
-        else:
-            await asyncio.sleep(0.1)
+        await asyncio.sleep(0.1)
 
 
 async def wait_and_run(app):
