@@ -5,25 +5,26 @@ import pytest
 from Arbie.Actions import ActionTree, Store
 from Arbie.Actions.arbitrage import Arbitrage, ArbitrageFinder
 from Arbie.address import dummy_token_generator
-from Arbie.Variables import ArbitrageOpportunity, Pool, Trade
-
-dai = dummy_token_generator("dai", 300.0)
-eth = dummy_token_generator("eth", 1)
-tokens = [dai, eth]
+from Arbie.Variables import Pool, Trade
 
 
 @pytest.fixture
-def trade1():
+def tokens(dai, eth):
+    return [dai, eth]
+
+
+@pytest.fixture
+def trade1(tokens, dai, eth):
     pool1 = Pool(tokens, [400, 1], [0.5, 0.5])
     pool2 = Pool(tokens, [410, 1], [0.5, 0.5])
-    return ArbitrageOpportunity([Trade(pool1, dai, eth), Trade(pool2, eth, dai)])
+    return Trade([pool1, pool2], [dai, eth, dai])
 
 
 @pytest.fixture
-def trade2():
+def trade2(tokens, dai, eth):
     pool1 = Pool(tokens, [400, 1], [0.9, 0.1])
     pool2 = Pool(tokens, [410, 1], [0.1, 0.9])
-    return ArbitrageOpportunity([Trade(pool1, dai, eth), Trade(pool2, eth, dai)])
+    return Trade([pool1, pool2], [dai, eth, dai])
 
 
 class TestArbitrage(object):
@@ -37,31 +38,31 @@ class TestArbitrage(object):
         amount, profit = ArbitrageFinder(trade2).find_arbitrage()
         assert amount == pytest.approx(27.8547574719045)  # noqa: WPS432
 
-    def test_find_arbitrage_no_opportunity(self):
+    def test_find_arbitrage_no_opportunity(self, tokens, dai, eth):
         pool1 = Pool(tokens, [400, 1], [0.9, 0.1])
         pool2 = Pool(tokens, [410, 1], [0.1, 0.9])
         trade = [Trade(pool1, eth, dai), Trade(pool2, dai, eth)]
 
         with pytest.raises(ValueError):
-            ArbitrageFinder(ArbitrageOpportunity(trade)).find_arbitrage()
+            ArbitrageFinder(trade).find_arbitrage()
 
-    def test_calc_optimal_arbitrage_no_opportunity(self):
+    def test_calc_optimal_arbitrage_no_opportunity(self, tokens, dai, eth):
         pool1 = Pool(tokens, [400, 1], [0.9, 0.1])
         pool2 = Pool(tokens, [410, 1], [0.1, 0.9])
-        trade = [Trade(pool1, eth, dai), Trade(pool2, dai, eth)]
+        trade = Trade([pool1, pool2], [eth, dai, eth])
 
         with pytest.raises(ValueError) as e:
-            ArbitrageFinder(ArbitrageOpportunity(trade)).calculate_optimal_arbitrage()
+            ArbitrageFinder(trade).calculate_optimal_arbitrage()
             assert e.message == "No arbitrage opportunity found."
 
-    def test_find_arbitrage_wrong_token(self):
+    def test_find_arbitrage_wrong_token(self, tokens, dai):
         pool1 = Pool(tokens, [400, 1], [0.9, 0.1])
         pool2 = Pool(tokens, [410, 1], [0.1, 0.9])
         sai = dummy_token_generator("sai", 300.0)
-        trade = [Trade(pool1, dai, sai), Trade(pool2, sai, dai)]
+        trade = Trade([pool1, pool2], [dai, sai, dai])
 
         with pytest.raises(ValueError):
-            ArbitrageFinder(ArbitrageOpportunity(trade)).find_arbitrage()
+            ArbitrageFinder(trade).find_arbitrage()
 
 
 class TestArbitrageAction(object):
