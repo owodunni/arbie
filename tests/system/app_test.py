@@ -11,6 +11,7 @@ from Arbie.app import App
 class Result(object):
     pools = "arbie.1.pools"
     trades = "filtered_trades"
+    profit = "profit"
 
 
 pytestmark = pytest.mark.asyncio
@@ -31,7 +32,16 @@ async def wait_and_run(app):
 
 class TestApp(object):
     @pytest.fixture
-    def base_config(self, web3_server, redis_server, weth, pool_factory, pair_factory):
+    def base_config(
+        self,
+        web3_server,
+        redis_server,
+        weth,
+        pool_factory,
+        pair_factory,
+        arbie,
+        deploy_address,
+    ):
         return f"""
         store:
             address: {redis_server}
@@ -48,7 +58,14 @@ class TestApp(object):
             balancer_factory:
                 type: BalancerFactory
                 address: '{pool_factory.get_address()}'
-        """
+            arbie:
+                type: Arbie
+                address: '{arbie.get_address()}'
+            trader_address:
+                type: str
+                value: '{deploy_address}'
+
+        """  # noqa: WPS221
 
     @pytest.fixture
     def pool_config(self, base_config):
@@ -92,15 +109,13 @@ class TestApp(object):
         config = yaml.safe_load(pool_config)
         app = App(config)
         assert len(app.action_tree.actions) == 1
-        assert len(app.store.state.keys()) == 4
         yield app
         app.store.delete(Result.pools)
 
     @pytest.mark.slow
     async def test_run(self, app):
         await app.run()
-        assert len(app.store.state.keys()) == 5
-        assert len(app.store.get(Result.pools)) == 6
+        assert len(app.store.get(Result.pools)) == 7
         tokens = app.store.get("all_tokens")
         assert len(tokens) == 3
 
@@ -112,4 +127,4 @@ class TestApp(object):
             trade_finder.run(),
             wait_and_stop(trade_finder, Result.trades),
         )
-        assert len(trade_finder.store.get(Result.trades)) == 3
+        assert len(trade_finder.store.get(Result.trades)) == 4

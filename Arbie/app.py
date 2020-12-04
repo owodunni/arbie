@@ -4,6 +4,8 @@ import logging
 
 from Arbie.settings_parser import SettingsParser
 
+logger = logging.getLogger()
+
 
 class App(object):
     """App is used for configuring and running Arbie."""
@@ -15,7 +17,7 @@ class App(object):
 
     async def run(self):
         if self.action_tree is None:
-            logging.getLogger().warning("No actions given in configuration")
+            logger.warning("No actions given in configuration")
             return
         await self.action_tree.run()
 

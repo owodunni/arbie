@@ -18,10 +18,19 @@ class Arbie(Contract):
     name = "Arbie"
     protocol = "arbie"
 
-    def check_out_given_in(self, amount_in: BigNumber, trade: Trade):
+    def check_out_given_in(self, trade: Trade):
         addresses, types = address_and_pool_type(trade.pools)
         path_address = list(map(lambda t: t.address, trade.path))
         amount_out = self.contract.functions.checkOutGivenIn(
-            amount_in.value, addresses, types, path_address
+            BigNumber(trade.amount_in).value, addresses, types, path_address
         ).call()
         return BigNumber.from_value(amount_out).to_number()
+
+    def swap(self, trade, from_address=None):
+        addresses, types = address_and_pool_type(trade.pools)
+        path = list(map(lambda t: t.address, trade.path))
+        transaction = self.contract.functions.swap(
+            BigNumber(trade.amount_in).value, addresses, types, path
+        )
+
+        return self._transact_status(transaction, from_address)
