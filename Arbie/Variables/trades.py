@@ -1,33 +1,29 @@
 """Trades contain variables for trading."""
 
-from typing import List
-
-from Arbie.Variables.pool import Pool
-from Arbie.Variables.token import Balance, Token
+from Arbie.Variables.pool import Pools
+from Arbie.Variables.token import Balance, Tokens
 
 
 class Trade(object):
-    def __init__(self, pool: Pool, token_in: Token, token_out: Token):
-        self.pool = pool
-        self.token_in = token_in
-        self.token_out = token_out
-
-
-class ArbitrageOpportunity(object):
-    def __init__(self, trades: List[Trade], ratio=None):
-        self.trades = trades
+    def __init__(self, pools: Pools, path: Tokens, ratio=None):
+        self.pools = pools
+        self.path = path
         self.amount_in = None
         self.profit = None
+        self.balance = None
         self.ratio = ratio
 
-    def __iter__(self):
-        return iter(self.trades)
-
     def __len__(self):
-        return len(self.trades)
+        return len(self.path)
+
+    def __iter__(self):
+        return iter(self._generator())
 
     def __getitem__(self, i):
-        return self.trades[i]
+        return self.pools[i], self.path[i], self.path[i + 1]  # noqa: WPS221
 
     def set_balance(self, balance: Balance):
         self.balance = balance
+
+    def _generator(self):
+        yield from (self[i] for i, _ in enumerate(self.pools))

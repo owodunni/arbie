@@ -6,20 +6,20 @@ from typing import Tuple
 from sympy import nsolve, symbols
 
 from Arbie.Actions import Action
-from Arbie.Variables import ArbitrageOpportunity
+from Arbie.Variables import Trade
 
 logger = logging.getLogger()
 x = symbols("x")
 
 
 class ArbitrageFinder(object):
-    def __init__(self, trades: ArbitrageOpportunity):
-        self.trades = trades
+    def __init__(self, trade: Trade):
+        self.trade = trade
 
     def find_arbitrage(self) -> Tuple[float, float]:
-        if len(self.trades) < 2:
+        if len(self.trade) < 3:
             raise ValueError(
-                "Can only found arbitrage opportunity between two or more pools"
+                "Can only find arbitrage opportunity between at leat 3 tokens"
             )
 
         if not self.token_in_pools():
@@ -31,34 +31,27 @@ class ArbitrageFinder(object):
         return trade_input, profit
 
     def token_in_pools(self) -> bool:
-        for trade in self.trades:
-            pool = trade.pool
-            if trade.token_in not in pool.tokens or trade.token_out not in pool.tokens:
+        for pool, token_in, token_out in self.trade:
+            if token_in not in pool.tokens or token_out not in pool.tokens:
                 return False
         return True
 
     def trade_expr(self):
-        first_trade = self.trades[0]
-        expr = first_trade.pool.out_given_in_expr(
-            first_trade.token_in, first_trade.token_out
-        )
-
-        for trade in self.trades[1:]:
-            inner_expr = trade.pool.out_given_in_expr(trade.token_in, trade.token_out)
-            expr = inner_expr.subs(x, expr)
-
-        return expr
+        return self.expr_builder(lambda inner, expr: inner.subs(x, expr))
 
     def arbitrage_expr(self):
-        first_trade = self.trades[0]
-        expr = first_trade.pool.out_given_in_expr(
-            first_trade.token_in, first_trade.token_out
-        )
+        return self.expr_builder(lambda inner, expr: inner.subs(x, expr) - x)
 
-        for trade in self.trades[1:]:
-            inner_expr = trade.pool.out_given_in_expr(trade.token_in, trade.token_out)
-            expr = inner_expr.subs(x, expr) - x
-
+    def expr_builder(self, subs_expr):  # noqa: WPS210
+        i = 0
+        expr = None
+        for pool, token_in, token_out in self.trade:
+            inner_expr = pool.out_given_in_expr(token_in, token_out)
+            if i > 0:
+                expr = subs_expr(inner_expr, expr)
+            else:
+                expr = inner_expr
+                i = i + 1
         return expr
 
     def arbitrage_diff_expr(self):
@@ -73,6 +66,10 @@ class ArbitrageFinder(object):
     def calculate_profit(self, value) -> float:
         expr = self.trade_expr()
         return expr.subs(x, value) - value
+
+    def _initial_expr(self):
+        pool, trade_in, trade_out = self.trade[0]
+        return pool.out_given_in_expr(trade_in, trade_out)
 
 
 def _update_oportunity(raw_trades, nmb_trades):
@@ -117,7 +114,5 @@ class Arbitrage(Action):
         sorted_trade = sorted(
             trades, key=lambda trade: trade.profit / trade.amount_in, reverse=True
         )
-        logger.info(
-            f"Top trade has {sorted_trade[0].profit} was {sorted_trade[0].trades}"
-        )
+        logger.info(f"Top trade has {sorted_trade[0].profit}")
         data.out_trades(sorted_trade)

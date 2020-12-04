@@ -6,7 +6,7 @@ from typing import List
 import networkx as nx
 
 from Arbie.Actions import Action
-from Arbie.Variables import ArbitrageOpportunity, Pool, Token, Tokens, Trade
+from Arbie.Variables import Pool, Token, Tokens, Trade
 from Arbie.Variables.graph import FilteredTradingGraph, TradingGraph
 
 
@@ -86,13 +86,13 @@ class CycleFinder(object):
         )
 
 
-def create_trade(cycle: Cycle) -> ArbitrageOpportunity:
-    trades = []
-    start_node = cycle.nodes[0].token
+def create_trade(cycle: Cycle) -> Trade:
+    path = [cycle.nodes[0].token]
+    pools = []
     for node in cycle.nodes[1:]:
-        trades.append(Trade(node.pool, start_node, node.token))
-        start_node = node.token
-    return ArbitrageOpportunity(trades, ratio=cycle.ratio)
+        pools.append(node.pool)
+        path.append(node.token)
+    return Trade(pools, path, ratio=cycle.ratio)
 
 
 class PathFinder(Action):
