@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.5.0 (2020-12-04)
+### Feature
+* Add arbie smart contract ([`0457321`](https://github.com/owodunni/arbie/commit/045732115902c6e869342a5bebef224a266feab2))
+* Add router smart contract ([`8254646`](https://github.com/owodunni/arbie/commit/8254646e9ee8be1252270c79a80643bf01e9baa2))
+* Add Arbie contract and Uniswap router ([`579f913`](https://github.com/owodunni/arbie/commit/579f913c67fee2335dbfc8cd673e629a005a89f5))
+
 ## v0.4.4 (2020-11-27)
 ### Fix
 * Prevent arbitrage finder from crashing on imaginary roots ([`9c0d314`](https://github.com/owodunni/arbie/commit/9c0d3146014ebf38bdeea951a8636d4cf89d72f4))
