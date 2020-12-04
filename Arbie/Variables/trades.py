@@ -5,10 +5,10 @@ from Arbie.Variables.token import Balance, Tokens
 
 
 class Trade(object):
-    def __init__(self, pools: Pools, path: Tokens, ratio=None):
+    def __init__(self, pools: Pools, path: Tokens, ratio=None, amount_in=None):
         self.pools = pools
         self.path = path
-        self.amount_in = None
+        self.amount_in = amount_in
         self.profit = None
         self.balance = None
         self.ratio = ratio

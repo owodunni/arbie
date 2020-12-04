@@ -28,6 +28,9 @@ def config():
             balancer_factory:
                 type: BalancerFactory
                 address: "0xdac17f958d2ee523a2206206994597c13d831ec7"
+            arbie:
+                type: Arbie
+                address: "0xdac17f958d2ee523a2206206994597c13d831ec7"
             amount:
                 type: float
                 value: 26.3
@@ -76,7 +79,7 @@ class TestSettingsParser(object):
 
         sp = SettingsParser(config)
         store = sp.setup_store()
-        assert len(store.state) == 7
+        assert len(store.state) == 8
 
     def test_set_up_store_no_variables(self, config, mocker):
         mock_web3(mocker)

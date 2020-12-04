@@ -38,11 +38,13 @@ class Contract(object):
     def get_address(self) -> str:
         return self.contract.address
 
-    def _transact(self, transaction):
-        return transact(self.w3, self.owner_address, transaction)
+    def _transact(self, transaction, from_address=None):
+        if from_address is None:
+            from_address = self.owner_address
+        return transact(self.w3, from_address, transaction)
 
-    def _transact_status(self, transaction) -> bool:
-        return self._transact(transaction).status
+    def _transact_status(self, transaction, from_address=None) -> bool:
+        return self._transact(transaction, from_address).status
 
     def _transact_status_and_contract(self, transaction) -> Tuple[bool, str]:
         tx_receipt = self._transact(transaction)

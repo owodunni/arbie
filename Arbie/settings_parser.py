@@ -8,6 +8,7 @@ from web3 import Web3
 
 from Arbie.Actions import ActionTree, RedisState, Store
 from Arbie.Contracts import (
+    Arbie,
     BalancerFactory,
     ContractFactory,
     IERC20Token,
@@ -79,6 +80,9 @@ class VariableParser(object):
     def set_up_token(self, config):
         return self._set_up_contracts(config, IERC20Token).create_token(1)
 
+    def set_up_arbie(self, config):
+        return self._set_up_contracts(config, Arbie)
+
     def _create_variable(self, variable_config):  # noqa: WPS321
         variable_type = variable_config[Keys.type_key]
         if variable_type == "UniswapFactory":
@@ -87,6 +91,8 @@ class VariableParser(object):
             return self.set_up_balancer(variable_config)
         if variable_type == "Token":
             return self.set_up_token(variable_config)
+        if variable_type == "Arbie":
+            return self.set_up_arbie(variable_config)
         if variable_type == "float":
             return float(variable_config[Keys.value])
         if variable_type == "int":
@@ -95,7 +101,7 @@ class VariableParser(object):
             return str(variable_config[Keys.value])
         raise TypeError(f"No rule for creating variable if type {variable_type}")
 
-    def _set_up_contracts(self, config, contract):
+    def _set_up_contracts(self, config, contract, *kwargs):
         factory = ContractFactory(self.w3, contract)
         if Keys.network in config:
             return factory.load_contract(network=to_network(config[Keys.network]))
