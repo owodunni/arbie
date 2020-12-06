@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.6.0 (2020-12-06)
+### Feature
+* **trader:** Add action for trading using arbie ([`8fd32a0`](https://github.com/owodunni/arbie/commit/8fd32a085ad47fcd5ed26a3fc512d7b52edb5381))
+
 ## v0.5.0 (2020-12-04)
 ### Feature
 * Add arbie smart contract ([`0457321`](https://github.com/owodunni/arbie/commit/045732115902c6e869342a5bebef224a266feab2))
