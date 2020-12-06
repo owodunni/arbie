@@ -15,12 +15,13 @@ class Network(Enum):
     ropsten = 2
 
 
-def transact(w3, address: str, transaction):
+def transact(w3, address: str, transaction, value=0):
     """Transact a transaction and return transaction receipt."""
     tx_hash = transaction.transact(
         {
             "from": address,
             "gas": 48814000,
+            "value": value
         }
     )
     # wait for the transaction to be mined
@@ -38,13 +39,13 @@ class Contract(object):
     def get_address(self) -> str:
         return self.contract.address
 
-    def _transact(self, transaction, from_address=None):
+    def _transact(self, transaction, from_address=None, value=0):
         if from_address is None:
             from_address = self.owner_address
-        return transact(self.w3, from_address, transaction)
+        return transact(self.w3, from_address, transaction, value)
 
-    def _transact_status(self, transaction, from_address=None) -> bool:
-        return self._transact(transaction, from_address).status
+    def _transact_status(self, transaction, from_address=None, value=0) -> bool:
+        return self._transact(transaction, from_address, value).status
 
     def _transact_status_and_contract(self, transaction) -> Tuple[bool, str]:
         tx_receipt = self._transact(transaction)
