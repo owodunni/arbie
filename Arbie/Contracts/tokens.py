@@ -71,3 +71,15 @@ class GenericToken(IERC20Token):
 
     def _name(self):
         return self.contract.functions.name()
+
+class Weth(GenericToken):
+    name = "Weth"
+    protocol = "tokens"
+
+    def deposit(self, amount, address):
+        transaction = self.contract.functions.deposit()
+        return self._transact_status(transaction, address, BigNumber(amount).value)
+
+    def withdraw(self, amount, address):
+        transaction = self.contract.functions.withdraw(BigNumber(amount).value)
+        return self._transact_status(transaction, address)

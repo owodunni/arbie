@@ -2,7 +2,7 @@
 import pytest
 
 from Arbie.Contracts import ContractFactory
-from Arbie.Contracts.tokens import GenericToken
+from Arbie.Contracts.tokens import GenericToken, Weth
 from Arbie.Variables import BigNumber
 
 bg10 = BigNumber(10)
@@ -46,3 +46,17 @@ async def test_transfer(dai: GenericToken, deploy_address, dummy_address):
 async def test_name(dai: GenericToken):
     name = await dai.get_name()
     assert name == "Dai"
+
+class TestWeth(object):
+
+    @pytest.fixture
+    def real_weth(self, w3, deploy_address):
+        return ContractFactory(w3, Weth).deploy_contract(deploy_address)
+
+    @pytest.mark.asyncio
+    async def test_deposit_withdraw(self, real_weth: Weth, dummy_address):
+        real_weth.deposit(2,dummy_address)
+        assert await real_weth.balance_of(dummy_address) == BigNumber(2)
+
+        real_weth.withdraw(2, dummy_address)
+        assert await real_weth.balance_of(dummy_address) == BigNumber(0)
