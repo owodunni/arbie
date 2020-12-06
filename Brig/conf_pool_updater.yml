@@ -1,5 +1,5 @@
 store:
-  address: 'redis:6379'
+  address: 'gluteus:6379'
 
 web3:
   address: 'http://gluteus:8545'
@@ -16,8 +16,12 @@ variables:
       network: mainnet
 
 action_tree:
+  event:
+    'PoolUpdater.1.pools'
   actions:
-    PoolFinder:
-      output:
+    PoolUpdater:
+      input:
+        web3: web3
         pools: 'PoolFinder.1.pools'
-        tokens: 'PoolFinder.1.tokens'
+      output:
+        new_pools: 'PoolUpdater.1.pools'

@@ -1,0 +1,33 @@
+store:
+  address: 'redis:6379'
+
+web3:
+  address: 'http://Node:8545'
+
+variables:
+  weth:
+    type: Token
+    address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'
+  uniswap_factory:
+      type: UniswapFactory
+      network: mainnet
+  balancer_factory:
+      type: BalancerFactory
+      network: mainnet
+
+action_tree:
+  event:
+    'PoolUpdater.1.pools'
+  actions:
+    PathFinder:
+      input:
+        pools: 'PoolUpdater.1.pools'
+        max_depth: 4
+        weth: weth
+      output:
+          trades: trades
+    Arbitrage:
+        input:
+            trades: trades
+        output:
+          out_trades: 'Arbitrage.1.filtered_trades'

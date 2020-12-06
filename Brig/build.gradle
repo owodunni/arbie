@@ -1,0 +1,14 @@
+task dockerArbie(type: Exec) {
+    workingDir projectDir
+    
+    commandLine "docker", "build", "-f", "Dockerfile.arbie",
+                "-t", "arbie:prod", "."
+}
+
+
+task dockerHardhat(type: Exec) {
+    workingDir projectDir
+    
+    commandLine "docker", "build", "-f", "Dockerfile.hardhat",
+                "-t", "hardhat:node", "."
+}

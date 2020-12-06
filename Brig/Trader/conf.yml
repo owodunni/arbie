@@ -2,7 +2,7 @@ store:
   address: 'redis:6379'
 
 web3:
-  address: 'http://gluteus:8545'
+  address: 'http://Node:8545'
 
 variables:
   weth:
@@ -16,8 +16,11 @@ variables:
       network: mainnet
 
 action_tree:
+  event:
+    'PoolUpdater.1.pools'
   actions:
-    PoolFinder:
-      output:
-        pools: 'PoolFinder.1.pools'
-        tokens: 'PoolFinder.1.tokens'
+    Trader:
+        input:
+            trades: trades
+        output:
+          out_trades: 'Arbitrage.1.filtered_trades'
