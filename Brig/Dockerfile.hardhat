@@ -1,0 +1,7 @@
+FROM node:15-slim
+
+WORKDIR /hardhat
+
+Add hardhat.config.js hardhat.config.js
+
+RUN npm init --yes && npm install --save-dev hardhat
