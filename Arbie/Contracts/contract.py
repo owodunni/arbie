@@ -7,6 +7,7 @@ from typing import Tuple
 from pkg_resources import resource_string
 
 from Arbie.async_helpers import run_async
+from Arbie.Variables import BigNumber
 
 
 class Network(Enum):
@@ -15,13 +16,14 @@ class Network(Enum):
     ropsten = 2
 
 
-def transact(w3, address: str, transaction, value=0):
+def transact(w3, address: str, transaction, value=0, gas_price=30):
     """Transact a transaction and return transaction receipt."""
     tx_hash = transaction.transact(
         {
             "from": address,
             "gas": 48814000,
-            "value": value
+            "value": value,
+            "gas_price": BigNumber(gas_price).value,
         }
     )
     # wait for the transaction to be mined
@@ -39,13 +41,15 @@ class Contract(object):
     def get_address(self) -> str:
         return self.contract.address
 
-    def _transact(self, transaction, from_address=None, value=0):
+    def _transact(self, transaction, from_address=None, value=0, gas_cost=30):
         if from_address is None:
             from_address = self.owner_address
-        return transact(self.w3, from_address, transaction, value)
+        return transact(self.w3, from_address, transaction, value, gas_cost)
 
-    def _transact_status(self, transaction, from_address=None, value=0) -> bool:
-        return self._transact(transaction, from_address, value).status
+    def _transact_status(
+        self, transaction, from_address=None, value=0, gas_cost=30
+    ) -> bool:
+        return self._transact(transaction, from_address, value, gas_cost).status
 
     def _transact_status_and_contract(self, transaction) -> Tuple[bool, str]:
         tx_receipt = self._transact(transaction)

@@ -11,6 +11,7 @@ from Arbie.Contracts import (
     ContractFactory,
     UniswapFactory,
     UniswapV2Router,
+    Weth,
 )
 from Arbie.Contracts.tokens import BadERC20Token, GenericToken
 from Arbie.Variables import BigNumber, Trade
@@ -92,6 +93,11 @@ def bad(deploy_address, w3) -> BadERC20Token:
     )
 
 
+@pytest.fixture
+def real_weth(w3, deploy_address):
+    return ContractFactory(w3, Weth).deploy_contract(deploy_address)
+
+
 small = 10e4
 medium = 10e6
 large = 10e8
@@ -170,7 +176,6 @@ async def pair_factory(  # noqa: WPS210, WPS217
     w3,
     deploy_address,
 ) -> UniswapFactory:
-
     await factory.setup_pair(
         [wbtc, dai],
         [
