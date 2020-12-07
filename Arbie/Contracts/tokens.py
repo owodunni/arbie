@@ -6,10 +6,12 @@ import logging
 from Arbie.Contracts.contract import Contract
 from Arbie.Variables import BigNumber, Token
 
+token_protocol = "tokens"
+
 
 class IERC20Token(Contract):
     name = "IERC20"
-    protocol = "tokens"
+    protocol = token_protocol
 
     def __eq__(self, other):
         return self.get_address() == other.get_address()
@@ -41,12 +43,12 @@ class IERC20Token(Contract):
 
 class BadERC20Token(IERC20Token):
     name = "BadERC20"
-    protocol = "tokens"
+    protocol = token_protocol
 
 
 class GenericToken(IERC20Token):
     name = "ERC20"
-    protocol = "tokens"
+    protocol = token_protocol
 
     def __str__(self):
         return (
@@ -72,14 +74,17 @@ class GenericToken(IERC20Token):
     def _name(self):
         return self.contract.functions.name()
 
+
 class Weth(GenericToken):
     name = "Weth"
-    protocol = "tokens"
+    protocol = token_protocol
 
-    def deposit(self, amount, address):
+    def deposit(self, amount, address, gas_cost=30):
         transaction = self.contract.functions.deposit()
-        return self._transact_status(transaction, address, BigNumber(amount).value)
+        return self._transact_status(
+            transaction, address, BigNumber(amount).value, gas_cost
+        )
 
-    def withdraw(self, amount, address):
+    def withdraw(self, amount, address, gas_cost=30):
         transaction = self.contract.functions.withdraw(BigNumber(amount).value)
-        return self._transact_status(transaction, address)
+        return self._transact_status(transaction, address, gas_cost=gas_cost)

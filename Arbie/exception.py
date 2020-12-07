@@ -19,3 +19,7 @@ class PoolValueError(ValueError):
 
 class StateError(Exception):
     """Raised when there is an issue with the state."""
+
+
+class TransactionError(RuntimeError):
+    """Raised when a Transaction unexpectedly fails."""

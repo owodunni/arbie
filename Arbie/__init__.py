@@ -5,6 +5,7 @@ from Arbie.exception import (  # noqa: F401
     IERC20TokenError,
     PoolValueError,
     StateError,
+    TransactionError,
 )
 from Arbie.settings_parser import SettingsParser  # noqa: F401
 
