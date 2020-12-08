@@ -56,7 +56,6 @@ class TestSetUpTrader(object):
         store.add("weth", real_weth)
         store.add("web3", w3)
         store.add("trader_address", dummy_address)
-        store.add("gas_cost", 30)  # noqa: WPS432
         return store
 
     @pytest.mark.asyncio

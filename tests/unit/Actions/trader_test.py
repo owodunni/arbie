@@ -50,12 +50,12 @@ class TestBalanceChecker(object):
     async def test_low_eth(self):
         checker = BalanceChecker(*setup_mocks([1], [0]))
         with pytest.raises(ValueError):
-            await checker.check_and_convert(some_address, 1, 2, 10, 30)
+            await checker.check_and_convert(some_address, 1, 2, 10)
 
     @pytest.mark.asyncio
     async def test_high_eth_and_weth(self):
         checker = BalanceChecker(*setup_mocks([12], [11]))
-        eth, weth = await checker.check_and_convert(some_address, 1, 2, 10, 30)
+        eth, weth = await checker.check_and_convert(some_address, 1, 2, 10)
         assert eth == 12
         assert weth == 11
 
@@ -64,22 +64,22 @@ class TestBalanceChecker(object):
         eth_mock, weth_mock = setup_mocks([12, 2], [0, 10])
         checker = BalanceChecker(eth_mock, weth_mock)
 
-        eth, weth = await checker.check_and_convert(some_address, 1, 2, 10, 30)
+        eth, weth = await checker.check_and_convert(some_address, 1, 2, 10)
         assert eth == 2
         assert weth == 10
 
-        weth_mock.deposit.assert_called_once_with(10, some_address, 30)
+        weth_mock.deposit.assert_called_once_with(10, some_address)
 
     @pytest.mark.asyncio
     async def test_high_weth(self):
         eth_mock, weth_mock = setup_mocks([0.5, 1], [10, 9.5])
         checker = BalanceChecker(eth_mock, weth_mock)
 
-        eth, weth = await checker.check_and_convert(some_address, 1, 2, 10, 30)
+        eth, weth = await checker.check_and_convert(some_address, 1, 2, 10)
         assert eth == 1
         assert weth == 9.5
 
-        weth_mock.withdraw.assert_called_once_with(0.5, some_address, 30)
+        weth_mock.withdraw.assert_called_once_with(0.5, some_address)
 
     @pytest.mark.asyncio
     async def test_high_eth_transaction_error(self):
@@ -88,7 +88,7 @@ class TestBalanceChecker(object):
 
         checker = BalanceChecker(eth_mock, weth_mock)
         with pytest.raises(TransactionError):
-            await checker.check_and_convert(some_address, 1, 2, 10, 30)
+            await checker.check_and_convert(some_address, 1, 2, 10)
 
     @pytest.mark.asyncio
     async def test_high_weth_transaction_error(self):
@@ -97,4 +97,4 @@ class TestBalanceChecker(object):
 
         checker = BalanceChecker(eth_mock, weth_mock)
         with pytest.raises(TransactionError):
-            await checker.check_and_convert(some_address, 1, 2, 10, 30)
+            await checker.check_and_convert(some_address, 1, 2, 10)
