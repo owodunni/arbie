@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.6.1 (2020-12-08)
+### Fix
+* **SetUpTrader:** Add action for setting up trader ([`5f2e0c9`](https://github.com/owodunni/arbie/commit/5f2e0c9c21a3737707605adc4e43d0131ddcbb03))
+* **weth:** Add real weth contract ([`59aab3a`](https://github.com/owodunni/arbie/commit/59aab3a1d98accdaea1bf29e28b734cca9b8bbc9))
+
 ## v0.6.0 (2020-12-06)
 ### Feature
 * **trader:** Add action for trading using arbie ([`8fd32a0`](https://github.com/owodunni/arbie/commit/8fd32a085ad47fcd5ed26a3fc512d7b52edb5381))
