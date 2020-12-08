@@ -79,12 +79,10 @@ class Weth(GenericToken):
     name = "Weth"
     protocol = token_protocol
 
-    def deposit(self, amount, address, gas_cost=30):
+    def deposit(self, amount, address):
         transaction = self.contract.functions.deposit()
-        return self._transact_status(
-            transaction, address, BigNumber(amount).value, gas_cost
-        )
+        return self._transact_status(transaction, address, BigNumber(amount).value)
 
-    def withdraw(self, amount, address, gas_cost=30):
+    def withdraw(self, amount, address):
         transaction = self.contract.functions.withdraw(BigNumber(amount).value)
-        return self._transact_status(transaction, address, gas_cost=gas_cost)
+        return self._transact_status(transaction, address)

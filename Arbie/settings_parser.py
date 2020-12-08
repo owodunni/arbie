@@ -4,7 +4,8 @@ import logging
 
 from requests import Session
 from requests.adapters import HTTPAdapter
-from web3 import Web3
+from web3 import Web3, middleware
+from web3.gas_strategies.time_based import fast_gas_price_strategy
 
 from Arbie.Actions import ActionTree, RedisState, Store
 from Arbie.Contracts import (
@@ -63,6 +64,11 @@ class VariableParser(object):
         session.mount("https://", adapter)
 
         w3 = Web3(Web3.HTTPProvider(address, session=session))
+        w3.eth.setGasPriceStrategy(fast_gas_price_strategy)
+
+        w3.middleware_onion.add(middleware.time_based_cache_middleware)
+        w3.middleware_onion.add(middleware.latest_block_based_cache_middleware)
+        w3.middleware_onion.add(middleware.simple_cache_middleware)
 
         if not w3.isConnected():
             raise ConnectionError("Web3 is not connected")

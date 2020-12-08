@@ -22,9 +22,7 @@ class BalanceChecker(object):
     async def check_total(self, address):
         return sum(await self.check(address))
 
-    async def check_and_convert(
-        self, trader_address, min_eth, min_weth, max_weth, gas_cost
-    ):
+    async def check_and_convert(self, trader_address, min_eth, min_weth, max_weth):
         amount_eth, amount_weth = await self.check(trader_address)
 
         # Already have sufficient amount setup
@@ -39,27 +37,23 @@ class BalanceChecker(object):
 
         # ETH is good but not weth
         if amount_eth > min_eth + min_weth:
-            self._to_weth(amount_eth, min_eth, max_weth, trader_address, gas_cost)
+            self._to_weth(amount_eth, min_eth, max_weth, trader_address)
         else:
-            self._to_eth(
-                amount_eth, amount_weth, min_eth, min_weth, trader_address, gas_cost
-            )
+            self._to_eth(amount_eth, amount_weth, min_eth, min_weth, trader_address)
 
         return await self.check(trader_address)
 
-    def _to_weth(self, amount_eth, min_eth, max_weth, trader_address, gas_cost):
+    def _to_weth(self, amount_eth, min_eth, max_weth, trader_address):
         max_deposit = amount_eth - min_eth
         max_deposit = min(max_deposit, max_weth)
-        status = self.weth.deposit(max_deposit, trader_address, gas_cost)
+        status = self.weth.deposit(max_deposit, trader_address)
         if not status:
             raise TransactionError("Failed to deposit eth for weth")
 
-    def _to_eth(
-        self, amount_eth, amount_weth, min_eth, min_weth, trader_address, gas_cost
-    ):
+    def _to_eth(self, amount_eth, amount_weth, min_eth, min_weth, trader_address):
         max_withdraw = amount_weth - min_weth
         max_withdraw = min(max_withdraw, min_eth - amount_eth)
-        status = self.weth.withdraw(max_withdraw, trader_address, gas_cost)
+        status = self.weth.withdraw(max_withdraw, trader_address)
         if not status:
             raise TransactionError("Failed to withdraw weth for eth")
 
@@ -74,7 +68,6 @@ class SetUpTrader(Action):
         min_eth: 1
         min_weth: 2
         max_weth: 10
-        gas_cost: gas_cost
         trader_address: trader_address
     output:
         balance_eth: balance_eth
@@ -89,7 +82,6 @@ class SetUpTrader(Action):
             data.min_eth(),
             data.min_weth(),
             data.max_weth(),
-            data.gas_cost(),
         )
         data.balance_eth(amount_eth)
         data.balance_weth(amount_weth)
