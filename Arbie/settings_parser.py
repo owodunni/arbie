@@ -1,7 +1,9 @@
 """settings parser can be used for parsing input yaml."""
 
+import json
 import logging
 
+from eth_account import Account
 from requests import Session
 from requests.adapters import HTTPAdapter
 from web3 import Web3, middleware
@@ -39,14 +41,29 @@ class Keys(object):
     action_tree = "action_tree"
     event = "event"
     redis = "redis"
+    account = "account"
+    key = "key"
+    path = "path"
+
+
+def setup_gas_strategy(w3):
+    w3.eth.setGasPriceStrategy(fast_gas_price_strategy)
+
+    w3.middleware_onion.add(middleware.time_based_cache_middleware)
+    w3.middleware_onion.add(middleware.latest_block_based_cache_middleware)
+    w3.middleware_onion.add(middleware.simple_cache_middleware)
 
 
 class VariableParser(object):
     """VariableParser parses settings config and adds variable to store."""
 
-    def __init__(self, config, w3_config):
+    def __init__(self, config, w3_config, account_config):
         self.config = config
         self.w3 = self.set_up_web3(w3_config)
+        if account_config is None:
+            self.account = None
+        else:
+            self.account = self._set_up_account(account_config)
 
     def add_variables(self, store):
         for name, variable_config in self.config.items():
@@ -64,12 +81,6 @@ class VariableParser(object):
         session.mount("https://", adapter)
 
         w3 = Web3(Web3.HTTPProvider(address, session=session))
-        w3.eth.setGasPriceStrategy(fast_gas_price_strategy)
-
-        w3.middleware_onion.add(middleware.time_based_cache_middleware)
-        w3.middleware_onion.add(middleware.latest_block_based_cache_middleware)
-        w3.middleware_onion.add(middleware.simple_cache_middleware)
-
         if not w3.isConnected():
             raise ConnectionError("Web3 is not connected")
 
@@ -110,8 +121,15 @@ class VariableParser(object):
     def _set_up_contracts(self, config, contract, *kwargs):
         factory = ContractFactory(self.w3, contract)
         if Keys.network in config:
-            return factory.load_contract(network=to_network(config[Keys.network]))
-        return factory.load_contract(address=config[Keys.address])
+            return factory.load_contract(
+                network=to_network(config[Keys.network]), account=self.account
+            )
+        return factory.load_contract(address=config[Keys.address], account=self.account)
+
+    def _set_up_account(self, account_config):
+        with open(account_config[Keys.path], "r") as config_file:
+            config = json.load(config_file)
+            return Account.from_key(config[Keys.key])
 
 
 class SettingsParser(object):
@@ -144,7 +162,11 @@ class SettingsParser(object):
         return tree
 
     def _add_variables(self, store):
+        account_conf = None
+        if Keys.account in self.config:
+            account_conf = self.config[Keys.account]
+
         variable_parser = VariableParser(
-            self.config[Keys.variables], self.config[Keys.web3]
+            self.config[Keys.variables], self.config[Keys.web3], account_conf
         )
         variable_parser.add_variables(store)

@@ -29,9 +29,9 @@ class IERC20Token(Contract):
         transaction = self.contract.functions.transfer(to, bg_number.value)
         return self._transact_status(transaction)
 
-    def approve(self, spender: str, bg_number: BigNumber, from_address=None) -> bool:
+    def approve(self, spender: str, bg_number: BigNumber) -> bool:
         transaction = self.contract.functions.approve(spender, bg_number.value)
-        return self._transact_status(transaction, from_address)
+        return self._transact_status(transaction)
 
     async def approve_owner(self):
         bg = await self.balance_of(self.owner_address)
@@ -79,10 +79,10 @@ class Weth(GenericToken):
     name = "Weth"
     protocol = token_protocol
 
-    def deposit(self, amount, address):
+    def deposit(self, amount):
         transaction = self.contract.functions.deposit()
-        return self._transact_status(transaction, address, BigNumber(amount).value)
+        return self._transact_status(transaction, BigNumber(amount).value)
 
-    def withdraw(self, amount, address):
+    def withdraw(self, amount):
         transaction = self.contract.functions.withdraw(BigNumber(amount).value)
-        return self._transact_status(transaction, address)
+        return self._transact_status(transaction)

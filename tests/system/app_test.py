@@ -47,6 +47,8 @@ class TestApp(object):
             address: {redis_server}
         web3:
             address: {web3_server}
+        account:
+            path: tests/system/test_account.json
 
         variables:
             weth:
@@ -61,10 +63,6 @@ class TestApp(object):
             arbie:
                 type: Arbie
                 address: '{arbie.get_address()}'
-            trader_address:
-                type: str
-                value: '{deploy_address}'
-
         """  # noqa: WPS221
 
     @pytest.fixture

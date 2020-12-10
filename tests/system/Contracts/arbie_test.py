@@ -18,14 +18,22 @@ class TestArbie(object):
         assert pytest.approx(1, 1e-5) == amount_out - profit
 
     @pytest.mark.asyncio
-    async def test_swap(self, trade, arbie, weth: GenericToken, deploy_address):
+    async def test_swap(self, trade, arbie: Arbie, weth: GenericToken, dummy_account):
         trade.amount_in = 1
-        balance_before = await weth.balance_of(deploy_address)
+        weth.transfer(dummy_account.address, BigNumber(2))
+        weth.set_account(dummy_account)
+        balance_before = await weth.balance_of(dummy_account.address)
 
         assert balance_before > 1
 
         weth.approve(arbie.get_address(), BigNumber(2))
 
+        arbie.set_account(dummy_account)
         assert arbie.swap(trade)
+        amount_out = arbie.check_out_given_in(trade)
 
-        assert await weth.balance_of(deploy_address) > balance_before
+        balance_after = await weth.balance_of(dummy_account.address)
+        assert (
+            balance_after.to_number() - balance_before.to_number()
+            > amount_out - trade.amount_in - 0.001
+        )
