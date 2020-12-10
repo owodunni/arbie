@@ -1,7 +1,9 @@
 """Help module for web3 tests."""
 import asyncio
+import json
 
 import pytest
+from eth_account import Account
 from web3 import Web3
 
 from Arbie.async_helpers import async_map
@@ -14,6 +16,7 @@ from Arbie.Contracts import (
     Weth,
 )
 from Arbie.Contracts.tokens import BadERC20Token, GenericToken
+from Arbie.settings_parser import setup_gas_strategy
 from Arbie.Variables import BigNumber, Trade
 
 
@@ -33,6 +36,13 @@ def w3(web3_server):
 
 
 @pytest.fixture
+def w3_with_gas_strategy(web3_server):
+    w3 = Web3(Web3.HTTPProvider(web3_server))
+    setup_gas_strategy(w3)
+    return w3
+
+
+@pytest.fixture
 def deploy_address(w3) -> str:
     return w3.eth.accounts[0]
 
@@ -40,6 +50,30 @@ def deploy_address(w3) -> str:
 @pytest.fixture
 def dummy_address(w3) -> str:
     return w3.eth.accounts[1]
+
+
+@pytest.fixture
+def empty_account(w3) -> Account:
+    with open("tests/system/test_account.json", "r") as config_file:
+        config = json.load(config_file)
+        return Account.from_key(config["key"])
+
+
+@pytest.fixture()
+def dummy_account(w3, empty_account) -> Account:
+    balance = w3.eth.getBalance(empty_account.address)
+    required = 11 - BigNumber.from_value(balance).to_number()
+    required = max(0, required)
+
+    tx_recip = w3.eth.sendTransaction(
+        {
+            "from": w3.eth.accounts[2],
+            "to": empty_account.address,
+            "value": BigNumber(required).value,
+        }
+    )
+    w3.eth.waitForTransactionReceipt(tx_recip)
+    return empty_account
 
 
 @pytest.fixture
@@ -214,8 +248,8 @@ def uniswap_router(w3, deploy_address, weth, factory):
 
 
 @pytest.fixture
-def arbie(w3, deploy_address, uniswap_router):
-    return ContractFactory(w3, Arbie).deploy_contract(
+def arbie(w3_with_gas_strategy, deploy_address, uniswap_router):
+    return ContractFactory(w3_with_gas_strategy, Arbie).deploy_contract(
         deploy_address, uniswap_router.get_address()
     )
 

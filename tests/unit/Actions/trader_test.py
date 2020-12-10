@@ -68,7 +68,7 @@ class TestBalanceChecker(object):
         assert eth == 2
         assert weth == 10
 
-        weth_mock.deposit.assert_called_once_with(10, some_address)
+        weth_mock.deposit.assert_called_once_with(10)
 
     @pytest.mark.asyncio
     async def test_high_weth(self):
@@ -79,7 +79,7 @@ class TestBalanceChecker(object):
         assert eth == 1
         assert weth == 9.5
 
-        weth_mock.withdraw.assert_called_once_with(0.5, some_address)
+        weth_mock.withdraw.assert_called_once_with(0.5)
 
     @pytest.mark.asyncio
     async def test_high_eth_transaction_error(self):

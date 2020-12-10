@@ -26,11 +26,23 @@ class Arbie(Contract):
         ).call()
         return BigNumber.from_value(amount_out).to_number()
 
-    def swap(self, trade, from_address=None):
+    def estimate_swap_const(self, trade):
+        price = self.w3.eth.generateGasPrice()
+        gas = self._estimate_gas_swap(trade)
+        return BigNumber.from_value(price * gas).to_number()
+
+    def swap(self, trade):
+        gas = self._estimate_gas_swap(trade)
+        transaction = self._swap_transaction(trade)
+        return self._transact_status(transaction, gas=gas)
+
+    def _swap_transaction(self, trade):
         addresses, types = address_and_pool_type(trade.pools)
         path = list(map(lambda t: t.address, trade.path))
-        transaction = self.contract.functions.swap(
+        return self.contract.functions.swap(
             BigNumber(trade.amount_in).value, addresses, types, path
         )
 
-        return self._transact_status(transaction, from_address)
+    def _estimate_gas_swap(self, trade):
+        transaction = self._swap_transaction(trade)
+        return self._estimate_gas(transaction)

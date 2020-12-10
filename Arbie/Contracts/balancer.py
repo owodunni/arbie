@@ -103,9 +103,9 @@ class BalancerFactory(Contract):
     name = "BFactory"
     protocol = "balancer"
 
-    def __init__(self, w3, owner_address: str, contract):
+    def __init__(self, w3, contract, **kwargs):
         self.cf = ContractFactory(w3, BalancerPool)
-        super().__init__(w3, owner_address, contract)
+        super().__init__(w3, contract, **kwargs)
 
     async def setup_pool(
         self,

@@ -49,8 +49,9 @@ class TestToken(object):
 class TestWeth(object):
     @pytest.mark.asyncio
     async def test_deposit_withdraw(self, real_weth: Weth, dummy_address):
-        real_weth.deposit(2, dummy_address)
+        real_weth.set_owner_address(dummy_address)
+        real_weth.deposit(2)
         assert await real_weth.balance_of(dummy_address) == BigNumber(2)
 
-        real_weth.withdraw(2, dummy_address)
+        real_weth.withdraw(2)
         assert await real_weth.balance_of(dummy_address) == BigNumber(0)
