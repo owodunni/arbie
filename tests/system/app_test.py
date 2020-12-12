@@ -48,7 +48,7 @@ class TestApp(object):
         web3:
             address: {web3_server}
         account:
-            path: tests/system/test_account.json
+            path: Brig/Trader/test_account.json
 
         variables:
             weth:
