@@ -54,7 +54,7 @@ def dummy_address(w3) -> str:
 
 @pytest.fixture
 def empty_account(w3) -> Account:
-    with open("tests/system/test_account.json", "r") as config_file:
+    with open("Brig/Trader/test_account.json", "r") as config_file:
         config = json.load(config_file)
         return Account.from_key(config["key"])
 
