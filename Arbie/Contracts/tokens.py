@@ -6,7 +6,7 @@ import logging
 from Arbie.Contracts.contract import Contract
 from Arbie.Variables import BigNumber, Token
 
-token_protocol = "tokens"
+token_protocol = "tokens"  # noqa: S105
 
 
 class IERC20Token(Contract):
