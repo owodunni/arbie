@@ -30,7 +30,7 @@ class TestTrader(object):
         store.add("filtered_trades", [trade])
         store.add("weth", weth)
         store.add("web3", w3)
-        store.add("trader_account", trader_account)
+        store.add("account", trader_account)
         return store
 
     @pytest.mark.asyncio
@@ -53,12 +53,13 @@ class TestTrader(object):
 
 class TestSetUpTrader(object):
     @pytest.fixture
-    def trade_store(self, w3, real_weth, dummy_account):
+    def trade_store(self, w3, arbie, real_weth, dummy_account):
         real_weth.set_account(dummy_account)
         store = Store()
         store.add("weth", real_weth)
         store.add("web3", w3)
-        store.add("trader_account", dummy_account)
+        store.add("account", dummy_account)
+        store.add("arbie", arbie)
         return store
 
     @pytest.mark.asyncio

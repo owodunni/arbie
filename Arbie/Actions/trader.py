@@ -65,10 +65,11 @@ class SetUpTrader(Action):
     input:
         web3: web3
         weth: weth
+        arbie: arbie
         min_eth: 1
         min_weth: 2
         max_weth: 10
-        trader_account: trader_account
+        account: account
     output:
         balance_eth: balance_eth
         balance_weth: balance_weth
@@ -76,13 +77,17 @@ class SetUpTrader(Action):
 
     async def on_next(self, data):
         balance_checker = BalanceChecker(data.web3(), data.weth())
-        trader_account = data.trader_account()
+        trader_account = data.account()
         amount_eth, amount_weth = await balance_checker.check_and_convert(
             trader_account.address,
             data.min_eth(),
             data.min_weth(),
             data.max_weth(),
         )
+        arbie = data.arbie()
+        if not arbie.approve(data.weth()):
+            raise Exception("Failed to authorize arbie to spend tokens.")
+
         data.balance_eth(amount_eth)
         data.balance_weth(amount_weth)
 
@@ -106,10 +111,12 @@ def _perform_trade(trade, arbie, min_profit):
     return False
 
 
-def perform_trade(data):
+def perform_trade(data, amount_weth):
     arbie = data.arbie()
     min_profit = data.min_profit()
     for trade in data.trades():
+        # Make sure that we don't try to trade with more weth then we have
+        trade.amount_in = min(trade.amount_in, amount_weth)
         if _perform_trade(trade, arbie, min_profit):
             return True
     return False
@@ -127,17 +134,18 @@ class Trader(Action):
         trades: filtered_trades
         min_profit: 0.3
         weth: weth
-        trader_account: trader_account
+        account: account
     output:
         profit: profit
     """
 
-    async def on_next(self, data):
-        trader_account = data.trader_account()
+    async def on_next(self, data):  # noqa: WPS210
+        trader_account = data.account()
         balance_checker = BalanceChecker(data.web3(), data.weth())
-        balance_pre = await balance_checker.check_total(trader_account.address)
+        amount_eth, amount_weth = await balance_checker.check(trader_account.address)
+        balance_pre = amount_weth + amount_eth
 
-        if not perform_trade(data):
+        if not perform_trade(data, amount_weth):
             raise Exception("No trade performed")
 
         balance_post = await balance_checker.check_total(trader_account.address)

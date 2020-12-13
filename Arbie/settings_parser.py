@@ -14,8 +14,8 @@ from Arbie.Contracts import (
     Arbie,
     BalancerFactory,
     ContractFactory,
-    IERC20Token,
     UniswapFactory,
+    Weth,
 )
 from Arbie.Contracts.contract import Network
 
@@ -69,6 +69,8 @@ class VariableParser(object):
         for name, variable_config in self.config.items():
             store.add(name, self._create_variable(variable_config))
         store.add(Keys.web3, self.w3)
+        if self.account:
+            store.add(Keys.account, self.account)
 
     def set_up_web3(self, config):
         address = config[Keys.address]
@@ -95,7 +97,7 @@ class VariableParser(object):
         return self._set_up_contracts(config, BalancerFactory)
 
     def set_up_token(self, config):
-        return self._set_up_contracts(config, IERC20Token).create_token(1)
+        return self._set_up_contracts(config, Weth)
 
     def set_up_arbie(self, config):
         return self._set_up_contracts(config, Arbie)
@@ -106,7 +108,7 @@ class VariableParser(object):
             return self.set_up_uniswap(variable_config)
         if variable_type == "BalancerFactory":
             return self.set_up_balancer(variable_config)
-        if variable_type == "Token":
+        if variable_type == "Weth":
             return self.set_up_token(variable_config)
         if variable_type == "Arbie":
             return self.set_up_arbie(variable_config)

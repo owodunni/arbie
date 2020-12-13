@@ -108,33 +108,30 @@ class PoolFinder(Action):
     """
 
     async def on_next(self, data):
-        weth = data.weth()
+        weth = await data.weth().create_token(1)
 
         uni_coro = self._get_pairs_and_tokens(data.uniswap_factory(), weth)
-        bal_coro = data.balancer_factory().all_pools(data.balancer_start(), 100)
 
         pools, tokens = await self._get_pools_and_tokens(
-            *await self._get_results(uni_coro, bal_coro),
+            *await self._get_results(uni_coro),
         )
 
         data.pools(pools)
         data.tokens(tokens)
 
-    async def _get_pools_and_tokens(self, pool_contracts, pair_contracts, tokens):
+    async def _get_pools_and_tokens(self, pair_contracts, tokens):
         result = await asyncio.gather(
             create_and_filter_pools(pair_contracts, tokens),
-            create_and_filter_pools(pool_contracts, tokens),
         )
-        return result[0] + result[1], tokens
+        return result[0], tokens
 
     async def _get_results(
-        self, uni_coro, bal_coro
+        self, uni_coro
     ) -> Tuple[List[BalancerFactory], List[UniswapFactory], List[GenericToken]]:
-        results = await asyncio.gather(uni_coro, bal_coro)
-        pools = results[1]
+        results = await asyncio.gather(uni_coro)
         pairs = results[0][0]
         tokens = results[0][1]
-        return pools, pairs, tokens
+        return pairs, tokens
 
     async def _get_pairs_and_tokens(self, factory: UniswapFactory, weth):
         pairs = await factory.all_pairs()

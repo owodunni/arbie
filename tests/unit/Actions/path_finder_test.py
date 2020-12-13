@@ -1,4 +1,7 @@
 """Unittests of PathFinder."""
+import asyncio
+from unittest.mock import MagicMock
+
 import pytest
 import yaml
 
@@ -26,7 +29,11 @@ def config_file():
 def store(pools, eth) -> Store:
     store = Store()
     store.add("pools", pools)
-    store.add("eth", eth)
+    future = asyncio.Future()
+    future.set_result(eth)
+    weth_mock = MagicMock()
+    weth_mock.create_token.return_value = future
+    store.add("eth", weth_mock)
     return store
 
 

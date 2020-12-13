@@ -6,6 +6,8 @@ import pytest
 import yaml
 
 from Arbie.app import App
+from Arbie.Contracts import GenericToken
+from Arbie.Variables import BigNumber
 
 
 class Result(object):
@@ -64,12 +66,9 @@ store:
     address: {redis_server}
 web3:
     address: {web3_server}
-account:
-    path: Brig/Trader/test_account.json
-
 variables:
     weth:
-        type: Token
+        type: Weth
         address: '{weth.get_address()}'
     uniswap_factory:
         type: UniswapFactory
@@ -81,6 +80,17 @@ variables:
         type: Arbie
         address: '{arbie.get_address()}'
         """  # noqa: WPS221
+
+    @pytest.fixture
+    def base_config_with_account(self, base_config):
+        split_conf = base_config.split("variables:")
+        return f"""
+{split_conf[0]}
+account:
+    path: Brig/Trader/test_account.json
+variables:
+{split_conf[1]}
+"""
 
     @pytest.fixture
     def pool_finder_config(self, base_config):
@@ -103,8 +113,8 @@ variables:
         return setup_config("PoolUpdater/pool_updater.yml", base_config)
 
     @pytest.fixture
-    def trader_config(self, base_config):
-        return setup_config("Trader/trader.yml", base_config)
+    def trader_config(self, base_config_with_account):
+        return setup_config("Trader/trader.yml", base_config_with_account)
 
     @pytest.fixture
     def pool_finder(self, pool_finder_config):
@@ -130,26 +140,26 @@ variables:
         app.store.delete(Result.arbitrage_filtered_trades)
 
     @pytest.fixture
-    def trader(self, trader_config):
+    def trader(self, trader_config, weth: GenericToken, dummy_account):
+        weth.transfer(dummy_account.address, BigNumber(4))
         config = yaml.safe_load(trader_config)
         app = App(config)
         yield app
         app.store.delete(Result.trader_profit)
 
     @pytest.mark.slow
-    async def test_full_pipeline(self, pool_finder, pool_updater, path_finder):
+    async def test_full_pipeline(self, pool_finder, pool_updater, path_finder, trader):
         await asyncio.gather(
             wait_and_run(pool_finder),
             pool_updater.run(),
             wait_and_stop(pool_updater, Result.pool_updater_pools),
             path_finder.run(),
             wait_and_stop(path_finder, Result.arbitrage_filtered_trades),
+            trader.run(),
+            wait_and_stop(trader, Result.trader_profit),
         )
-        # wait_and_stop(path_finder, Result.arbitrage_filtered_trades),
-        # wait_and_stop(trader, Result.trader_profit))
-
-        assert len(pool_finder.store.get(Result.pool_finder_pools)) == 7
+        assert len(pool_finder.store.get(Result.pool_finder_pools)) == 4
         assert len(pool_finder.store.get(Result.pool_finder_tokens)) == 3
-        assert len(pool_updater.store.get(Result.pool_updater_pools)) == 7
-        assert len(path_finder.store.get(Result.arbitrage_filtered_trades)) == 4
-        # assert len(trader.store.get(Result.trader_profit)) == 4
+        assert len(pool_updater.store.get(Result.pool_updater_pools)) == 4
+        assert len(path_finder.store.get(Result.arbitrage_filtered_trades)) == 1
+        assert trader.store.get(Result.trader_profit) > 3.278

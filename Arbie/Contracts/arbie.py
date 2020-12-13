@@ -1,6 +1,7 @@
 """Utility functions for interacting with Arbie.sol."""
 
 from Arbie.Contracts.contract import Contract
+from Arbie.Contracts.tokens import GenericToken
 from Arbie.Variables import BigNumber, Pools, Trade
 
 
@@ -18,6 +19,11 @@ class Arbie(Contract):
     name = "Arbie"
     protocol = "arbie"
 
+    def approve(self, weth: GenericToken):
+        if weth.allowance(self.get_address()) < BigNumber(10e6):  # noqa: WPS432
+            return weth.approve(self.get_address(), BigNumber(10e8))  # noqa: WPS432
+        return True
+
     def check_out_given_in(self, trade: Trade):
         addresses, types = address_and_pool_type(trade.pools)
         path_address = list(map(lambda t: t.address, trade.path))
@@ -28,6 +34,8 @@ class Arbie(Contract):
 
     def estimate_swap_const(self, trade):
         price = self.w3.eth.generateGasPrice()
+        if not price:
+            price = 69 * 10e9  # noqa: WPS432
         gas = self._estimate_gas_swap(trade)
         return BigNumber.from_value(price * gas).to_number()
 

@@ -118,6 +118,12 @@ task startRedis(type: KonsoleTask) {
     command = "docker-compose up --force-recreate redis"
 }
 
+task startJupyter(type: KonsoleTask) {
+    command = "docker run --rm -p 8888:8888 -e " +
+            "JUPYTER_ENABLE_LAB=yes -v $projectDir:/home/jovyan/work " +
+            "jupyter/datascience-notebook:latest"
+}
+
 task develop{
   dependsOn startRedis, startGanache
 }

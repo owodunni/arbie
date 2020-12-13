@@ -178,7 +178,7 @@ class ContractFactory(object):
         raise NameError("kwargs does not contain network or address")
 
     def _read_account(self, **kwargs):
-        if "accounts" in kwargs:
+        if "account" in kwargs:
             return kwargs.get("account")
 
     def _load_contract(self, address: str):

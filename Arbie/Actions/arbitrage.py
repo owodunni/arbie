@@ -79,14 +79,15 @@ def _update_oportunity(raw_trades, nmb_trades):
         profit = None
         try:
             amount_in, profit = ArbitrageFinder(arb).find_arbitrage()
-        except (AssertionError, ValueError, TypeError):
+        except (AssertionError, ValueError, TypeError) as e:
+            logger.warning(f"No arbitrage found {e}")
             continue
 
         arb.amount_in = amount_in
         arb.profit = profit
         trades.append(arb)
         logger.info(
-            f"Found oportunity {index}:{len(raw_trades)}"
+            f"Found opportunity {index}:{len(raw_trades)}"
             + " with profit {arb.profit} for {arb.amount_in} eth"
         )
         if index > nmb_trades:
