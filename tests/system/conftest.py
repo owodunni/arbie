@@ -240,8 +240,8 @@ async def pair_factory(  # noqa: WPS210, WPS217
 
 
 @pytest.fixture
-def router(w3, deploy_address, weth, factory):
-    return ContractFactory(w3, UniswapV2Router).deploy_contract(
+def router(w3_with_gas_strategy, deploy_address, weth, factory):
+    return ContractFactory(w3_with_gas_strategy, UniswapV2Router).deploy_contract(
         deploy_address, factory.get_address(), weth.get_address()
     )
 

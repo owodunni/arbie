@@ -83,6 +83,7 @@ class VariableParser(object):
         session.mount("https://", adapter)
 
         w3 = Web3(Web3.HTTPProvider(address, session=session))
+        setup_gas_strategy(w3)
         if not w3.isConnected():
             raise ConnectionError("Web3 is not connected")
 
