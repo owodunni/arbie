@@ -3,22 +3,24 @@
 import pytest
 
 from Arbie.Actions.arbitrage import ArbitrageFinder
-from Arbie.Contracts import Arbie, GenericToken
+from Arbie.Contracts import GenericToken, UniswapV2Router
 from Arbie.Variables import BigNumber
 
 
-class TestArbie(object):
+class TestRouter(object):
     @pytest.mark.asyncio
-    def test_out_given_in(self, arbie: Arbie, trade):
+    def test_out_given_in(self, router, trade):
         trade.amount_in = 1
-        amount_out = arbie.check_out_given_in(trade)
+        amount_out = router.check_out_given_in(trade)
         assert amount_out > 1
 
         profit = ArbitrageFinder(trade).calculate_profit(1)
         assert pytest.approx(1, 1e-5) == amount_out - profit
 
     @pytest.mark.asyncio
-    async def test_swap(self, trade, arbie: Arbie, weth: GenericToken, dummy_account):
+    async def test_swap(
+        self, trade, router: UniswapV2Router, weth: GenericToken, dummy_account
+    ):
         trade.amount_in = 1
         weth.transfer(dummy_account.address, BigNumber(2))
         weth.set_account(dummy_account)
@@ -26,11 +28,11 @@ class TestArbie(object):
 
         assert balance_before > 1
 
-        weth.approve(arbie.get_address(), BigNumber(2))
+        weth.approve(router.get_address(), BigNumber(2))
 
-        arbie.set_account(dummy_account)
-        assert arbie.swap(trade)
-        amount_out = arbie.check_out_given_in(trade)
+        router.set_account(dummy_account)
+        assert router.swap(trade)
+        amount_out = router.check_out_given_in(trade)
 
         balance_after = await weth.balance_of(dummy_account.address)
         assert (
