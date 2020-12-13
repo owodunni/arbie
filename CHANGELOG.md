@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.7.1 (2020-12-13)
+### Fix
+* **gas-strategy:** Setup web3 to use gas strategy ([`9225823`](https://github.com/owodunni/arbie/commit/9225823070f91ea9344e573f83807d8eeb2840bd))
+* **brig:** Update docker-compose ([`140c845`](https://github.com/owodunni/arbie/commit/140c845b7ea7debddb3b759d40775dcfb700737a))
+* **Brig:** Update configurations ([`6863108`](https://github.com/owodunni/arbie/commit/68631081142dde5db106ef0826f24657787d8e3b))
+* **UniswapV2Router:** Update bytecode and functions ([`3998896`](https://github.com/owodunni/arbie/commit/399889655dea62813daed45ca39446bb7ee218ca))
+
 ## v0.7.0 (2020-12-13)
 ### Feature
 * **account:** Make it possible to sign transaction from accounts ([`0ea4a1e`](https://github.com/owodunni/arbie/commit/0ea4a1e4f3686d7cd7e615940be3228ac43e89e1))
