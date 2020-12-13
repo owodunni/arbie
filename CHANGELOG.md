@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.7.3 (2020-12-13)
+### Fix
+* **app:** Print exceptions ([`abca2ae`](https://github.com/owodunni/arbie/commit/abca2ae41896d4b0e9d37a5dac0f4e637a853865))
+
 ## v0.7.2 (2020-12-13)
 ### Fix
 * **Brig:** Fix issues with Weth address ([`92760f1`](https://github.com/owodunni/arbie/commit/92760f16d1cc1f93e15ea88373e54acd1403a715))
