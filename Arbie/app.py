@@ -19,7 +19,11 @@ class App(object):
         if self.action_tree is None:
             logger.warning("No actions given in configuration")
             return
-        await self.action_tree.run()
+        try:
+            await self.action_tree.run()
+        except Exception as e:
+            logger.error(e)
+            raise e
 
     def stop(self):
         self.action_tree.stop()
