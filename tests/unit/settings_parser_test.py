@@ -20,7 +20,7 @@ def config():
 
         variables:
             my_weth_token:
-                type: Token
+                type: Weth
                 address: "0xdac17f958d2ee523a2206206994597c13d831ec7"
             uniswap_factory:
                 type: UniswapFactory

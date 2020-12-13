@@ -213,26 +213,26 @@ async def pair_factory(  # noqa: WPS210, WPS217
     await factory.setup_pair(
         [wbtc, dai],
         [
-            BigNumber(large / 10000.0),
-            BigNumber(large),
+            BigNumber(medium / 20000.0),
+            BigNumber(medium),
         ],
     )
     await factory.setup_pair(
         [dai, yam],
         [
-            BigNumber(small / 1.1),
-            BigNumber(small / 0.1),
+            BigNumber(medium / 1.1),
+            BigNumber(medium / 0.1),
         ],  # noqa: WPS221
     )
     await factory.setup_pair(
         [weth, dai],
-        [BigNumber(large / 300), BigNumber(large)],
+        [BigNumber(medium / 310), BigNumber(medium)],
     )
     await factory.setup_pair(
         [wbtc, weth],
         [
-            BigNumber(large / 10000),
-            BigNumber(large / 300),
+            BigNumber(medium / 10000),
+            BigNumber(medium / 285),
         ],
     )
     await factory.create_pair(weth, bad)

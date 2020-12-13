@@ -29,7 +29,7 @@ class BigNumber(object):
     @classmethod
     def from_value(cls, value, exp=18):
         bg = cls(0, exp)
-        bg.value = value
+        bg.value = int(value)
         return bg
 
     def to_number(self) -> float:

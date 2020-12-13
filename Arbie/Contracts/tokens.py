@@ -29,6 +29,9 @@ class IERC20Token(Contract):
         transaction = self.contract.functions.transfer(to, bg_number.value)
         return self._transact_status(transaction)
 
+    def allowance(self, to: str):
+        return self.contract.functions.allowance(self._get_account(), to).call()
+
     def approve(self, spender: str, bg_number: BigNumber) -> bool:
         transaction = self.contract.functions.approve(spender, bg_number.value)
         return self._transact_status(transaction)
