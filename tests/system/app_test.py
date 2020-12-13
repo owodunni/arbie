@@ -137,11 +137,13 @@ variables:
         app.store.delete(Result.trader_profit)
 
     @pytest.mark.slow
-    async def test_full_pipeline(self, pool_finder, pool_updater):
+    async def test_full_pipeline(self, pool_finder, pool_updater, path_finder):
         await asyncio.gather(
             wait_and_run(pool_finder),
             pool_updater.run(),
             wait_and_stop(pool_updater, Result.pool_updater_pools),
+            path_finder.run(),
+            wait_and_stop(path_finder, Result.arbitrage_filtered_trades),
         )
         # wait_and_stop(path_finder, Result.arbitrage_filtered_trades),
         # wait_and_stop(trader, Result.trader_profit))
@@ -149,5 +151,5 @@ variables:
         assert len(pool_finder.store.get(Result.pool_finder_pools)) == 7
         assert len(pool_finder.store.get(Result.pool_finder_tokens)) == 3
         assert len(pool_updater.store.get(Result.pool_updater_pools)) == 7
-        # assert len(path_finder.store.get(Result.arbitrage_filtered_trades)) == 4
+        assert len(path_finder.store.get(Result.arbitrage_filtered_trades)) == 4
         # assert len(trader.store.get(Result.trader_profit)) == 4
