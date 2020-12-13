@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.7.2 (2020-12-13)
+### Fix
+* **Brig:** Fix issues with Weth address ([`92760f1`](https://github.com/owodunni/arbie/commit/92760f16d1cc1f93e15ea88373e54acd1403a715))
+
 ## v0.7.1 (2020-12-13)
 ### Fix
 * **gas-strategy:** Setup web3 to use gas strategy ([`9225823`](https://github.com/owodunni/arbie/commit/9225823070f91ea9344e573f83807d8eeb2840bd))
