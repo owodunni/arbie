@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.7.0 (2020-12-13)
+### Feature
+* **account:** Make it possible to sign transaction from accounts ([`0ea4a1e`](https://github.com/owodunni/arbie/commit/0ea4a1e4f3686d7cd7e615940be3228ac43e89e1))
+
+### Fix
+* **Trader:** Fix app and tests so that trader works ([`4eeca95`](https://github.com/owodunni/arbie/commit/4eeca9598e57db508f14353e4cce9f25b2871403))
+* **ActionTree:** Make it possible to subscribe to multiple events ([`efbe4c3`](https://github.com/owodunni/arbie/commit/efbe4c31ee7e3e3653ad9af6d0222fea5be57b5e))
+
 ## v0.6.1 (2020-12-08)
 ### Fix
 * **SetUpTrader:** Add action for setting up trader ([`5f2e0c9`](https://github.com/owodunni/arbie/commit/5f2e0c9c21a3737707605adc4e43d0131ddcbb03))
