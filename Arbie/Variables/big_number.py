@@ -13,11 +13,6 @@ class BigNumber(object):
             return self.value == other.value and self.exp == other.exp
         return self.value == other
 
-    def __lt__(self, other):
-        if isinstance(other, BigNumber):
-            return self.value < other.value
-        return self.value < other
-
     def __gt__(self, other):
         if isinstance(other, BigNumber):
             return self.value > other.value
