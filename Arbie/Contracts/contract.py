@@ -154,7 +154,7 @@ class ContractFactory(object):
     def _get_address(self, network: Network):
         json_data = json.loads(self._read_resource(None, "contract_addresses.json"))
 
-        return json_data[self.factory_class.protocol][self.factory_class.abi][
+        return json_data[self.factory_class.protocol][self.factory_class.name][
             network.name
         ]
 

@@ -4,7 +4,7 @@ services:
     image: trufflesuite/ganache-cli
     ports:
       - 7545:7545
-    command: --gasLimit 0xfffffffffff --callGasLimit 0xfffffffffff -p 7545
+    command: --gasLimit 0xfffffffffff --callGasLimit 0xfffffffffff -p 7545 --allowUnlimitedContractSize
 
   redis:
     image: "redis:alpine"

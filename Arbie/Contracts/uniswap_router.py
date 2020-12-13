@@ -25,17 +25,16 @@ class UniswapV2Router(Contract):
         return True
 
     def check_out_given_in(self, trade: Trade):
-        addresses, types = address_and_pool_type(trade.pools)
         path_address = list(map(lambda t: t.address, trade.path))
-        amount_out = self.contract.functions.checkOutGivenIn(
-            BigNumber(trade.amount_in).value, addresses, types, path_address
+        amount_out = self.contract.functions.getAmountsOut(
+            BigNumber(trade.amount_in).value, path_address
         ).call()
-        return BigNumber.from_value(amount_out).to_number()
+        return BigNumber.from_value(amount_out[-1]).to_number()
 
     def estimate_swap_const(self, trade):
         price = self.w3.eth.generateGasPrice()
         if not price:
-            price = 69 * 10e9  # noqa: WPS432
+            price = 6.9 * 10e9  # noqa: WPS432
         gas = self._estimate_gas_swap(trade)
         return BigNumber.from_value(price * gas).to_number()
 
@@ -45,10 +44,14 @@ class UniswapV2Router(Contract):
         return self._transact_status(transaction, gas=gas)
 
     def _swap_transaction(self, trade):
-        addresses, types = address_and_pool_type(trade.pools)
         path = list(map(lambda t: t.address, trade.path))
-        return self.contract.functions.swap(
-            BigNumber(trade.amount_in).value, addresses, types, path
+        return self.contract.functions.swapExactTokensForTokens(
+            BigNumber(trade.amount_in).value,
+            BigNumber(trade.amount_in).value,
+            path,
+            self._get_account(),
+            # Require trades to be executed in 120 seconds
+            self.w3.eth.getBlock("latest").timestamp + 120,  # noqa: WPS432
         )
 
     def _estimate_gas_swap(self, trade):
