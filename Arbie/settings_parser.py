@@ -161,7 +161,7 @@ class SettingsParser(object):
             return tree
 
         events = config[Keys.event]
-        if not hasattr(events, "__len__"):  # noqa: WPS421
+        if not isinstance(events, list):
             events = [events]
         for event in events:
             tree.register_event(event)
