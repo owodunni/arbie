@@ -2,7 +2,7 @@ task dockerArbie(type: Exec) {
     workingDir projectDir
     
     commandLine "docker", "build", "-f", "Dockerfile.arbie",
-                "-t", "arbie:prod", "."
+                "-t", "arbie:prod", ".", "--no-cache"
 }
 
 
