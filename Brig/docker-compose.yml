@@ -13,21 +13,25 @@ services:
     image: arbie:prod
     volumes:
       - ./PoolFinder:/arbie
+    command: Arbie -f pool_finder.yml
 
   PoolUpdater:
     image: arbie:prod
     volumes:
       - ./PoolUpdater:/arbie
+    command: Arbie -f pool_updater.yml
 
   PathFinder:
     image: arbie:prod
     volumes:
       - ./PathFinder:/arbie
+   command: Arbie -f path_finder.yml
 
   Trader:
     image: arbie:prod
     volumes:
       - ./Trader:/arbie
+   command: Arbie -f trader.yml
 
   Node:
     image: hardhat:node

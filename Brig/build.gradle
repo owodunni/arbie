@@ -12,3 +12,7 @@ task dockerHardhat(type: Exec) {
     commandLine "docker", "build", "-f", "Dockerfile.hardhat",
                 "-t", "hardhat:node", "."
 }
+
+task dockerBuild {
+    dependsOn dockerHardhat, dockerArbie
+}
