@@ -33,8 +33,6 @@ class UniswapV2Router(Contract):
 
     def estimate_swap_const(self, trade):
         price = self.w3.eth.generateGasPrice()
-        if not price:
-            price = 6.9 * 10e9  # noqa: WPS432
         gas = self._estimate_gas_swap(trade)
         return BigNumber.from_value(price * gas).to_number()
 
@@ -56,4 +54,7 @@ class UniswapV2Router(Contract):
 
     def _estimate_gas_swap(self, trade):
         transaction = self._swap_transaction(trade)
-        return self._estimate_gas(transaction)
+        # Lets use a bit more gas then required, since
+        # some tokens like $VLO actually suck gas
+        # out of the transaction
+        return int(self._estimate_gas(transaction)*1.05) + 1  # noqa: WPS432
