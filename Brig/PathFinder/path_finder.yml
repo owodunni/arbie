@@ -7,7 +7,7 @@ web3:
 variables:
   weth:
     type: Weth
-    address: mainnet
+    network: mainnet
 
 action_tree:
   event:
