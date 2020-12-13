@@ -34,11 +34,11 @@ class ActionTree(object):
     def __init__(self, store: Store):
         self.store = store
         self.actions = []
-        self.channel = None
+        self.channels = []
         self.is_stopped = False
 
     def register_event(self, event_channel):
-        self.channel = self.store.subscribe(event_channel)
+        self.channels.append(self.store.subscribe(event_channel))
 
     @classmethod
     def create(cls, action_configs: Dict, store: Store, extra_actions=None):
@@ -54,19 +54,19 @@ class ActionTree(object):
     async def run(self):
         with RUN_TIME.time():
             self.is_stopped = False
-            if self.channel is not None:
-                await self._run_continous()
+            if self.channels:
+                await self._run_continuous()
             else:
                 await self._run_once()
 
     def stop(self):
         self.is_stopped = True
 
-    async def _run_continous(self):
+    async def _run_continuous(self):
         while not self.is_stopped:
-            new_message = self.channel.get_message(True)
-            if new_message:
-                logging.getLogger().info(f"New message {new_message}")
+            new_messages = self._get_messages()
+            if new_messages:
+                logging.getLogger().info(f"New messages {new_messages}")
                 await self._run_once()
             else:
                 await asyncio.sleep(0.1)
@@ -80,3 +80,8 @@ class ActionTree(object):
                 f"Time taken to process action {action_name}",
             ).time():
                 await action.on_next(data)
+
+    def _get_messages(self):
+        messages = list(map(lambda c: c.get_message(True), self.channels))
+        # Remove None
+        return [message for message in messages if message]

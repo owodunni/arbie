@@ -1,8 +1,9 @@
 store:
   address: 'redis:6379'
-
 web3:
   address: 'http://Node:8545'
+account:
+    path: Brig/Trader/test_account.json
 
 variables:
   weth:
@@ -17,10 +18,11 @@ variables:
 
 action_tree:
   event:
-    'PoolUpdater.1.pools'
+    'Arbitrage.1.filtered_trades'
   actions:
+    SetUpTrader:
     Trader:
-        input:
-            trades: trades
-        output:
-          out_trades: 'Arbitrage.1.filtered_trades'
+      input:
+        trades: 'Arbitrage.1.filtered_trades'
+      output:
+        profit: 'Trader.1.profit'
