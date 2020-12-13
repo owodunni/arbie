@@ -65,7 +65,7 @@ class SetUpTrader(Action):
     input:
         web3: web3
         weth: weth
-        arbie: arbie
+        router: router
         min_eth: 1
         min_weth: 2
         max_weth: 10
@@ -84,8 +84,8 @@ class SetUpTrader(Action):
             data.min_weth(),
             data.max_weth(),
         )
-        arbie = data.arbie()
-        if not arbie.approve(data.weth()):
+        router = data.router()
+        if not router.approve(data.weth()):
             raise Exception("Failed to authorize arbie to spend tokens.")
 
         data.balance_eth(amount_eth)
@@ -99,25 +99,25 @@ def _is_trade_uni(trade):
     return True
 
 
-def _perform_trade(trade, arbie, min_profit):
+def _perform_trade(trade, router, min_profit):
     if not _is_trade_uni(trade):
         return False
 
-    amount_out = arbie.check_out_given_in(trade)
-    gas_cost = arbie.estimate_swap_const(trade)
+    amount_out = router.check_out_given_in(trade)
+    gas_cost = router.estimate_swap_const(trade)
     if amount_out - trade.amount_in - gas_cost > min_profit:
         logger.info(f"Executing trade with return: {amount_out}, trade: {trade}")
-        return arbie.swap(trade)
+        return router.swap(trade)
     return False
 
 
 def perform_trade(data, amount_weth):
-    arbie = data.arbie()
+    router = data.router()
     min_profit = data.min_profit()
     for trade in data.trades():
         # Make sure that we don't try to trade with more weth then we have
         trade.amount_in = min(trade.amount_in, amount_weth)
-        if _perform_trade(trade, arbie, min_profit):
+        if _perform_trade(trade, router, min_profit):
             return True
     return False
 
@@ -130,7 +130,7 @@ class Trader(Action):
     [Settings]
     input:
         web3: web3
-        arbie: arbie
+        router: router
         trades: filtered_trades
         min_profit: 0.3
         weth: weth

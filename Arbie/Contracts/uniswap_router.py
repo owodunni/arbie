@@ -15,9 +15,9 @@ def address_and_pool_type(pools: Pools):
     return address, pool_type
 
 
-class Arbie(Contract):
-    name = "Arbie"
-    protocol = "arbie"
+class UniswapV2Router(Contract):
+    name = "UniswapV2Router02"
+    protocol = "uniswap"
 
     def approve(self, weth: GenericToken):
         if weth.allowance(self.get_address()) < BigNumber(10e6):  # noqa: WPS432

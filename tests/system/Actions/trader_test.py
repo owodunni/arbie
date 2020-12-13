@@ -16,17 +16,17 @@ def send_eth(web3, from_address, to_address, value):
 
 class TestTrader(object):
     @pytest.fixture
-    def trader_account(self, w3, weth: GenericToken, arbie, dummy_account):
-        arbie.set_account(dummy_account)
+    def trader_account(self, w3, weth: GenericToken, router, dummy_account):
+        router.set_account(dummy_account)
         weth.transfer(dummy_account.address, BigNumber(2))
         weth.set_account(dummy_account)
-        weth.approve(arbie.get_address(), BigNumber(2))
+        weth.approve(router.get_address(), BigNumber(2))
         return dummy_account
 
     @pytest.fixture
-    def trade_store(self, w3, arbie, trade, weth, trader_account):
+    def trade_store(self, w3, router, trade, weth, trader_account):
         store = Store()
-        store.add("arbie", arbie)
+        store.add("router", router)
         store.add("filtered_trades", [trade])
         store.add("weth", weth)
         store.add("web3", w3)
@@ -53,13 +53,13 @@ class TestTrader(object):
 
 class TestSetUpTrader(object):
     @pytest.fixture
-    def trade_store(self, w3, arbie, real_weth, dummy_account):
+    def trade_store(self, w3, router, real_weth, dummy_account):
         real_weth.set_account(dummy_account)
         store = Store()
         store.add("weth", real_weth)
         store.add("web3", w3)
         store.add("account", dummy_account)
-        store.add("arbie", arbie)
+        store.add("router", router)
         return store
 
     @pytest.mark.asyncio

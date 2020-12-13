@@ -11,10 +11,10 @@ from web3.gas_strategies.time_based import fast_gas_price_strategy
 
 from Arbie.Actions import ActionTree, RedisState, Store
 from Arbie.Contracts import (
-    Arbie,
     BalancerFactory,
     ContractFactory,
     UniswapFactory,
+    UniswapV2Router,
     Weth,
 )
 from Arbie.Contracts.contract import Network
@@ -99,8 +99,8 @@ class VariableParser(object):
     def set_up_token(self, config):
         return self._set_up_contracts(config, Weth)
 
-    def set_up_arbie(self, config):
-        return self._set_up_contracts(config, Arbie)
+    def set_up_router(self, config):
+        return self._set_up_contracts(config, UniswapV2Router)
 
     def _create_variable(self, variable_config):  # noqa: WPS321
         variable_type = variable_config[Keys.type_key]
@@ -110,8 +110,8 @@ class VariableParser(object):
             return self.set_up_balancer(variable_config)
         if variable_type == "Weth":
             return self.set_up_token(variable_config)
-        if variable_type == "Arbie":
-            return self.set_up_arbie(variable_config)
+        if variable_type == "UniswapV2Router":
+            return self.set_up_router(variable_config)
         if variable_type == "float":
             return float(variable_config[Keys.value])
         if variable_type == "int":

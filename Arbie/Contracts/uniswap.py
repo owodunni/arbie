@@ -29,11 +29,6 @@ async def create_reserve(result: Tuple[float, GenericToken]):
     return BigNumber.from_value(value, exp)
 
 
-class UniswapV2Router(Contract):
-    name = "UniswapV2Router02"
-    protocol = "uniswap"
-
-
 class UniswapPair(PoolContract):
     name = "UniswapV2Pair"
     protocol = "uniswap"

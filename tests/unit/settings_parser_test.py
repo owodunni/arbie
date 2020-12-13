@@ -28,8 +28,8 @@ def config():
             balancer_factory:
                 type: BalancerFactory
                 address: "0xdac17f958d2ee523a2206206994597c13d831ec7"
-            arbie:
-                type: Arbie
+            router:
+                type: UniswapV2Router
                 address: "0xdac17f958d2ee523a2206206994597c13d831ec7"
             amount:
                 type: float
