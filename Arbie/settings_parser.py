@@ -157,8 +157,14 @@ class SettingsParser(object):
 
     def _setup_action_tree(self, store, config):
         tree = ActionTree.create(config[Keys.actions], store)
-        if Keys.event in config:
-            tree.register_event(config[Keys.event])
+        if Keys.event not in config:
+            return tree
+
+        events = config[Keys.event]
+        if not hasattr(events, "__len__"):  # noqa: WPS421
+            events = [events]
+        for event in events:
+            tree.register_event(event)
         return tree
 
     def _add_variables(self, store):

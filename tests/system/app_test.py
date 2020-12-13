@@ -9,9 +9,11 @@ from Arbie.app import App
 
 
 class Result(object):
-    pools = "arbie.1.pools"
-    trades = "filtered_trades"
-    profit = "profit"
+    pool_finder_pools = "PoolFinder.1.pools"
+    pool_finder_tokens = "PoolFinder.1.tokens"
+    pool_updater_pools = "PoolUpdater.1.pools"
+    arbitrage_filtered_trades = "Arbitrage.1.filtered_trades"
+    trader_profit = "Trader.1.profit"
 
 
 pytestmark = pytest.mark.asyncio
@@ -30,6 +32,21 @@ async def wait_and_run(app):
     await app.run()
 
 
+def replace_base_conf(config, base_config):
+    split_conf = config.split("action_tree:")
+    return f"""
+{base_config}
+
+action_tree:
+{split_conf[1]}
+            """
+
+
+def setup_config(path, base_config):
+    with open(f"Brig/{path}", "r") as f:
+        return replace_base_conf(f.read(), base_config)
+
+
 class TestApp(object):
     @pytest.fixture
     def base_config(
@@ -43,86 +60,94 @@ class TestApp(object):
         deploy_address,
     ):
         return f"""
-        store:
-            address: {redis_server}
-        web3:
-            address: {web3_server}
-        account:
-            path: Brig/Trader/test_account.json
+store:
+    address: {redis_server}
+web3:
+    address: {web3_server}
+account:
+    path: Brig/Trader/test_account.json
 
-        variables:
-            weth:
-                type: Token
-                address: '{weth.get_address()}'
-            uniswap_factory:
-                type: UniswapFactory
-                address: '{pair_factory.get_address()}'
-            balancer_factory:
-                type: BalancerFactory
-                address: '{pool_factory.get_address()}'
-            arbie:
-                type: Arbie
-                address: '{arbie.get_address()}'
+variables:
+    weth:
+        type: Token
+        address: '{weth.get_address()}'
+    uniswap_factory:
+        type: UniswapFactory
+        address: '{pair_factory.get_address()}'
+    balancer_factory:
+        type: BalancerFactory
+        address: '{pool_factory.get_address()}'
+    arbie:
+        type: Arbie
+        address: '{arbie.get_address()}'
         """  # noqa: WPS221
 
     @pytest.fixture
-    def pool_config(self, base_config):
-        return (
-            base_config
-            + f"""
-        action_tree:
-            actions:
-                PoolFinder:
-                    input:
-                        balancer_start: 0
-                    output:
-                        pools: {Result.pools}
-        """
-        )
+    def pool_finder_config(self, base_config):
+        conf = setup_config("PoolFinder/pool_finder.yml", base_config)
+        split_conf = conf.split("PoolFinder:")
+        return f"""
+{split_conf[0]}
+    PoolFinder:
+      input:
+        balancer_start: 0
+{split_conf[1]}
+"""
 
     @pytest.fixture
-    def trade_config(self, base_config):
-        return (
-            base_config
-            + f"""
-        action_tree:
-            event:
-                {Result.pools}
-            actions:
-                PathFinder:
-                    input:
-                        pools:  {Result.pools}
-                        weth: weth
-                    output:
-                        trades: trades
-                Arbitrage:
-                    input:
-                        trades: trades
-                    output:
-        """
-        )
+    def path_finder_config(self, base_config):
+        return setup_config("PathFinder/path_finder.yml", base_config)
 
     @pytest.fixture
-    def app(self, pool_config):
-        config = yaml.safe_load(pool_config)
+    def pool_updater_config(self, base_config):
+        return setup_config("PoolUpdater/pool_updater.yml", base_config)
+
+    @pytest.fixture
+    def trader_config(self, base_config):
+        return setup_config("Trader/trader.yml", base_config)
+
+    @pytest.fixture
+    def pool_finder(self, pool_finder_config):
+        config = yaml.safe_load(pool_finder_config)
         app = App(config)
         assert len(app.action_tree.actions) == 1
         yield app
-        app.store.delete(Result.pools)
+        app.store.delete(Result.pool_finder_pools)
+        app.store.delete(Result.pool_finder_tokens)
+
+    @pytest.fixture
+    def pool_updater(self, pool_updater_config):
+        config = yaml.safe_load(pool_updater_config)
+        app = App(config)
+        yield app
+        app.store.delete(Result.pool_updater_pools)
+
+    @pytest.fixture
+    def path_finder(self, path_finder_config):
+        config = yaml.safe_load(path_finder_config)
+        app = App(config)
+        yield app
+        app.store.delete(Result.arbitrage_filtered_trades)
+
+    @pytest.fixture
+    def trader(self, trader_config):
+        config = yaml.safe_load(trader_config)
+        app = App(config)
+        yield app
+        app.store.delete(Result.trader_profit)
 
     @pytest.mark.slow
-    async def test_run(self, app):
-        await app.run()
-        assert len(app.store.get(Result.pools)) == 7
-        tokens = app.store.get("all_tokens")
-        assert len(tokens) == 3
-
-    @pytest.mark.slow
-    async def test_full_pipeline(self, app, trade_config):
-        trade_finder = App(yaml.safe_load(trade_config))
+    async def test_full_pipeline(self, pool_finder, pool_updater):
         await asyncio.gather(
-            wait_and_run(app),
-            trade_finder.run(),
-            wait_and_stop(trade_finder, Result.trades),
+            wait_and_run(pool_finder),
+            pool_updater.run(),
+            wait_and_stop(pool_updater, Result.pool_updater_pools),
         )
-        assert len(trade_finder.store.get(Result.trades)) == 4
+        # wait_and_stop(path_finder, Result.arbitrage_filtered_trades),
+        # wait_and_stop(trader, Result.trader_profit))
+
+        assert len(pool_finder.store.get(Result.pool_finder_pools)) == 7
+        assert len(pool_finder.store.get(Result.pool_finder_tokens)) == 3
+        assert len(pool_updater.store.get(Result.pool_updater_pools)) == 7
+        # assert len(path_finder.store.get(Result.arbitrage_filtered_trades)) == 4
+        # assert len(trader.store.get(Result.trader_profit)) == 4

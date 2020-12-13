@@ -16,8 +16,7 @@ variables:
       network: mainnet
 
 action_tree:
-  event:
-    'PoolUpdater.1.pools'
+  event: ['PoolFinder.1.pools', 'PoolUpdater.1.pools']
   actions:
     PoolUpdater:
       input:
