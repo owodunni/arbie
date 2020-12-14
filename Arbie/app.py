@@ -22,7 +22,7 @@ class App(object):
         try:
             await self.action_tree.run()
         except Exception as e:
-            logger.fatal(e, exc_info=True, stack_info=True)
+            logger.fatal(e, exc_info=True)
             raise e
 
     def stop(self):

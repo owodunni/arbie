@@ -144,6 +144,7 @@ class Trader(Action):
         balance_checker = BalanceChecker(data.web3(), data.weth())
         amount_eth, amount_weth = await balance_checker.check(trader_account.address)
         balance_pre = amount_weth + amount_eth
+        logger.info(f"amount_eth: {amount_eth}, amount_weth: {amount_weth}")
 
         if not perform_trade(data, amount_weth):
             raise Exception("No trade performed")
@@ -152,3 +153,52 @@ class Trader(Action):
 
         data.profit(balance_post - balance_pre)
         logger.info("Finished trading")
+
+
+class LogTrader(Action):
+    """Log arbitrage opportunity for a list sorted trades.
+
+    Remove all trades that are not profitable.
+
+    [Settings]
+    input:
+        web3: web3
+        router: router
+        trades: filtered_trades
+        min_profit: 0.3
+        weth: weth
+    output:
+        profit_per_trade: profit_per_trade
+        profit: profit
+    """
+
+    async def on_next(self, data):  # noqa: WPS210
+        value = self.log_trade(data)
+        profit = sum(value)
+        profit_per_trade = profit / len(value)
+
+        logger.info(f"Total profit: {profit}, profit per trade: {profit_per_trade}")
+
+        data.profit_per_trade(profit_per_trade)
+        data.profit(profit)
+
+        logger.info("Finished trading")
+
+    def log_trade(self, data):
+        router = data.router()
+        min_profit = data.min_profit()
+        profits = []
+        for trade in data.trades():
+            profit = self._log_trade(trade, router, min_profit)
+            if profit:
+                profits.append(profit)
+        return profits
+
+    def _log_trade(self, trade, router, min_profit):
+        amount_out = router.check_out_given_in(trade)
+        profit = amount_out - trade.amount_in
+        if profit > min_profit:
+            logger.info(
+                f"Executing trade with profit {profit}, amount_in: {trade.amount_in}, amount out: {amount_out}"
+            )
+            return profit

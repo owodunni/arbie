@@ -2,7 +2,7 @@ store:
   address: 'redis:6379'
 
 web3:
-  address: 'http://Node:8545'
+  address: 'http://gluteus:8545'
 
 variables:
   weth:
