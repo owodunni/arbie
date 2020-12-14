@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.7.5 (2020-12-14)
+### Fix
+* **UniswapV2Router:** Add logging when checking value of trades ([`bcb1e12`](https://github.com/owodunni/arbie/commit/bcb1e12f52ccad83644a8bc583c40539ed8f5bd5))
+
 ## v0.7.4 (2020-12-14)
 ### Fix
 * **App:** Log stacktrace and exception info ([`1d6a058`](https://github.com/owodunni/arbie/commit/1d6a0581fb0b6ad3a88c640262248983313edc87))
