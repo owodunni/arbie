@@ -10,6 +10,7 @@ from Arbie.async_helpers import async_map, run_async
 from Arbie.Contracts.contract import Contract, ContractFactory
 from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.Contracts.tokens import GenericToken
+from Arbie.exception import PoolValueError
 from Arbie.prometheus import get_prometheus
 from Arbie.Variables import BigNumber, PoolType
 
@@ -53,6 +54,8 @@ class UniswapPair(PoolContract):
 
     async def get_balances(self) -> List[BigNumber]:
         result = await asyncio.gather(self._get_reserves(), self.get_tokens())
+        if self._is_old(result[0][2]):
+            raise PoolValueError(f"Pair is inactive, address: {self.get_address()}")
         ziped_result = list(zip(result[0], result[1]))
         return await async_map(create_reserve, ziped_result)
 

@@ -3,7 +3,7 @@ import asyncio
 
 import pytest
 
-from Arbie import IERC20TokenError
+from Arbie import IERC20TokenError, PoolValueError
 from Arbie.Contracts.tokens import BadERC20Token, GenericToken
 from Arbie.Contracts.uniswap import UniswapFactory, UniswapPair
 from Arbie.Variables import BigNumber, PoolType
@@ -39,7 +39,8 @@ async def pair(factory_with_pair) -> UniswapPair:
 
 
 async def test_get_weights(pair):
-    assert await pair.get_balances() == [0, 0]
+    with pytest.raises(PoolValueError):
+        assert await pair.get_balances()
 
 
 async def test_mint(

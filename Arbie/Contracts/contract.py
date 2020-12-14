@@ -103,6 +103,10 @@ class Contract(object):
     async def _call_async(self, function):
         return await run_async(function.call)
 
+    def _is_old(self, timestamp):
+        last_block_time = self.w3.eth.getBlock("latest").timestamp
+        return last_block_time - 60 * 60 * 12 > timestamp  # noqa: WPS432
+
 
 class ContractFactory(object):
     def __init__(self, w3, factory_class: Contract):
