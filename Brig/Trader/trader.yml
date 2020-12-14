@@ -1,7 +1,7 @@
 store:
   address: 'redis:6379'
 web3:
-  address: 'http://Node:8545'
+  address: 'http://gluteus:8545'
 account:
     path: test_account.json
 

@@ -30,7 +30,6 @@ class UniswapV2Router(Contract):
 
     def check_out_given_in(self, trade: Trade):
         path_address = list(map(lambda t: t.address, trade.path))
-        logger.info(f"Checking value of trade: {trade}")
         amount_out = self.contract.functions.getAmountsOut(
             BigNumber(trade.amount_in).value, path_address
         ).call()
