@@ -10,7 +10,6 @@ pytestmark = pytest.mark.asyncio
 
 
 class TestPoolUpdater(object):
-    @pytest.mark.slow
     async def test_on_next(self, pools):
         store = Store()
         store.add("web3", MagicMock())
