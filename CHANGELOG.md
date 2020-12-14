@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.7.6 (2020-12-14)
+### Fix
+* **Trader:** Make it possible to log trades ([`1aa202c`](https://github.com/owodunni/arbie/commit/1aa202c13045dae4f161f2b7c48528b3ba4104cd))
+
 ## v0.7.5 (2020-12-14)
 ### Fix
 * **UniswapV2Router:** Add logging when checking value of trades ([`bcb1e12`](https://github.com/owodunni/arbie/commit/bcb1e12f52ccad83644a8bc583c40539ed8f5bd5))
