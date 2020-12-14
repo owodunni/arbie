@@ -16,6 +16,16 @@ class Trade(object):
     def __len__(self):
         return len(self.path)
 
+    def __str__(self):
+        return f"""
+Trade(
+    pools:{self.pools},
+    path:{self.path},
+    amount_in:{self.amount_in},
+    profit:{self.profit},
+    balance:{self.balance},
+    ratio:{self.ratio})"""  # noqa: WPS221
+
     def __iter__(self):
         return iter(self._generator())
 

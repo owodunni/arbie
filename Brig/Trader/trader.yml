@@ -3,7 +3,7 @@ store:
 web3:
   address: 'http://Node:8545'
 account:
-    path: Brig/Trader/test_account.json
+    path: test_account.json
 
 variables:
   weth:
