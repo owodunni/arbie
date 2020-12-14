@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.7.4 (2020-12-14)
+### Fix
+* **App:** Log stacktrace and exception info ([`1d6a058`](https://github.com/owodunni/arbie/commit/1d6a0581fb0b6ad3a88c640262248983313edc87))
+
 ## v0.7.3 (2020-12-13)
 ### Fix
 * **app:** Print exceptions ([`abca2ae`](https://github.com/owodunni/arbie/commit/abca2ae41896d4b0e9d37a5dac0f4e637a853865))
