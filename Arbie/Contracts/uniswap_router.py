@@ -57,4 +57,4 @@ class UniswapV2Router(Contract):
         # Lets use a bit more gas then required, since
         # some tokens like $VLO actually suck gas
         # out of the transaction
-        return int(self._estimate_gas(transaction)*1.05) + 1  # noqa: WPS432
+        return int(self._estimate_gas(transaction) * 1.05) + 1  # noqa: WPS432
