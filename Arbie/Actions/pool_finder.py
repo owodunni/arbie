@@ -115,8 +115,6 @@ class PoolFinder(Action):
     input:
         weth: weth
         uniswap_factory: uniswap_factory
-        balancer_factory: balancer_factory
-        balancer_start: 9562480
         whitelist: addresses
     output:
         pools: all_pools

@@ -97,14 +97,7 @@ variables:
 
     @pytest.fixture
     def pool_finder_config(self, base_config):
-        conf = setup_config("PoolFinder/pool_finder.yml", base_config)
-        split_conf = conf.split("input:")
-        return f"""
-{split_conf[0]}
-      input:
-        balancer_start: 0
-{split_conf[1]}
-"""
+        return setup_config("PoolFinder/pool_finder.yml", base_config)
 
     @pytest.fixture
     def path_finder_config(self, base_config):
