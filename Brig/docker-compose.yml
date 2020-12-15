@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3'
 services:
   redis:
     image: redis:alpine
@@ -47,7 +47,9 @@ services:
 
   Node:
     image: hardhat:node
-    command: npx hardhat node --fork http://gluteus:8545
+    ports:
+      - 8545:8545
+    command: npx hardhat node --fork https://eth-mainnet.alchemyapi.io/v2/zhFcWx0COjEBwoEaBZTPlHlYPL1IzTO0
 
 volumes:
   redis-data:

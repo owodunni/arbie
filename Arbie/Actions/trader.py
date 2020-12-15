@@ -88,6 +88,10 @@ class SetUpTrader(Action):
         if not router.approve(data.weth()):
             raise Exception("Failed to authorize arbie to spend tokens.")
 
+        logger.info(
+                f"Finished setting up trader, eth: {amount_eth}, weth: {amount_weth}"
+        )
+
         data.balance_eth(amount_eth)
         data.balance_weth(amount_weth)
 
@@ -104,9 +108,14 @@ def _perform_trade(trade, router, min_profit):
         return False
 
     amount_out = router.check_out_given_in(trade)
-    gas_cost = router.estimate_swap_const(trade)
-    if amount_out - trade.amount_in - gas_cost > min_profit:
-        logger.info(f"Executing trade with return: {amount_out}, trade: {trade}")
+    profit = amount_out - trade.amount_in
+    logger.info(
+        f"Checking trade with profit {profit}, amount_in: {trade.amount_in}, amount out: {amount_out}"
+    )
+    if profit > min_profit:
+        logger.info(
+            f"Executing trade {trade}"
+        )
         return router.swap(trade)
     return False
 
