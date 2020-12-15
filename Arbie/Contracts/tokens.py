@@ -89,3 +89,12 @@ class Weth(GenericToken):
     def withdraw(self, amount):
         transaction = self.contract.functions.withdraw(BigNumber(amount).value)
         return self._transact_status(transaction)
+
+
+class MaliciousToken(GenericToken):
+    name = "MaliciousToken"
+    protocol = token_protocol
+
+    def pause(self):
+        transaction = self.contract.functions.pause()
+        return self._transact_status(transaction)
