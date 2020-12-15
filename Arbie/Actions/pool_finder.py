@@ -100,8 +100,6 @@ class PoolFinder(Action):
     input:
         weth: weth
         uniswap_factory: uniswap_factory
-        balancer_factory: balancer_factory
-        balancer_start: 9562480
     output:
         pools: all_pools
         tokens: all_tokens
