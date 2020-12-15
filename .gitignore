@@ -11,3 +11,5 @@ build
 .venv/
 .idea/.name
 fragmap.html
+real_account.json
+arbie.log*
