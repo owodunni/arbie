@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.7.7 (2020-12-15)
+### Fix
+* **Node:** Run node against alchemy archive node ([`a5b3082`](https://github.com/owodunni/arbie/commit/a5b30820024a6bf28bc192d912975ddbc7a6c78f))
+
 ## v0.7.6 (2020-12-14)
 ### Fix
 * **Trader:** Make it possible to log trades ([`1aa202c`](https://github.com/owodunni/arbie/commit/1aa202c13045dae4f161f2b7c48528b3ba4104cd))
