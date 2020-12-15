@@ -4,19 +4,9 @@ import logging
 
 from Arbie.Contracts.contract import Contract
 from Arbie.Contracts.tokens import GenericToken
-from Arbie.Variables import BigNumber, Pools, Trade
+from Arbie.Variables import BigNumber, Trade
 
 logger = logging.getLogger()
-
-
-def address_and_pool_type(pools: Pools):
-    address = []
-    pool_type = []
-
-    for pool in pools:
-        address.append(pool.address)
-        pool_type.append(pool.pool_type.value)
-    return address, pool_type
 
 
 class UniswapV2Router(Contract):
@@ -34,11 +24,6 @@ class UniswapV2Router(Contract):
             BigNumber(trade.amount_in).value, path_address
         ).call()
         return BigNumber.from_value(amount_out[-1]).to_number()
-
-    def estimate_swap_const(self, trade):
-        price = self.w3.eth.generateGasPrice()
-        gas = self._estimate_gas_swap(trade)
-        return BigNumber.from_value(price * gas).to_number()
 
     def swap(self, trade):
         gas = self._estimate_gas_swap(trade)
