@@ -146,8 +146,10 @@ variables:
             trader.run(),
             wait_and_stop(trader, Result.trader_profit),
         )
-        assert len(pool_finder.store.get(Result.pool_finder_pools)) == 4
-        assert len(pool_finder.store.get(Result.pool_finder_tokens)) == 3
-        assert len(pool_updater.store.get(Result.pool_updater_pools)) == 4
+        assert len(pool_finder.store.get(Result.pool_finder_pools)) == 8
+        assert len(pool_finder.store.get(Result.pool_finder_tokens)) == 5
+        assert len(pool_updater.store.get(Result.pool_updater_pools)) == 8
+        # Asserts bellow here still hold true. But malicious tokens
+        # are messing wih our pool finder!
         assert len(path_finder.store.get(Result.arbitrage_filtered_trades)) == 1
         assert trader.store.get(Result.trader_profit) > 3.278
