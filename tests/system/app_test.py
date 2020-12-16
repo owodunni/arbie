@@ -56,7 +56,6 @@ class TestApp(object):
         web3_server,
         redis_server,
         weth,
-        pool_factory,
         pair_factory,
         router,
         deploy_address,
@@ -73,9 +72,6 @@ variables:
     uniswap_factory:
         type: UniswapFactory
         address: '{pair_factory.get_address()}'
-    balancer_factory:
-        type: BalancerFactory
-        address: '{pool_factory.get_address()}'
     router:
         type: UniswapV2Router
         address: '{router.get_address()}'
