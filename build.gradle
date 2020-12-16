@@ -13,6 +13,7 @@ def homeDir = System.getenv("HOME")
 def codecov = "$buildDir/tools/codecov.sh"
 
 def web3_server = System.getenv('RUNNING_IN_DOCKER') ? 'http://ganache:7545' : 'http://127.0.0.1:7545'
+def web3_fork = System.getenv('RUNNING_IN_DOCKER') ? 'http://ganache-fork:8545' : 'http://127.0.0.1:8545'
 def redis_server = System.getenv('RUNNING_IN_DOCKER') ? 'redis:6379' : '127.0.0.1:6379'
 
 ext {
@@ -51,6 +52,7 @@ task test(type: Exec) {
             "--cov-report", "xml:$testResultDir/cov/coverage.xml",
             "--junitxml=$testResultDir/surefire-reports/TEST-report.xml",
             "--cov=$sorceDir",  "--web3_server", "$web3_server",
+            "--web3_fork", "$web3_fork",
             "--redis_server", "$redis_server", "--run_slow"
 }
 
@@ -61,6 +63,7 @@ task systemTest(type: Exec) {
     commandLine "pytest", "-v", "--pyargs", "$systemTestDir",
             "--cov-report", "html:$testResultDir/cov/system/html",
             "--cov=$sorceDir",  "--web3_server", "$web3_server",
+            "--web3_fork", "$web3_fork",
             "--redis_server", "$redis_server"
 }
 

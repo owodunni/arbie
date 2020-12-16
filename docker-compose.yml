@@ -6,10 +6,18 @@ services:
       - 7545:7545
     command: --gasLimit 0xfffffffffff --callGasLimit 0xfffffffffff -p 7545 --allowUnlimitedContractSize
 
+  ganache-fork:
+    image: trufflesuite/ganache-cli
+    depends_on:
+      - ganache
+    ports:
+      - 8545:8545
+    command: -f http://ganache:7545
+
   redis:
     image: "redis:alpine"
     ports:
-     - "6379:6379"
+     - 6379:6379
     environment:
      - REDIS_REPLICATION_MODE=master
 
@@ -17,6 +25,7 @@ services:
     image: arbie
     depends_on:
       - ganache
+      - ganache-fork
       - redis
     volumes:
       - .:/arbie
