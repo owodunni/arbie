@@ -54,6 +54,16 @@ def setup_gas_strategy(w3):
     w3.middleware_onion.add(middleware.simple_cache_middleware)
 
 
+def create_web3_provider(address):
+    adapter = HTTPAdapter(
+        pool_connections=20, pool_maxsize=20, max_retries=10  # noqa: WPS432
+    )  # noqa: WPS432
+    session = Session()
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+    return Web3.HTTPProvider(address, session=session)
+
+
 class VariableParser(object):
     """VariableParser parses settings config and adds variable to store."""
 
@@ -75,14 +85,7 @@ class VariableParser(object):
     def set_up_web3(self, config):
         address = config[Keys.address]
 
-        adapter = HTTPAdapter(
-            pool_connections=20, pool_maxsize=20, max_retries=10  # noqa: WPS432
-        )  # noqa: WPS432
-        session = Session()
-        session.mount("http://", adapter)
-        session.mount("https://", adapter)
-
-        w3 = Web3(Web3.HTTPProvider(address, session=session))
+        w3 = Web3(create_web3_provider(address))
         setup_gas_strategy(w3)
         if not w3.isConnected():
             raise ConnectionError("Web3 is not connected")

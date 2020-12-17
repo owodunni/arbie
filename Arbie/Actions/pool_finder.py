@@ -1,5 +1,4 @@
 """Pool finder is responsible for finding all pools."""
-import asyncio
 import logging
 from math import isclose
 from typing import List, Tuple
@@ -9,9 +8,10 @@ from prometheus_async.aio import time
 from Arbie import IERC20TokenError, PoolValueError
 from Arbie.Actions.action import Action
 from Arbie.async_helpers import async_map
-from Arbie.Contracts import BalancerFactory, GenericToken, UniswapFactory, UniswapPair
+from Arbie.Contracts import UniswapFactory, UniswapPair
 from Arbie.Contracts.pool_contract import PoolContract
 from Arbie.prometheus import get_prometheus
+from Arbie.settings_parser import create_web3_provider
 from Arbie.Variables import Pools, Token, Tokens
 
 logger = logging.getLogger()
@@ -29,10 +29,11 @@ def check_and_get_price(balances) -> Tuple[bool, float]:
 
 
 class TokenFinder(object):
-    def __init__(self, weth):
+    def __init__(self, weth, web3, test_provider):
         self.weth = weth
-        self.tokens = []
-        self.pairs = []
+        self.web3 = web3
+        self.test_provider = test_provider
+        self.original_provider = web3.provider
 
     async def create_token_if_weth_pair(self, pair: UniswapPair, price):
         tokens = await pair.get_tokens()
@@ -56,17 +57,43 @@ class TokenFinder(object):
             return None
 
         token = await self.create_token_if_weth_pair(pair, price)
-        if token:
-            self.tokens.append(token)
-            self.pairs.append(pair)
+        if not token:
+            return None
+
+        if self._check_if_malicious(token, pair):
+            return None
+
         logger.info(f"Finished creating token from {pair.get_address()}")
+        return token
 
     async def create_tokens(self, uniswap_pairs: List[UniswapPair]) -> List[Token]:
-        self.tokens = []
-        self.pairs = []
-        await async_map(self.create_and_check_token, uniswap_pairs)
-        self.tokens.append(self.weth)
-        return self.tokens, self.pairs
+        tokens = await async_map(self.create_and_check_token, uniswap_pairs)
+        tokens.append(self.weth)
+        token_set = set(tokens)
+        token_set.discard(None)
+        return list(token_set)
+
+    async def _check_if_malicious(self, token, pair):
+        """Check if a token is malicious.
+
+        Certain tokens can be paused, that means that any trade
+        through those tokens will fail. Not removing theses tokens
+        early will give us bad data down the line.
+
+        Certain tokens might steal funds. That means that any trade with them
+        can not be accurate if we do not know exactly how they steal funds.
+        Therefore we remove those as well.
+
+        There might be other ways for tokens to be maliciouse, time will tell.
+        """
+        self.web3.provider = self.test_provider
+        try:  # noqa: WPS328
+            pass  # noqa: WPS420
+        except IERC20TokenError:
+            logger.warning("Found malicious token: {token}")
+            return False
+        self.web3.provider = self.original_provider
+        return True
 
 
 async def create_and_filter_pools(
@@ -114,9 +141,10 @@ class PoolFinder(Action):
     async def on_next(self, data):
         weth = await data.weth().create_token(1)
 
-        tokens, pools, weth_pairs = await self._get_pairs_and_tokens(data.uniswap_factory(), weth)
-
-        tokens, pools = await self.filter_malicious_tokens(tokens, pools, weth, data.web3(), data.fork_address())
+        tf = TokenFinder(weth, data.web3(), create_web3_provider(data.fork_address))
+        tokens, pools = await self._get_pairs_and_tokens(
+            data.uniswap_factory(), weth, tf
+        )
 
         await self._get_pools_and_tokens(pools, tokens)
 
@@ -124,11 +152,11 @@ class PoolFinder(Action):
         data.tokens(tokens)
 
     async def _get_pools_and_tokens(self, pair_contracts, tokens):
-        pools = await create_and_filter_pools(pair_contracts, tokens),
+        pools = (await create_and_filter_pools(pair_contracts, tokens),)
         return tokens, pools
 
-    async def _get_pairs_and_tokens(self, factory: UniswapFactory, weth):
+    async def _get_pairs_and_tokens(self, factory: UniswapFactory, token_finder):
         pairs = await factory.all_pairs()
         logging.getLogger().info("Found all uniswap pairs, filtering tokens.")
-        tokens, weth_pairs = await TokenFinder(weth).create_tokens(pairs)
-        return tokens, pairs, weth_pairs
+        tokens, weth_pairs = await token_finder.create_tokens(pairs)
+        return tokens, pairs
