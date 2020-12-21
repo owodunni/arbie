@@ -8,12 +8,12 @@ Arbie is a greedy crypto pirate!
 
 ![Arbie](./assets/icon/arbie-icon-192x192.png)
 
-## Deploy
+## Run
 
-Deploy Brig to the local docker swarm with the following command:
+Run Brig with docker-compose:
 
 ```
-docker stack deploy --compose-file Brig/docker-compose.yml birka
+cd Brig && docker-compose up -d
 ```
 
 ## Getting started
