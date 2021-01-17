@@ -95,6 +95,10 @@ task venv(type: Exec) {
     commandLine "python3", "-m", "venv", ".venv"
 }
 
+task buildDocker(type: Exec){
+    commandLine "docker", "build", ".", "-t", "arbie"
+}
+
 task preCommit(type: Exec) {
     dependsOn pip
     commandLine "pre-commit",
@@ -104,7 +108,7 @@ task preCommit(type: Exec) {
 }
 
 task setup {
-  dependsOn preCommit, pip
+  dependsOn preCommit, pip, buildDocker
 }
 
 class KonsoleTask extends DefaultTask {
