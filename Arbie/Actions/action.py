@@ -39,6 +39,12 @@ def parse_settings(settings: Dict):
     return parsed_settings
 
 
+def to_none_safe_dict(items) -> Dict[str, str]:
+    if items:
+        return items
+    return {}
+
+
 class Action(object):
     """Action is a base class for data processing actions.
 
@@ -64,11 +70,11 @@ class Action(object):
         self.settings = self._create_settings()
         self.settings = self._update_settings_with_config(config)
 
-    def get_input_settings(self):
-        return self.settings[self.input_key]
+    def get_input_settings(self) -> Dict[str, str]:
+        return to_none_safe_dict(self.settings[self.input_key])
 
-    def get_output_settings(self):
-        return self.settings[self.output_key]
+    def get_output_settings(self) -> Dict[str, str]:
+        return to_none_safe_dict(self.settings[self.output_key])
 
     async def on_next(self, data):
         raise NotImplementedError("Action does not have a on_next statement")

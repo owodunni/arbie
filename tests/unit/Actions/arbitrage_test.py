@@ -31,11 +31,11 @@ class TestArbitrage(object):
     """Test Arbitrage."""
 
     def test_find_arbitrage(self, trade1):
-        amount, profit = ArbitrageFinder(trade1).find_arbitrage()
+        amount, _ = ArbitrageFinder(trade1).find_arbitrage()
         assert amount == pytest.approx(2.48456731316587)  # noqa: WPS432
 
     def test_find_arbitrage_unbalanced(self, trade2):
-        amount, profit = ArbitrageFinder(trade2).find_arbitrage()
+        amount, _ = ArbitrageFinder(trade2).find_arbitrage()
         assert amount == pytest.approx(27.8547574719045)  # noqa: WPS432
 
     def test_find_arbitrage_no_opportunity(self, tokens, dai, eth):

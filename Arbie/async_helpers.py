@@ -18,10 +18,11 @@ async def async_map_chunk(function, seq):
     return await asyncio.gather(*tasks)
 
 
-async def async_map(function, seq, chunk_size=100):
+async def async_map(function, seq, chunk_size=100, wait_time=0):
     res = []
     for chunk in chunked(seq, chunk_size):
         res.extend(await async_map_chunk(function, chunk))
+        await asyncio.sleep(wait_time)
     return res
 
 
