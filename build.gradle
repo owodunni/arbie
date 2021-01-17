@@ -95,6 +95,17 @@ task venv(type: Exec) {
     commandLine "python3", "-m", "venv", ".venv"
 }
 
+task preCommit(type: Exec) {
+    dependsOn pip
+    commandLine "pre-commit",
+                "install",
+                "--hook-type",
+                "commit-msg"
+}
+
+task setup {
+  dependsOn preCommit, pip
+}
 
 class KonsoleTask extends DefaultTask {
     @Input
