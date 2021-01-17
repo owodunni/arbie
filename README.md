@@ -22,6 +22,15 @@ cd Brig && docker-compose up -d
 
 Instructions for developing arbie using docker or virual-env.
 
+To setup the development environment run:
+
+```
+./gradlew venv && source .venv/bin/activate && ./gradlew setup
+```
+
+It will run the steps bellow and make sure that all tools required for Arbie
+are setup.
+
 ### Docker
 
 The arbie repository can be built using docker. This is probably the simplest
@@ -45,7 +54,12 @@ Create a virtual env:
 ./gradlew venv
 ```
 
-Install requirment:
+Run virual env:
+```
+source .venv/bin/activate
+```
+
+Install requirements:
 ```
 ./gradlew pip
 ```
@@ -53,4 +67,24 @@ Install requirment:
 lint:
 ```
 ./gradlew lint
+```
+
+### Commits
+
+Arbie works with [semantic-release](https://python-semantic-release.readthedocs.io/en/latest/)
+and therefore has a special commit style. We use [Angular style](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commits) commits. A helpful tool for ensuring the correct commit style is [commitizen](https://github.com/commitizen/cz-cli).
+
+Simply run when commiting:
+```
+cz c
+```
+
+### Pre commit hooks
+
+To enforce code standard we use [pre-commit](https://pre-commit.com/) it manages
+pre commit hooks.
+
+Run to setup:
+```
+pre-commit install
 ```
