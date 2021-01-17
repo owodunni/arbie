@@ -8,3 +8,4 @@ redis
 hiredis
 prometheus_client
 prometheus_async
+requests
