@@ -24,4 +24,4 @@ class TestCoingecko(object):
     async def test_coins_from_ids(self):
         ids = await Coingecko().ids()  # noqa: WPS437
         addresses = await Coingecko().coins_from_ids(ids[0:100])  # noqa: WPS349
-        assert len(addresses) == 2
+        assert len(addresses) == 3

@@ -4,15 +4,18 @@ import asyncio
 
 import pytest
 import yaml
+from pytest_mock.plugin import MockerFixture
 
 from Arbie.app import App
 from Arbie.Contracts import GenericToken
+from Arbie.Services import Coingecko
 from Arbie.Variables import BigNumber
 
 
 class Result(object):
     pool_finder_pools = "PoolFinder.1.pools"
     pool_finder_tokens = "PoolFinder.1.tokens"
+    whitelist_addresses = "Whitelist.1.addresses"
     pool_updater_pools = "PoolUpdater.1.pools"
     arbitrage_filtered_trades = "Arbitrage.1.filtered_trades"
     trader_profit = "Trader.1.profit"
@@ -95,10 +98,9 @@ variables:
     @pytest.fixture
     def pool_finder_config(self, base_config):
         conf = setup_config("PoolFinder/pool_finder.yml", base_config)
-        split_conf = conf.split("PoolFinder:")
+        split_conf = conf.split("input:")
         return f"""
 {split_conf[0]}
-    PoolFinder:
       input:
         balancer_start: 0
 {split_conf[1]}
@@ -117,13 +119,16 @@ variables:
         return setup_config("Trader/trader.yml", base_config_with_account)
 
     @pytest.fixture
-    def pool_finder(self, pool_finder_config):
+    def pool_finder(self, pool_finder_config, mocker: MockerFixture, whitelist):
+        mocker.patch.object(Coingecko, "coins", return_value=whitelist)
+
         config = yaml.safe_load(pool_finder_config)
         app = App(config)
-        assert len(app.action_tree.actions) == 1
+        assert len(app.action_tree.actions) == 2
         yield app
         app.store.delete(Result.pool_finder_pools)
         app.store.delete(Result.pool_finder_tokens)
+        app.store.delete(Result.whitelist_addresses)
 
     @pytest.fixture
     def pool_updater(self, pool_updater_config):
@@ -158,8 +163,10 @@ variables:
             trader.run(),
             wait_and_stop(trader, Result.trader_profit),
         )
+
         assert len(pool_finder.store.get(Result.pool_finder_pools)) == 4
         assert len(pool_finder.store.get(Result.pool_finder_tokens)) == 3
+        assert len(pool_finder.store.get(Result.whitelist_addresses)) == 4
         assert len(pool_updater.store.get(Result.pool_updater_pools)) == 4
         assert len(path_finder.store.get(Result.arbitrage_filtered_trades)) == 1
         assert trader.store.get(Result.trader_profit) > 3.278

@@ -2,7 +2,7 @@
 import asyncio
 import logging
 from math import isclose
-from typing import List, Tuple
+from typing import List, Set, Tuple
 
 from prometheus_async.aio import time
 
@@ -29,8 +29,9 @@ def check_and_get_price(balances) -> Tuple[bool, float]:
 
 
 class TokenFinder(object):
-    def __init__(self, uoa):
+    def __init__(self, uoa, whitelist: Set[str]):
         self.uoa = uoa
+        self.whitelist = whitelist
 
     async def create_token(self, pair: UniswapPair, price):
         tokens = await pair.get_tokens()
@@ -43,6 +44,9 @@ class TokenFinder(object):
 
     @time(CREATE_TOKEN_TIME)
     async def create_and_check_token(self, pair):
+        if not await self._pair_in_whitelist(pair):
+            return None
+
         balances = None
         try:
             balances = await pair.get_balances()
@@ -63,6 +67,14 @@ class TokenFinder(object):
         token_set = set(tokens)
         token_set.discard(None)
         return list(token_set)
+
+    async def _pair_in_whitelist(self, pair):
+        tokens = await pair.get_tokens()
+        t0 = tokens[0].get_address().lower()
+        t1 = tokens[1].get_address().lower()
+        if t0 in self.whitelist and t1 in self.whitelist:
+            return True
+        return False
 
 
 async def create_and_filter_pools(
@@ -102,6 +114,7 @@ class PoolFinder(Action):
         uniswap_factory: uniswap_factory
         balancer_factory: balancer_factory
         balancer_start: 9562480
+        whitelist: addresses
     output:
         pools: all_pools
         tokens: all_tokens
@@ -110,7 +123,9 @@ class PoolFinder(Action):
     async def on_next(self, data):
         weth = await data.weth().create_token(1)
 
-        uni_coro = self._get_pairs_and_tokens(data.uniswap_factory(), weth)
+        uni_coro = self._get_pairs_and_tokens(
+            data.uniswap_factory(), TokenFinder(weth, set(data.whitelist()))
+        )
 
         pools, tokens = await self._get_pools_and_tokens(
             *await self._get_results(uni_coro),
@@ -133,8 +148,10 @@ class PoolFinder(Action):
         tokens = results[0][1]
         return pairs, tokens
 
-    async def _get_pairs_and_tokens(self, factory: UniswapFactory, weth):
+    async def _get_pairs_and_tokens(
+        self, factory: UniswapFactory, token_finder: TokenFinder
+    ):
         pairs = await factory.all_pairs()
         logging.getLogger().info("Found all uniswap pairs, filtering tokens.")
-        tokens = await TokenFinder(weth).create_tokens(pairs)
+        tokens = await token_finder.create_tokens(pairs)
         return pairs, tokens

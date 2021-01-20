@@ -111,6 +111,15 @@ async def yam(deploy_address, token_factory) -> GenericToken:
 
 
 @pytest.fixture
+async def blocked_token(deploy_address, token_factory) -> GenericToken:
+    token = token_factory.deploy_contract(
+        deploy_address, "shit", "SHI", large_number.value
+    )
+    await token.approve_owner()
+    return token
+
+
+@pytest.fixture
 async def wbtc(deploy_address, token_factory) -> GenericToken:
     token = token_factory.deploy_contract(
         deploy_address, "Wbtc", "WBTC", large_number.value
@@ -205,6 +214,7 @@ async def pair_factory(  # noqa: WPS210, WPS217
     weth: GenericToken,
     yam: GenericToken,
     wbtc: GenericToken,
+    blocked_token: GenericToken,
     bad,
     w3,
     deploy_address,
@@ -234,9 +244,30 @@ async def pair_factory(  # noqa: WPS210, WPS217
             BigNumber(medium / 285),
         ],
     )
+
+    await factory.setup_pair(
+        [blocked_token, weth],
+        [
+            BigNumber(medium / 10000),
+            BigNumber(medium / 285),
+        ],
+    )
+
     await factory.create_pair(weth, bad)
     await factory.create_pair(weth, yam)
     return factory
+
+
+@pytest.fixture
+def whitelist(  # noqa: WPS210, WPS217
+    dai: GenericToken, weth: GenericToken, yam: GenericToken, wbtc: GenericToken
+):
+    return [
+        dai.get_address().lower(),
+        weth.get_address().lower(),
+        yam.get_address().lower(),
+        wbtc.get_address().lower(),
+    ]
 
 
 @pytest.fixture
