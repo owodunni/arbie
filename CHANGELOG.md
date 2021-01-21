@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.8.1 (2021-01-21)
+### Fix
+* **Whitelist:** Lower request speed to not be blocked ([`1360c59`](https://github.com/owodunni/arbie/commit/1360c59516dc6e8bd302b4c63e840acead13c96c))
+
 ## v0.8.0 (2021-01-21)
 ### Feature
 * **PoolFinder:** Filter pairs with whitelist ([`59dce2d`](https://github.com/owodunni/arbie/commit/59dce2d77023f0a0be89e40ad1bc50cffea15b95))
