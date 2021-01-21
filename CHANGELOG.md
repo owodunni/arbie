@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.8.2 (2021-01-21)
+### Fix
+* **Whitelist:** Add config params and logging ([`7f97dd6`](https://github.com/owodunni/arbie/commit/7f97dd6dc97bfa47ead2d0e8b968af94786f0c5e))
+
 ## v0.8.1 (2021-01-21)
 ### Fix
 * **Whitelist:** Lower request speed to not be blocked ([`1360c59`](https://github.com/owodunni/arbie/commit/1360c59516dc6e8bd302b4c63e840acead13c96c))
