@@ -14,4 +14,6 @@ class Whitelist(Action):
     """
 
     async def on_next(self, data):
-        data.whitelist(await Coingecko().coins())
+        # 2 requests every 0.6 seconds is equal to 3,33 req/sec
+        # In total we need to do ~6000 request which will take 30 min
+        data.whitelist(await Coingecko(2, 0.6).coins())  # noqa: WPS432
