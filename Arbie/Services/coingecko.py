@@ -12,6 +12,10 @@ COINS_URL = urljoin(COINGECKO_URL, "api/v3/coins/list")
 
 
 class Coingecko(object):
+    def __init__(self, batch_size=5, timeout=0.6):
+        self.batch_size = batch_size
+        self.timeout = timeout
+
     async def coins(self):
         ids = await self.ids()
         if ids:
@@ -31,7 +35,7 @@ class Coingecko(object):
 
     async def _coin_urls(self, ids):
         urls = list(map(self._coin_url, ids))
-        return await async_map(self._get, urls, 10, 1)
+        return await async_map(self._get, urls, self.batch_size, self.timeout)
 
     async def _coin_ticker(self, coin_id):
         url = self._coin_url(coin_id)
