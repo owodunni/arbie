@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.8.0 (2021-01-21)
+### Feature
+* **PoolFinder:** Filter pairs with whitelist ([`59dce2d`](https://github.com/owodunni/arbie/commit/59dce2d77023f0a0be89e40ad1bc50cffea15b95))
+* **PoolFinder:** Filter tokens with whitelist ([`099c47c`](https://github.com/owodunni/arbie/commit/099c47cd0e6a69e2465c2f878a82298a9dbebded))
+* **Whitelist:** Add action for finding whitelist tokens ([`66d0d5c`](https://github.com/owodunni/arbie/commit/66d0d5ce0d4b5c9849d9fd4f3e583bbe635c95e4))
+
+### Documentation
+* **readme:** Add getting started instructions ([`e98da45`](https://github.com/owodunni/arbie/commit/e98da45f1334114e5d9a803cb57acc00aa9dffc4))
+
 ## v0.7.7 (2020-12-15)
 ### Fix
 * **Node:** Run node against alchemy archive node ([`a5b3082`](https://github.com/owodunni/arbie/commit/a5b30820024a6bf28bc192d912975ddbc7a6c78f))
