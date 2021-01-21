@@ -1,10 +1,13 @@
 """Module for gettings tokens from Coingecko."""
 
+import logging
 from urllib.parse import urljoin
 
 import requests
 
 from Arbie.async_helpers import async_map, run_async
+
+logger = logging.getLogger()
 
 COINGECKO_URL = "https://api.coingecko.com"
 
@@ -69,4 +72,5 @@ class Coingecko(object):
         return not is_anomaly
 
     async def _get(self, url):
+        logger.info(f"Requesting endpoing {url}")
         return await run_async(requests.get, url)

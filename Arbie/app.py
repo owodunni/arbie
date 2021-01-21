@@ -2,6 +2,7 @@
 
 import logging
 
+import Arbie
 from Arbie.settings_parser import SettingsParser
 
 logger = logging.getLogger()
@@ -11,6 +12,7 @@ class App(object):
     """App is used for configuring and running Arbie."""
 
     def __init__(self, config):
+        logger.info(f"Arbie version {Arbie.__version__}")  # noqa: WPS609
         sp = SettingsParser(config)
         self.store = sp.setup_store()
         self.action_tree = sp.action_tree(self.store)
