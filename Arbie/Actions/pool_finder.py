@@ -43,10 +43,7 @@ class TokenFinder(object):
             return await t0.create_token(1 / price)
 
     @time(CREATE_TOKEN_TIME)
-    async def create_and_check_token(self, pair):
-        if not await self._pair_in_whitelist(pair):
-            return None
-
+    async def create_and_check_token(self, pair: UniswapPair) -> GenericToken:
         balances = None
         try:
             balances = await pair.get_balances()
@@ -61,20 +58,25 @@ class TokenFinder(object):
         logger.info(f"Finished creating token from {pair.get_address()}")
         return token
 
-    async def create_tokens(self, uniswap_pairs: List[UniswapPair]) -> List[Token]:
-        tokens = await async_map(self.create_and_check_token, uniswap_pairs)
+    async def create_tokens(self, pairs: List[UniswapPair]) -> List[Token]:
+        tokens = await async_map(self.create_and_check_token, pairs)
         tokens.append(self.uoa)
         token_set = set(tokens)
         token_set.discard(None)
         return list(token_set)
 
-    async def _pair_in_whitelist(self, pair):
+    async def filter_pairs(self, pairs: List[UniswapPair]) -> List[UniswapPair]:
+        pairs = await async_map(self._filter_pair_in_whitelist, pairs)
+        pair_set = set(pairs)
+        pair_set.discard(None)
+        return list(pair_set)
+
+    async def _filter_pair_in_whitelist(self, pair: UniswapPair) -> UniswapPair:
         tokens = await pair.get_tokens()
         t0 = tokens[0].get_address().lower()
         t1 = tokens[1].get_address().lower()
         if t0 in self.whitelist and t1 in self.whitelist:
-            return True
-        return False
+            return pair
 
 
 async def create_and_filter_pools(
@@ -152,6 +154,7 @@ class PoolFinder(Action):
         self, factory: UniswapFactory, token_finder: TokenFinder
     ):
         pairs = await factory.all_pairs()
+        pairs = await token_finder.filter_pairs(pairs)
         logging.getLogger().info("Found all uniswap pairs, filtering tokens.")
         tokens = await token_finder.create_tokens(pairs)
         return pairs, tokens
