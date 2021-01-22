@@ -5,7 +5,7 @@ from urllib.parse import urljoin
 
 import requests
 
-from Arbie.async_helpers import async_map, run_async
+from Arbie.async_helpers import CircuitBreaker, async_map, run_async
 
 logger = logging.getLogger()
 
@@ -15,9 +15,10 @@ COINS_URL = urljoin(COINGECKO_URL, "api/v3/coins/list")
 
 
 class Coingecko(object):
-    def __init__(self, batch_size=5, timeout=0.6):
+    def __init__(self, batch_size=5, timeout=0.6, retries=3, retrie_timeout=10):
         self.batch_size = batch_size
         self.timeout = timeout
+        self.breaker = CircuitBreaker(retries, retrie_timeout, requests.get)
 
     async def coins(self):
         ids = await self.ids()
@@ -73,4 +74,4 @@ class Coingecko(object):
 
     async def _get(self, url):
         logger.info(f"Requesting endpoing {url}")
-        return await run_async(requests.get, url)
+        return await run_async(self.breaker.safe_call, url)
