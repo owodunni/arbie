@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.8.3 (2021-01-22)
+### Fix
+* **CircuitBreaker:** Use a CircuitBreaker to not get disconnected ([`ee886e3`](https://github.com/owodunni/arbie/commit/ee886e36665668a6e1211062e89e024bd0c7209e))
+
 ## v0.8.2 (2021-01-21)
 ### Fix
 * **Whitelist:** Add config params and logging ([`7f97dd6`](https://github.com/owodunni/arbie/commit/7f97dd6dc97bfa47ead2d0e8b968af94786f0c5e))
