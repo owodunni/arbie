@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.8.4 (2021-01-22)
+### Fix
+* **Coingecko:** Retry response with code 429 ([`e3f94c6`](https://github.com/owodunni/arbie/commit/e3f94c6215f27ef2ee54bdc3c16a62a80b161881))
+
 ## v0.8.3 (2021-01-22)
 ### Fix
 * **CircuitBreaker:** Use a CircuitBreaker to not get disconnected ([`ee886e3`](https://github.com/owodunni/arbie/commit/ee886e36665668a6e1211062e89e024bd0c7209e))
