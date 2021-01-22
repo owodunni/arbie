@@ -75,6 +75,7 @@ class TokenFinder(object):
         tokens = await pair.get_tokens()
         t0 = tokens[0].get_address().lower()
         t1 = tokens[1].get_address().lower()
+        logging.getLogger().info(f"Token {t0} token {t1}")
         if t0 in self.whitelist and t1 in self.whitelist:
             return pair
 

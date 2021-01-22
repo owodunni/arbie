@@ -13,6 +13,7 @@ coins = [
     {"id": "1ai", "symbol": "1ai", "name": "1AI"},
     {"id": "velo-token", "symbol": "VLO", "name": "VELO Token"},
     {"id": "1inch", "symbol": "1inch", "name": "1inch"},
+    {"id": "weird-coin", "symbol": "", "name": ""},
 ]
 
 coin_1a1 = {
@@ -105,17 +106,30 @@ coin_1inch = {
 }
 
 
+weird_coin = {
+    "name": "1inch",
+    "tickers": [
+        {
+            "base": "0X7DC0AA78B770FA6A73803",
+            "target": "ETH",
+            "is_anomaly": False,
+        },
+    ],
+}
+
+
 def bad_request(endpoint):
     mock = MagicMock()
-    mock.ok = True
+    mock.ok = False
+    mock.json.return_value = None
     return mock
 
 
-def load_data(endpoint):
+def load_data(endpoint):  # noqa: WPS231
     mock = MagicMock()
     mock.ok = True
     json = None
-    if "coins/list" in endpoint:
+    if "coins/list" in endpoint:  # noqa: WPS223
         json = coins
     elif "velo" in endpoint:
         json = coin_vlo
@@ -123,6 +137,8 @@ def load_data(endpoint):
         json = coin_1inch
     elif "1ai" in endpoint:
         json = coin_1a1
+    elif "weird" in endpoint:
+        json = weird_coin
     mock.json.return_value = json
     return mock
 
@@ -142,5 +158,5 @@ class TestCoingecko(object):
 
     async def test_bad_request(self, request_mock: MagicMock):
         request_mock.get.side_effect = bad_request
-        addresses = await Coingecko().coins()
-        assert not addresses
+        with pytest.raises(ConnectionError):
+            await Coingecko(2, 0, 1, 0).coins()

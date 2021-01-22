@@ -18,59 +18,65 @@ class Coingecko(object):
     def __init__(self, batch_size=5, timeout=0.6, retries=3, retrie_timeout=10):
         self.batch_size = batch_size
         self.timeout = timeout
-        self.breaker = CircuitBreaker(retries, retrie_timeout, requests.get)
+        self.breaker = CircuitBreaker(retries, retrie_timeout, self._get_json)
 
     async def coins(self):
         ids = await self.ids()
         if ids:
             return await self.coins_from_ids(ids)
-        return []
 
     async def coins_from_ids(self, ids):
-        response = await self._coin_urls(ids)
-        addresses = set(map(self._parse_eth_coin, response))
+        urls = list(map(self._coin_url, ids))
+        addresses = await async_map(
+            self._parse_eth_coin, urls, self.batch_size, self.timeout
+        )
+        addresses = set(addresses)
         addresses.remove(None)
         return list(addresses)
 
     async def ids(self):
-        rs = await self._get(COINS_URL)
-        if rs.ok:
-            return list(map(lambda i: i["id"], rs.json()))
-
-    async def _coin_urls(self, ids):
-        urls = list(map(self._coin_url, ids))
-        return await async_map(self._get, urls, self.batch_size, self.timeout)
+        rs_json = await self._get(COINS_URL)
+        return list(map(lambda i: i["id"], rs_json))
 
     async def _coin_ticker(self, coin_id):
         url = self._coin_url(coin_id)
-        rs = await self._get(url)
-        return self._parse_eth_coin(rs)
+        return await self._parse_eth_coin(url)
 
     def _coin_url(self, coin_id):
         return urljoin(COINGECKO_URL, f"api/v3/coins/{coin_id}/tickers")
 
-    def _parse_eth_coin(self, response):
-        if not response.ok:
-            return None
-        tickers = self._tickers(response)
-        if (
-            tickers is None
-            or tickers["target"] != "ETH"
-            or not self._ok(tickers["is_anomaly"])
-        ):
-            return None
-        address = tickers["base"].lower()
-        eth_address_length = 42  # noqa: WPS432
-        if len(address) == eth_address_length:
-            return address
+    async def _parse_eth_coin(self, url):
+        body = await self._get(url)
 
-    def _tickers(self, response):
-        tickers = response.json()["tickers"]
+        for ticker in self._tickers(body):
+            if (
+                ticker is None
+                or ticker["target"] != "ETH"
+                or not self._ok(ticker["is_anomaly"])
+            ):
+                continue
+
+            address = ticker["base"].lower()
+            logger.info(f"Found token: {address}")
+
+            eth_address_length = 42  # noqa: WPS432
+            if len(address) == eth_address_length:
+                return address
+
+    def _tickers(self, body):
+        tickers = body["tickers"]
         if tickers:
-            return tickers[0]
+            return tickers
+        return []
 
     def _ok(self, is_anomaly):
         return not is_anomaly
+
+    def _get_json(self, url):
+        response = requests.get(url)
+        if not response.ok:
+            raise ConnectionError(f"Failed to connect to {url}, response: {response}")
+        return response.json()
 
     async def _get(self, url):
         logger.info(f"Requesting endpoing {url}")

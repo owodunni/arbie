@@ -1,7 +1,11 @@
 """Whitelist contains actions for finding good tokens."""
 
+import logging
+
 from Arbie.Actions import Action
 from Arbie.Services import Coingecko
+
+logger = logging.getLogger()
 
 
 class Whitelist(Action):
@@ -17,7 +21,7 @@ class Whitelist(Action):
         requests: 4
         delay: 1
         retries: 3
-        retrie_delay: 10
+        retrie_delay: 30
     output:
         whitelist: whitelist
     """
@@ -26,4 +30,8 @@ class Whitelist(Action):
         gecko = Coingecko(
             data.requests(), data.delay(), data.retries(), data.retrie_delay()
         )
-        data.whitelist(await gecko.coins())
+        coins = await gecko.coins()
+        if not coins:
+            raise ConnectionError("No Coins from Coingecko")
+        data.whitelist(coins)
+        logger.info(f"Whitelist: {coins}")

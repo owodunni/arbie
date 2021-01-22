@@ -64,3 +64,7 @@ def main(argv=None):
     except Exception as ex:
         logging.getLogger().error(ex)
         raise ex
+
+
+if __name__ == "__main__":
+    main()

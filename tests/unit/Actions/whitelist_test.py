@@ -24,3 +24,12 @@ class TestWhitelist(object):
         await tree.run()
 
         assert len(store.get("whitelist")) == 2
+
+    @pytest.mark.asyncio
+    async def test_on_next_no_coins(self, mocker: MockerFixture):
+        mocker.patch.object(Coingecko, "coins", return_value=None)
+        store = Store()
+        tree = ActionTree(store)
+        tree.add_action(Whitelist())
+        with pytest.raises(ConnectionError):
+            await tree.run()
