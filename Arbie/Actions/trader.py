@@ -114,7 +114,10 @@ def _perform_trade(trade, router, min_profit):
     )
     if profit > min_profit:
         logger.info(f"Executing trade {trade}")
-        return router.swap(trade)
+        try:
+            return router.swap(trade)
+        except Exception as e:
+            logger.warning(e)
     return False
 
 
@@ -154,7 +157,7 @@ class Trader(Action):
         logger.info(f"amount_eth: {amount_eth}, amount_weth: {amount_weth}")
 
         if not perform_trade(data, amount_weth):
-            raise Exception("No trade performed")
+            logger.warning("No trade opportunity found.")
 
         balance_post = await balance_checker.check_total(trader_account.address)
 

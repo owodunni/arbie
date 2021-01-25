@@ -54,8 +54,8 @@ class TestTrader(object):
         trade.amount_in = 1
         tree = ActionTree(trade_store)
         tree.add_action(Trader())
-        with pytest.raises(Exception):
-            await tree.run()
+        await tree.run()
+        assert trade_store.get("profit") == 0
 
 
 class TestLogTrader(object):
