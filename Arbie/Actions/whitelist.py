@@ -19,9 +19,9 @@ class Whitelist(Action):
     [Settings]
     input:
         requests: 4
-        delay: 1
-        retries: 3
-        retrie_delay: 30
+        delay: 2
+        retries: 4
+        retrie_delay: 60
     output:
         whitelist: whitelist
     """
