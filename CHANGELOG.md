@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.8.5 (2021-01-26)
+### Fix
+* **Whitelist:** Change default settings ([`ec81e39`](https://github.com/owodunni/arbie/commit/ec81e393502a4634ad48f50b045c663946579118))
+
 ## v0.8.4 (2021-01-22)
 ### Fix
 * **Coingecko:** Retry response with code 429 ([`e3f94c6`](https://github.com/owodunni/arbie/commit/e3f94c6215f27ef2ee54bdc3c16a62a80b161881))
