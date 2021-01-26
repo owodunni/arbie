@@ -2,9 +2,11 @@
 
 import logging
 
+from web3.exceptions import ContractLogicError
+
 from Arbie import TransactionError
 from Arbie.Actions import Action
-from Arbie.Variables import BigNumber, PoolType
+from Arbie.Variables import BigNumber
 
 logger = logging.getLogger()
 
@@ -96,17 +98,7 @@ class SetUpTrader(Action):
         data.balance_weth(amount_weth)
 
 
-def _is_trade_uni(trade):
-    for pool in trade.pools:
-        if pool.pool_type is not PoolType.uniswap:
-            return False
-    return True
-
-
 def _perform_trade(trade, router, min_profit):
-    if not _is_trade_uni(trade):
-        return False
-
     amount_out = router.check_out_given_in(trade)
     profit = amount_out - trade.amount_in
     logger.info(
@@ -116,7 +108,7 @@ def _perform_trade(trade, router, min_profit):
         logger.info(f"Executing trade {trade}")
         try:
             return router.swap(trade)
-        except Exception as e:
+        except ContractLogicError as e:
             logger.warning(e)
     return False
 
