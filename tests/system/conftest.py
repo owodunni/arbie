@@ -14,7 +14,7 @@ from Arbie.Contracts import (
     UniswapV2Router,
     Weth,
 )
-from Arbie.Contracts.tokens import BadERC20Token, GenericToken
+from Arbie.Contracts.tokens import BadERC20Token, GenericToken, MaliciousToken
 from Arbie.settings_parser import setup_gas_strategy
 from Arbie.Variables import BigNumber, Trade
 
@@ -111,9 +111,9 @@ async def yam(deploy_address, token_factory) -> GenericToken:
 
 
 @pytest.fixture
-async def blocked_token(deploy_address, token_factory) -> GenericToken:
-    token = token_factory.deploy_contract(
-        deploy_address, "shit", "SHI", large_number.value
+async def paused_token(w3, deploy_address) -> GenericToken:
+    token = ContractFactory(w3, MaliciousToken).deploy_contract(
+        deploy_address, "paused", "PAU", large_number.value
     )
     await token.approve_owner()
     return token
@@ -214,7 +214,7 @@ async def pair_factory(  # noqa: WPS210, WPS217
     weth: GenericToken,
     yam: GenericToken,
     wbtc: GenericToken,
-    blocked_token: GenericToken,
+    paused_token: GenericToken,
     bad,
     w3,
     deploy_address,
@@ -246,12 +246,14 @@ async def pair_factory(  # noqa: WPS210, WPS217
     )
 
     await factory.setup_pair(
-        [blocked_token, weth],
+        [paused_token, weth],
         [
             BigNumber(medium / 10000),
             BigNumber(medium / 285),
         ],
     )
+
+    paused_token.pause()
 
     await factory.create_pair(weth, bad)
     await factory.create_pair(weth, yam)
@@ -286,7 +288,7 @@ async def create_token(token):
 
 
 @pytest.fixture
-async def pairs(factory, weth, dai, wbtc):
+async def all_pairs(factory, weth, dai, wbtc, paused_token):
     p0 = await factory.setup_pair(
         [weth, dai],
         [
@@ -310,15 +312,51 @@ async def pairs(factory, weth, dai, wbtc):
             BigNumber(large / 285.0),
         ],
     )
-    return await async_map(create_pool, [p0, p1, p2])
+
+    p3 = await factory.setup_pair(
+        [paused_token, weth],
+        [
+            BigNumber(large / 10000.0),
+            BigNumber(large / 285.0),
+        ],
+    )
+
+    paused_token.pause()
+
+    return await async_map(create_pool, [p0, p1, p2, p3])
 
 
 @pytest.fixture
-async def path(weth, dai, wbtc):
+def good_pairs(all_pairs):
+    return all_pairs[:-1]
+
+
+@pytest.fixture
+def bad_pairs(all_pairs):
+    return all_pairs[-1:] + all_pairs[-1:]
+
+
+@pytest.fixture
+async def good_path(weth, dai, wbtc):
     raw_path = [weth, dai, wbtc, weth]
     return await async_map(create_token, raw_path)
 
 
 @pytest.fixture
-def trade(pairs, path):
-    return Trade(pairs, path)
+async def bad_path(weth, paused_token):
+    raw_path = [weth, paused_token, weth]
+    return await async_map(create_token, raw_path)
+
+
+@pytest.fixture
+def trade(good_pairs, good_path):
+    trade = Trade(good_pairs, good_path)
+    trade.amount_in = 1
+    return trade
+
+
+@pytest.fixture
+def bad_trade(bad_pairs, bad_path):
+    trade = Trade(bad_pairs, bad_path)
+    trade.amount_in = 1
+    return trade
