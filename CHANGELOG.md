@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.8.6 (2021-01-27)
+### Fix
+* **Trader:** Keep trading after exception ([`404d494`](https://github.com/owodunni/arbie/commit/404d4944617f1c66913fec6656912e0855491ed3))
+
 ## v0.8.5 (2021-01-26)
 ### Fix
 * **Whitelist:** Change default settings ([`ec81e39`](https://github.com/owodunni/arbie/commit/ec81e393502a4634ad48f50b045c663946579118))
