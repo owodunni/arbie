@@ -27,14 +27,14 @@ class IERC20Token(Contract):
 
     def transfer(self, to: str, bg_number: BigNumber) -> bool:
         transaction = self.contract.functions.transfer(to, bg_number.value)
-        return self._transact_status(transaction)
+        return self._transact_info(transaction)
 
     def allowance(self, to: str):
         return self.contract.functions.allowance(self._get_account(), to).call()
 
     def approve(self, spender: str, bg_number: BigNumber) -> bool:
         transaction = self.contract.functions.approve(spender, bg_number.value)
-        return self._transact_status(transaction)
+        return self._transact_info(transaction)
 
     async def approve_owner(self):
         bg = await self.balance_of(self.owner_address)
@@ -82,13 +82,19 @@ class Weth(GenericToken):
     name = "Weth"
     protocol = token_protocol
 
-    def deposit(self, amount):
+    def deposit(self, amount, dry_run=False):
         transaction = self.contract.functions.deposit()
-        return self._transact_status(transaction, BigNumber(amount).value)
+        # The gas amount 4249 was achieved by testing the contract and checking how much gas was needed.
+        return self._transact_info(
+            transaction,
+            value=BigNumber(amount).value,
+            gas=44249,  # noqa: WPS432
+            dry_run=dry_run,
+        )
 
-    def withdraw(self, amount):
+    def withdraw(self, amount, dry_run=False):
         transaction = self.contract.functions.withdraw(BigNumber(amount).value)
-        return self._transact_status(transaction)
+        return self._transact_info(transaction, dry_run=dry_run)
 
 
 class MaliciousToken(GenericToken):
@@ -97,4 +103,4 @@ class MaliciousToken(GenericToken):
 
     def pause(self):
         transaction = self.contract.functions.pause()
-        return self._transact_status(transaction)
+        return self._transact_info(transaction)

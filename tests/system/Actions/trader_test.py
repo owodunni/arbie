@@ -29,12 +29,12 @@ def trader_account(w3, weth: GenericToken, router, dummy_account):
 
 
 @pytest.fixture
-def trade_store(w3, router, bad_trade, trade, weth, trader_account):
+def trade_store(w3_with_gas_strategy, router, bad_trade, trade, weth, trader_account):
     store = Store()
     store.add("router", router)
     store.add("filtered_trades", [bad_trade, trade])
     store.add("weth", weth)
-    store.add("web3", w3)
+    store.add("web3", w3_with_gas_strategy)
     store.add("account", trader_account)
     return store
 
