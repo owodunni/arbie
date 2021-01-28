@@ -8,6 +8,7 @@ from eth_account import Account
 from pkg_resources import resource_string
 
 from Arbie.async_helpers import run_async
+from Arbie.Variables import BigNumber
 
 
 class Network(Enum):
@@ -33,9 +34,9 @@ def _wait_for_tx(w3, tx_hash):
     return w3.eth.waitForTransactionReceipt(tx_hash, 120)  # noqa: WPS432
 
 
-def transact(w3, address: str, transaction, value=None):
+def transact(w3, address: str, transaction, value=None, gas=48814000):  # noqa: WPS432
     """Transact a transaction and return transaction receipt."""
-    tx_params = _get_tx_params(w3, address, value, 48814000)  # noqa: WPS432
+    tx_params = _get_tx_params(w3, address, value, gas)
     tx_hash = transaction.transact(tx_params)
     return _wait_for_tx(w3, tx_hash)
 
@@ -78,11 +79,25 @@ class Contract(object):
 
     def _transact(self, transaction, value=None, gas=None):
         if self.user_account is None:
-            return transact(self.w3, self.owner_address, transaction, value)
+            return transact(self.w3, self.owner_address, transaction, value, gas)
         return signed_transaction(self.w3, self.user_account, transaction, value, gas)
 
-    def _transact_status(self, transaction, value=None, gas=None) -> bool:
-        return self._transact(transaction, value, gas).status
+    def _transact_info(
+        self, transaction, value=None, gas=None, dry_run=False
+    ) -> Tuple[bool, float]:
+        if gas is None:
+            gas = self._estimate_gas(transaction)
+        gas_amount = self.w3.eth.generateGasPrice()
+
+        if gas_amount:
+            gas_cost = BigNumber.from_value(gas * gas_amount).to_number()
+        else:
+            # No gas strategy specified
+            gas_cost = None
+
+        if dry_run:
+            return False, gas_cost
+        return self._transact(transaction, value, gas).status, gas_cost
 
     def _transact_status_and_contract(self, transaction) -> Tuple[bool, str]:
         tx_receipt = self._transact(transaction)
@@ -98,7 +113,7 @@ class Contract(object):
         built_transaction = transaction.buildTransaction(tx_params)
         # When estimateing gas te key gas can not be in the transaction
         built_transaction.pop("gas", None)
-        return self.w3.eth.estimateGas(built_transaction)
+        return self.w3.eth.estimateGas(built_transaction) + 1
 
     async def _call_async(self, function):
         return await run_async(function.call)

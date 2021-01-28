@@ -40,7 +40,7 @@ class UniswapPair(PoolContract):
 
     def mint(self, address: str) -> bool:
         transaction = self.contract.functions.mint(address)
-        return self._transact_status(transaction)
+        return self._transact_info(transaction)
 
     async def get_token0(self) -> GenericToken:
         return await self._get_token(self.contract.functions.token0())
@@ -99,7 +99,7 @@ class UniswapFactory(Contract):
             token_a.get_address(), token_b.get_address()
         )
 
-        if not self._transact_status(transaction):
+        if not self._transact_info(transaction):
             raise DeployContractError("Failed to deploy UniswapPair")
         pair_nmb = await self.all_pairs_length()
         return await self._create_pair_index(pair_nmb - 1)

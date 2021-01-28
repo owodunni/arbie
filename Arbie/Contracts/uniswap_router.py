@@ -25,10 +25,8 @@ class UniswapV2Router(Contract):
         ).call()
         return BigNumber.from_value(amount_out[-1]).to_number()
 
-    def swap(self, trade):
-        gas = self._estimate_gas_swap(trade)
-        transaction = self._swap_transaction(trade)
-        return self._transact_status(transaction, gas=gas)
+    def swap(self, trade, dry_run=False):
+        return self._transact_info(self._swap_transaction(trade), dry_run=dry_run)
 
     def _swap_transaction(self, trade):
         path = list(map(lambda t: t.address, trade.path))
@@ -40,10 +38,3 @@ class UniswapV2Router(Contract):
             # Require trades to be executed in 120 seconds
             self.w3.eth.getBlock("latest").timestamp + 120,  # noqa: WPS432
         )
-
-    def _estimate_gas_swap(self, trade):
-        transaction = self._swap_transaction(trade)
-        # Lets use a bit more gas then required, since
-        # some tokens like $VLO actually suck gas
-        # out of the transaction
-        return int(self._estimate_gas(transaction) * 1.05) + 1  # noqa: WPS432

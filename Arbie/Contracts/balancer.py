@@ -78,10 +78,10 @@ class BalancerPool(PoolContract):
         transaction = self.contract.functions.bind(
             address, balance.value, eth_safe_weight.value
         )
-        return self._transact_status(transaction)
+        return self._transact_info(transaction)
 
     def finalize(self) -> bool:
-        return self._transact_status(self.contract.functions.finalize())
+        return self._transact_info(self.contract.functions.finalize())
 
 
 class BalancerLoader(object):
