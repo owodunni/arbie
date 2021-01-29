@@ -100,19 +100,33 @@ Pool(
         wi, wo = self.get_weights(token_in, token_out)
         return (bi / wi) / (bo / wo)
 
-    def in_given_out_expr(self, token_in: Token, token_out: Token):
+    def in_given_out_expr(self, token_in: Token, token_out: Token, k=1):
         bi, bo = self.get_balances(token_in, token_out)
         wi, wo = self.get_weights(token_in, token_out)
 
-        return bi * ((bo / (bo - x * (1 - self.fee))) ** (wo / wi) - 1)  # noqa: WPS221'
+        bi *= k
+        bo *= k
 
-    def out_given_in_expr(self, token_in: Token, token_out: Token) -> float:
+        return bi * ((bo / (bo - x * (1 - self.fee))) ** (wo / wi) - 1)  # noqa: WPS221
+
+    def out_given_in_expr(self, token_in: Token, token_out: Token, k=1) -> float:
+        """Mathematical expression for out given in.
+
+        To increase the accuracy of floating point numbers the parameter k can be provided.
+        """
         bi, bo = self.get_balances(token_in, token_out)
         wi, wo = self.get_weights(token_in, token_out)
+
+        bi *= k
+        bo *= k
 
         return bo * (1 - (bi / (bi + x * (1 - self.fee))) ** (wi / wo))  # noqa: WPS221
 
     def in_given_out(self, token_in: Token, token_out: Token, amount: float) -> float:
+        """Mathematical expression for in given out.
+
+        To increase the accuracy of floating point numbers the parameter k can be provided.
+        """
         expr = self.in_given_out_expr(token_in, token_out)
         return expr.subs(x, amount)
 

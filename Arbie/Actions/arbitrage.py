@@ -13,8 +13,9 @@ x = symbols("x")
 
 
 class ArbitrageFinder(object):
-    def __init__(self, trade: Trade):
+    def __init__(self, trade: Trade, precision=10e6):
         self.trade = trade
+        self.precision = precision
 
     def find_arbitrage(self) -> Tuple[float, float]:
         if len(self.trade) < 3:
@@ -28,7 +29,7 @@ class ArbitrageFinder(object):
         trade_input = self.calculate_optimal_arbitrage()
         profit = self.calculate_profit(trade_input)
 
-        return trade_input, profit
+        return trade_input / self.precision, profit / self.precision
 
     def token_in_pools(self) -> bool:
         for pool, token_in, token_out in self.trade:
@@ -46,7 +47,7 @@ class ArbitrageFinder(object):
         i = 0
         expr = None
         for pool, token_in, token_out in self.trade:
-            inner_expr = pool.out_given_in_expr(token_in, token_out)
+            inner_expr = pool.out_given_in_expr(token_in, token_out, self.precision)
             if i > 0:
                 expr = subs_expr(inner_expr, expr)
             else:
