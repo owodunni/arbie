@@ -3,7 +3,8 @@
 import pytest
 
 from Arbie.Actions import ActionTree, LogTrader, SetUpTrader, Store, Trader
-from Arbie.Contracts import GenericToken, Weth
+from Arbie.Actions.arbitrage import ArbitrageFinder
+from Arbie.Contracts import GenericToken, UniswapV2Router, Weth
 from Arbie.Variables import BigNumber
 
 
@@ -41,12 +42,15 @@ def trade_store(w3_with_gas_strategy, router, bad_trade, trade, weth, trader_acc
 
 class TestTrader(object):
     @pytest.mark.asyncio
-    async def test_on_next(self, trade_store):
+    async def test_on_next(self, trade_store, trade, router: UniswapV2Router):
+        trade.amount_in, trade.profit = ArbitrageFinder(trade).find_arbitrage()
+        status, gas_cost = router.swap(trade, dry_run=True)
+
         trade_store.add(min_profit, -1)
         tree = ActionTree(trade_store)
         tree.add_action(Trader(conf_dict))
         await tree.run()
-        assert trade_store.get("profit") > 0.036  # noqa: WPS432
+        assert trade_store.get("profit") == trade.profit - gas_cost  # noqa: WPS432
 
     @pytest.mark.asyncio
     async def test_no_profit(self, trade_store):
