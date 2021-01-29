@@ -21,7 +21,7 @@ jobs:
         access-token: ${{ secrets.ACCESS_TOKEN }}
 
     - name: Python Semantic Release
-      uses: relekang/python-semantic-release@v7.12.0
+      uses: relekang/python-semantic-release@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         pypi_token: ${{ secrets.PYPI_TOKEN }}
