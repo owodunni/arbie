@@ -100,16 +100,20 @@ class SetUpTrader(Action):
 
 def _perform_trade(trade, router, min_profit):
     amount_out = router.check_out_given_in(trade)
-    profit = amount_out - trade.amount_in
+    try:
+        _, gas_cost = router.swap(trade, dry_run=True)
+    except ContractLogicError as e:
+        logger.warning(e)
+        return False
+
+    profit = amount_out - trade.amount_in - gas_cost
+
     logger.info(
-        f"Checking trade with profit {profit}, amount_in: {trade.amount_in}, amount out: {amount_out}"
+        f"Checking trade with profit {profit}, amount_in: {trade.amount_in}, amount out: {amount_out}, gas cost: {gas_cost}"
     )
     if profit > min_profit:
         logger.info(f"Executing trade {trade}")
-        try:
-            return router.swap(trade)
-        except ContractLogicError as e:
-            logger.warning(e)
+        return router.swap(trade)
     return False
 
 
