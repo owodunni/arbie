@@ -13,7 +13,7 @@ x = symbols("x")
 
 
 class ArbitrageFinder(object):
-    def __init__(self, trade: Trade, precision=10e6):
+    def __init__(self, trade: Trade, precision=10e3):
         self.trade = trade
         self.precision = precision
 
@@ -29,7 +29,7 @@ class ArbitrageFinder(object):
         trade_input = self.calculate_optimal_arbitrage()
         profit = self.calculate_profit(trade_input)
 
-        return trade_input / self.precision, profit / self.precision
+        return trade_input, profit
 
     def token_in_pools(self) -> bool:
         for pool, token_in, token_out in self.trade:
@@ -41,7 +41,7 @@ class ArbitrageFinder(object):
         return self.expr_builder(lambda inner, expr: inner.subs(x, expr))
 
     def arbitrage_expr(self):
-        return self.expr_builder(lambda inner, expr: inner.subs(x, expr) - x)
+        return self.trade_expr() - x
 
     def expr_builder(self, subs_expr):  # noqa: WPS210
         i = 0
@@ -62,11 +62,10 @@ class ArbitrageFinder(object):
         sol = nsolve(self.arbitrage_diff_expr(), 0)
         if sol <= 0:
             raise AssertionError("No arbitrage opportunity found.")
-        return sol
+        return sol / self.precision
 
     def calculate_profit(self, value) -> float:
-        expr = self.trade_expr()
-        return expr.subs(x, value) - value
+        return self.arbitrage_expr().subs(x, value*self.precision)/self.precision
 
     def _initial_expr(self):
         pool, trade_in, trade_out = self.trade[0]
