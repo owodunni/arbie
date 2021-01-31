@@ -12,10 +12,10 @@ class TestRouter(object):
     def test_out_given_in(self, router, trade):
         trade.amount_in = 1
         amount_out = router.check_out_given_in(trade)
-        assert amount_out > 1
+        assert amount_out == pytest.approx(4.008, 1e-4)
 
         profit = ArbitrageFinder(trade).calculate_profit(1)
-        assert pytest.approx(1, 1e-5) == amount_out - profit
+        assert profit == pytest.approx(amount_out - trade.amount_in)
 
     @pytest.mark.asyncio
     async def test_swap(
