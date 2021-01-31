@@ -289,7 +289,7 @@ async def create_token(token):
 
 @pytest.fixture
 async def all_pairs(factory, weth, dai, wbtc, paused_token):
-    """ all_pairs set up a very specific arbitrage opportunity.
+    """all_pairs set up a very specific arbitrage opportunity.
 
     We want a opportunity that requires less then 2 WETH and provides significant profit as
     to be able to separate profit from gas costs. If the numbers do not make sense it is because
@@ -298,8 +298,8 @@ async def all_pairs(factory, weth, dai, wbtc, paused_token):
     p0 = await factory.setup_pair(
         [weth, dai],
         [
-            BigNumber(small/500 / 300.0),
-            BigNumber(small/500),
+            BigNumber(small / 500 / 300.0),
+            BigNumber(small / 500),
         ],
     )
 
@@ -307,7 +307,7 @@ async def all_pairs(factory, weth, dai, wbtc, paused_token):
         [wbtc, dai],
         [
             BigNumber(large / 10000.0),
-            BigNumber(large/10),
+            BigNumber(large / 10),
         ],
     )
 

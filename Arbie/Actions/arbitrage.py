@@ -17,7 +17,7 @@ class ArbitrageFinder(object):
         self.trade = trade
         self.precision = precision
 
-    def find_arbitrage(self) -> Tuple[float, float]:
+    def find_arbitrage_and_update_trade(self) -> Tuple[float, float]:
         if len(self.trade) < 3:
             raise ValueError(
                 "Can only find arbitrage opportunity between at leat 3 tokens"
@@ -26,10 +26,10 @@ class ArbitrageFinder(object):
         if not self.token_in_pools():
             raise ValueError("Tokens does not exist in pools")
 
-        trade_input = self.calculate_optimal_arbitrage()
-        profit = self.calculate_profit(trade_input)
+        self.trade.amount_in = self.calculate_optimal_arbitrage()
+        self.trade.profit = self.calculate_profit(self.trade.amount_in)
 
-        return trade_input, profit
+        return self.trade
 
     def token_in_pools(self) -> bool:
         for pool, token_in, token_out in self.trade:
@@ -65,7 +65,7 @@ class ArbitrageFinder(object):
         return sol / self.precision
 
     def calculate_profit(self, value) -> float:
-        return self.arbitrage_expr().subs(x, value*self.precision)/self.precision
+        return self.arbitrage_expr().subs(x, value * self.precision) / self.precision
 
     def _initial_expr(self):
         pool, trade_in, trade_out = self.trade[0]
@@ -75,16 +75,12 @@ class ArbitrageFinder(object):
 def _update_oportunity(raw_trades, nmb_trades):
     trades = []
     for index, arb in enumerate(raw_trades):
-        amount_in = None
-        profit = None
         try:
-            amount_in, profit = ArbitrageFinder(arb).find_arbitrage()
+            ArbitrageFinder(arb).find_arbitrage_and_update_trade()
         except (AssertionError, ValueError, TypeError) as e:
             logger.warning(f"No arbitrage found {e}")
             continue
 
-        arb.amount_in = amount_in
-        arb.profit = profit
         trades.append(arb)
         logger.info(
             f"Found opportunity {index}:{len(raw_trades)}"
