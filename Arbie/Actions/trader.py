@@ -175,7 +175,7 @@ class LogTrader(Action):
     """
 
     async def on_next(self, data):  # noqa: WPS210
-        value = self.log_trade(data)
+        value = self._log_trades(data)
         profit = sum(value)
         profit_per_trade = profit / len(value)
 
@@ -186,7 +186,7 @@ class LogTrader(Action):
 
         logger.info("Finished trading")
 
-    def log_trade(self, data):
+    def _log_trades(self, data):
         router = data.router()
         min_profit = data.min_profit()
         profits = []
@@ -198,7 +198,11 @@ class LogTrader(Action):
 
     def _log_trade(self, trade, router, min_profit):
         amount_out = router.check_out_given_in(trade)
-        profit = amount_out - trade.amount_in
+        try:
+            status, gas_cost = router.swap(trade, dry_run=True)
+        except ContractLogicError:
+            return None
+        profit = amount_out - trade.amount_in - gas_cost
         if profit > min_profit:
             logger.info(
                 f"Executing trade with profit {profit}, amount_in: {trade.amount_in}, amount out: {amount_out}"
