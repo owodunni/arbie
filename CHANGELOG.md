@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.8.7 (2021-01-31)
+### Fix
+* **Trader:** Account for gas cost when estimating trade profit ([`e8eaeec`](https://github.com/owodunni/arbie/commit/e8eaeecf7f38f29c0c479cb0404d6a9f7d90f6c1))
+* **LogTrader:** Account for gas costs when extimating profit ([`c492edd`](https://github.com/owodunni/arbie/commit/c492edd31584d96b33b058cc284777ab7bfefb96))
+* **Arbitrage:** Change arbitrage expr to work with +2 pools ([`32baa2a`](https://github.com/owodunni/arbie/commit/32baa2a70c815b0b633a09307a2236a55e063349))
+* **Arbitrage:** Allow setting precision ([`bd407ae`](https://github.com/owodunni/arbie/commit/bd407ae7447d045ba833ce18553c4d751604d623))
+
 ## v0.8.6 (2021-01-27)
 ### Fix
 * **Trader:** Keep trading after exception ([`404d494`](https://github.com/owodunni/arbie/commit/404d4944617f1c66913fec6656912e0855491ed3))
