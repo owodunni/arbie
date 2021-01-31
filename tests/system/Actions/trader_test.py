@@ -44,30 +44,36 @@ class TestTrader(object):
     @pytest.mark.asyncio
     async def test_on_next(self, trade_store, trade, router: UniswapV2Router):
         trade.amount_in, trade.profit = ArbitrageFinder(trade).find_arbitrage()
-        status, gas_cost = router.swap(trade, dry_run=True)
+        _, gas_cost = router.swap(trade, dry_run=True)
 
+        # min profit is set to -1 because we want to execute a bad trade
+        # and see that it is reverted without costing us gas
         trade_store.add(min_profit, -1)
         tree = ActionTree(trade_store)
         tree.add_action(Trader(conf_dict))
         await tree.run()
-        assert trade_store.get("profit") == trade.profit - gas_cost  # noqa: WPS432
+        assert trade_store.get("profit") == pytest.approx(trade.profit - gas_cost, rel=1e-4)
 
     @pytest.mark.asyncio
     async def test_no_profit(self, trade_store):
+        trade_store.add(min_profit, 4)
         tree = ActionTree(trade_store)
-        tree.add_action(Trader())
+        tree.add_action(Trader(conf_dict))
         await tree.run()
         assert trade_store.get("profit") == 0
 
 
 class TestLogTrader(object):
     @pytest.mark.asyncio
-    async def test_on_next(self, trade_store):
+    async def test_on_next(self, trade_store, trade, router):
+        trade.amount_in, trade.profit = ArbitrageFinder(trade).find_arbitrage()
+        _, gas_cost = router.swap(trade, dry_run=True)
+
         trade_store.add(min_profit, 0)
         tree = ActionTree(trade_store)
         tree.add_action(LogTrader(conf_dict))
         await tree.run()
-        assert trade_store.get("profit") > 0.036  # noqa: WPS432
+        assert trade_store.get("profit") == pytest.approx(trade.profit - gas_cost, rel=1e-4)
 
 
 class TestSetUpTrader(object):
