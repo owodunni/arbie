@@ -64,6 +64,19 @@ class TestArbitrage(object):
         with pytest.raises(ValueError):
             ArbitrageFinder(trade).find_arbitrage()
 
+    def test_find_arbitrage_hard(self):
+        weth = dummy_token_generator('Weth', 0)
+        dai = dummy_token_generator('Dai', 0)
+        wbtc = dummy_token_generator('Wbtc', 0)
+        pool_dai_weth = Pool([dai, weth], [1E9, 1E7/3], [0.5, 0.5], fee=0.003)
+        pool_wbtc_dai = Pool([wbtc, dai], [1E5, 1E9], [0.5, 0.5], fee=0.003)
+        pool_wbtc_weth = Pool([wbtc, weth], [1E5, 3508772], [0.5, 0.5], fee=0.003)
+
+        trade = Trade([pool_dai_weth, pool_wbtc_dai, pool_wbtc_weth], [weth, dai, wbtc, weth])
+        trade.amount_in, trade.profit = ArbitrageFinder(trade).find_arbitrage()
+
+        assert trade.profit == pytest.approx(510.233038753510)
+
 
 class TestArbitrageAction(object):
     @pytest.mark.asyncio
