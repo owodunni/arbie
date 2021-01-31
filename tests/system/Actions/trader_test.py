@@ -69,7 +69,7 @@ class TestLogTrader(object):
         trade.amount_in, trade.profit = ArbitrageFinder(trade).find_arbitrage()
         _, gas_cost = router.swap(trade, dry_run=True)
 
-        trade_store.add(min_profit, 0)
+        trade_store.add(min_profit, -1)
         tree = ActionTree(trade_store)
         tree.add_action(LogTrader(conf_dict))
         await tree.run()
