@@ -12,7 +12,7 @@ def send_eth(web3, from_address, to_address, value):
     tx_hash = web3.eth.sendTransaction(
         {"to": to_address, "from": from_address, "value": BigNumber(value).value}
     )
-    return web3.eth.waitForTransactionReceipt(tx_hash, 180)  # noqa: WPS432
+    return web3.eth.waitForTransactionReceipt(tx_hash, 180)
 
 
 min_profit = "min_profit"
@@ -43,7 +43,7 @@ def trade_store(w3_with_gas_strategy, router, bad_trade, trade, weth, trader_acc
 class TestTrader(object):
     @pytest.mark.asyncio
     async def test_on_next(self, trade_store, trade, router: UniswapV2Router):
-        trade.amount_in, trade.profit = ArbitrageFinder(trade).find_arbitrage()
+        trade = ArbitrageFinder(trade).find_arbitrage_and_update_trade()
         _, gas_cost = router.swap(trade, dry_run=True)
 
         # min profit is set to -1 because we want to execute a bad trade
@@ -52,7 +52,9 @@ class TestTrader(object):
         tree = ActionTree(trade_store)
         tree.add_action(Trader(conf_dict))
         await tree.run()
-        assert trade_store.get("profit") == pytest.approx(trade.profit - gas_cost, rel=1e-4)
+        assert trade_store.get("profit") == pytest.approx(
+            trade.profit - gas_cost, rel=1e-4
+        )
 
     @pytest.mark.asyncio
     async def test_no_profit(self, trade_store):
@@ -66,14 +68,16 @@ class TestTrader(object):
 class TestLogTrader(object):
     @pytest.mark.asyncio
     async def test_on_next(self, trade_store, trade, router):
-        trade.amount_in, trade.profit = ArbitrageFinder(trade).find_arbitrage()
+        trade = ArbitrageFinder(trade).find_arbitrage_and_update_trade()
         _, gas_cost = router.swap(trade, dry_run=True)
 
         trade_store.add(min_profit, -1)
         tree = ActionTree(trade_store)
         tree.add_action(LogTrader(conf_dict))
         await tree.run()
-        assert trade_store.get("profit") == pytest.approx(trade.profit - gas_cost, rel=1e-4)
+        assert trade_store.get("profit") == pytest.approx(
+            trade.profit - gas_cost, rel=1e-4
+        )
 
 
 class TestSetUpTrader(object):
