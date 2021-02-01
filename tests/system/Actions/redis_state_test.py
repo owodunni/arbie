@@ -53,3 +53,10 @@ class TestRedisState(object):
         token_round_trip = redis_state[item_key]
         redis_state.delete(item_key)
         assert token_round_trip == token
+
+    def test_multiple_add_and_get(self, redis_state):
+        redis_state[collection_key] = [1, 2]
+        redis_state[collection_key] = [3, 4]
+        collection = redis_state[collection_key]
+        redis_state.delete(collection_key)
+        assert len(collection) == 2
