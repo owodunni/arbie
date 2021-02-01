@@ -1,14 +1,5 @@
 version: '3'
 services:
-  redis:
-    image: redis:alpine
-    volumes:
-      - redis-data:/var/lib/redis
-    ports:
-      - 6379:6379
-    environment:
-      - REDIS_REPLICATION_MODE=master
-
   PoolFinder:
     image: arbie:prod
     depends_on:
@@ -44,12 +35,3 @@ services:
     volumes:
       - ./Trader:/arbie
     command: Arbie -f trader.yml
-
-  Node:
-    image: hardhat:node
-    ports:
-      - 8545:8545
-    command: npx hardhat node --fork https://eth-mainnet.alchemyapi.io/v2/zhFcWx0COjEBwoEaBZTPlHlYPL1IzTO0
-
-volumes:
-  redis-data:

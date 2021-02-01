@@ -1,5 +1,5 @@
 store:
-  address: 'redis:6379'
+  address: 'gluteus:6379'
 
 web3:
   address: 'http://gluteus:8545'
