@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.8.9 (2021-02-01)
+### Fix
+* **RedisState:** Delete collection when resusing keys ([`2caa9bc`](https://github.com/owodunni/arbie/commit/2caa9bcdeab1ac36c77b9cd0edf72db813f9145d))
+
 ## v0.8.8 (2021-02-01)
 ### Fix
 * **Trader:** Make it possible to dry_run ([`ab4ccce`](https://github.com/owodunni/arbie/commit/ab4ccce1db7f7a4310d8c94f7e479b9220626c96))
