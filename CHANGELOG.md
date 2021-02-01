@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.8.8 (2021-02-01)
+### Fix
+* **Trader:** Make it possible to dry_run ([`ab4ccce`](https://github.com/owodunni/arbie/commit/ab4ccce1db7f7a4310d8c94f7e479b9220626c96))
+
 ## v0.8.7 (2021-01-31)
 ### Fix
 * **Trader:** Account for gas cost when estimating trade profit ([`e8eaeec`](https://github.com/owodunni/arbie/commit/e8eaeecf7f38f29c0c479cb0404d6a9f7d90f6c1))
