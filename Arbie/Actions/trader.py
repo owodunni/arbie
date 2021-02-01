@@ -98,7 +98,7 @@ class SetUpTrader(Action):
         data.balance_weth(amount_weth)
 
 
-def _perform_trade(trade, router, min_profit):
+def _perform_trade(trade, router, min_profit, dry_run):
     amount_out = router.check_out_given_in(trade)
     try:
         _, gas_cost = router.swap(trade, dry_run=True)
@@ -111,10 +111,13 @@ def _perform_trade(trade, router, min_profit):
     logger.info(
         f"Checking trade with profit {profit}, amount_in: {trade.amount_in}, amount out: {amount_out}, gas cost: {gas_cost}"
     )
-    if profit > min_profit:
-        logger.info(f"Executing trade {trade}")
-        return router.swap(trade)
-    return False
+    if profit < min_profit:
+        return False
+
+    logger.info(f"Executing trade {trade}")
+    if dry_run:
+        return False
+    return router.swap(trade)
 
 
 def perform_trade(data, amount_weth):
@@ -123,7 +126,7 @@ def perform_trade(data, amount_weth):
     for trade in data.trades():
         # Make sure that we don't try to trade with more weth then we have
         trade.amount_in = min(trade.amount_in, amount_weth)
-        if _perform_trade(trade, router, min_profit):
+        if _perform_trade(trade, router, min_profit, data.dry_run()):
             return True
     return False
 
@@ -141,6 +144,7 @@ class Trader(Action):
         min_profit: 0.3
         weth: weth
         account: account
+        dry_run: True
     output:
         profit: profit
     """
@@ -159,56 +163,3 @@ class Trader(Action):
 
         data.profit(balance_post - balance_pre)
         logger.info("Finished trading")
-
-
-class LogTrader(Action):
-    """Log arbitrage opportunity for a list sorted trades.
-
-    Remove all trades that are not profitable.
-
-    [Settings]
-    input:
-        web3: web3
-        router: router
-        trades: filtered_trades
-        min_profit: 0.3
-        weth: weth
-    output:
-        profit_per_trade: profit_per_trade
-        profit: profit
-    """
-
-    async def on_next(self, data):  # noqa: WPS210
-        value = self._log_trades(data)
-        profit = sum(value)
-        profit_per_trade = profit / len(value)
-
-        logger.info(f"Total profit: {profit}, profit per trade: {profit_per_trade}")
-
-        data.profit_per_trade(profit_per_trade)
-        data.profit(profit)
-
-        logger.info("Finished trading")
-
-    def _log_trades(self, data):
-        router = data.router()
-        min_profit = data.min_profit()
-        profits = []
-        for trade in data.trades():
-            profit = self._log_trade(trade, router, min_profit)
-            if profit:
-                profits.append(profit)
-        return profits
-
-    def _log_trade(self, trade, router, min_profit):
-        amount_out = router.check_out_given_in(trade)
-        try:
-            status, gas_cost = router.swap(trade, dry_run=True)
-        except ContractLogicError:
-            return None
-        profit = amount_out - trade.amount_in - gas_cost
-        if profit > min_profit:
-            logger.info(
-                f"Executing trade with profit {profit}, amount_in: {trade.amount_in}, amount out: {amount_out}"
-            )
-            return profit

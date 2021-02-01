@@ -21,5 +21,6 @@ action_tree:
     Trader:
       input:
         trades: 'Arbitrage.1.filtered_trades'
+        dry_run: False
       output:
         profit: 'Trader.1.profit'

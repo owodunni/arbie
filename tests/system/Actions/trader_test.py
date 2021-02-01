@@ -2,7 +2,7 @@
 
 import pytest
 
-from Arbie.Actions import ActionTree, LogTrader, SetUpTrader, Store, Trader
+from Arbie.Actions import ActionTree, SetUpTrader, Store, Trader
 from Arbie.Actions.arbitrage import ArbitrageFinder
 from Arbie.Contracts import GenericToken, UniswapV2Router, Weth
 from Arbie.Variables import BigNumber
@@ -16,8 +16,18 @@ def send_eth(web3, from_address, to_address, value):
 
 
 min_profit = "min_profit"
+dry_run = "dry_run"
 
-conf_dict = {"input": {min_profit: min_profit}, "output": {}}
+
+@pytest.fixture
+def conf_dict():
+    return {"input": {min_profit: min_profit}, "output": {}}
+
+
+@pytest.fixture
+def trade_conf(conf_dict):
+    conf_dict["input"][dry_run] = False
+    return conf_dict
 
 
 @pytest.fixture
@@ -42,7 +52,9 @@ def trade_store(w3_with_gas_strategy, router, bad_trade, trade, weth, trader_acc
 
 class TestTrader(object):
     @pytest.mark.asyncio
-    async def test_on_next(self, trade_store, trade, router: UniswapV2Router):
+    async def test_on_next(
+        self, trade_store, trade, router: UniswapV2Router, trade_conf
+    ):
         trade = ArbitrageFinder(trade).find_arbitrage_and_update_trade()
         _, gas_cost = router.swap(trade, dry_run=True)
 
@@ -50,34 +62,29 @@ class TestTrader(object):
         # and see that it is reverted without costing us gas
         trade_store.add(min_profit, -1)
         tree = ActionTree(trade_store)
-        tree.add_action(Trader(conf_dict))
+        tree.add_action(Trader(trade_conf))
         await tree.run()
         assert trade_store.get("profit") == pytest.approx(
             trade.profit - gas_cost, rel=1e-4
         )
 
     @pytest.mark.asyncio
-    async def test_no_profit(self, trade_store):
+    async def test_no_profit(self, trade_store, trade_conf):
         trade_store.add(min_profit, 4)
+        tree = ActionTree(trade_store)
+        tree.add_action(Trader(trade_conf))
+        await tree.run()
+        assert trade_store.get("profit") == 0
+
+    @pytest.mark.asyncio
+    async def test_dry_run(self, trade_store, trade, router, conf_dict):
+        trade = ArbitrageFinder(trade).find_arbitrage_and_update_trade()
+
+        trade_store.add(min_profit, -1)
         tree = ActionTree(trade_store)
         tree.add_action(Trader(conf_dict))
         await tree.run()
         assert trade_store.get("profit") == 0
-
-
-class TestLogTrader(object):
-    @pytest.mark.asyncio
-    async def test_on_next(self, trade_store, trade, router):
-        trade = ArbitrageFinder(trade).find_arbitrage_and_update_trade()
-        _, gas_cost = router.swap(trade, dry_run=True)
-
-        trade_store.add(min_profit, -1)
-        tree = ActionTree(trade_store)
-        tree.add_action(LogTrader(conf_dict))
-        await tree.run()
-        assert trade_store.get("profit") == pytest.approx(
-            trade.profit - gas_cost, rel=1e-4
-        )
 
 
 class TestSetUpTrader(object):
