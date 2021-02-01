@@ -117,6 +117,7 @@ class RedisState(object):
         return pickle.loads(self._get(key))  # noqa: S301
 
     def _add_collection(self, collection_key, collection):
+        self.delete(collection_key)
         pipe = self.r.pipeline()
         for item in collection:
             item_key = f"{collection_key}.{item}"
