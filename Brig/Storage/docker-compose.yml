@@ -34,7 +34,7 @@ services:
       - core
 
 volumes:
-  redis-data
+  redis-data:
   eth-data:
 
 networks:
