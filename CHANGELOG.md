@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.9.0 (2021-02-02)
+### Feature
+* **ArbitrageFinder:** Process trades in parallel ([`6a047e7`](https://github.com/owodunni/arbie/commit/6a047e78767f4850ebf6acbf8ae5a4d26a0e182a))
+
 ## v0.8.9 (2021-02-01)
 ### Fix
 * **RedisState:** Delete collection when resusing keys ([`2caa9bc`](https://github.com/owodunni/arbie/commit/2caa9bcdeab1ac36c77b9cd0edf72db813f9145d))
