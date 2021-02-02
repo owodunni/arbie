@@ -90,8 +90,9 @@ class Arbitrage(Action):
     [Settings]
     input:
         trades: all_trades
-        process_trades: 10000
+        process_trades: 20000
         top_trades: 10
+        processes: 10
     output:
         out_trades: filtered_trades
     """
@@ -99,7 +100,7 @@ class Arbitrage(Action):
     async def on_next(self, data):
         raw_trades = data.trades()[: data.process_trades()]
 
-        with Pool(20) as p:  # noqa: WPS432
+        with Pool(data.processes()) as p:  # noqa: WPS432
             trades = p.map(_check_oportunity, raw_trades)
 
         trades = list(filter(partial(is_not, None), trades))
