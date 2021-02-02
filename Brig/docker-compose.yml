@@ -2,36 +2,24 @@ version: '3'
 services:
   PoolFinder:
     image: arbie:prod
-    depends_on:
-      - Node
-      - redis
     volumes:
       - ./PoolFinder:/arbie
     command: Arbie -f pool_finder.yml
 
   PoolUpdater:
     image: arbie:prod
-    depends_on:
-      - Node
-      - redis
     volumes:
       - ./PoolUpdater:/arbie
     command: Arbie -f pool_updater.yml
 
   PathFinder:
     image: arbie:prod
-    depends_on:
-      - Node
-      - redis
     volumes:
       - ./PathFinder:/arbie
     command: Arbie -f path_finder.yml
 
   Trader:
     image: arbie:prod
-    depends_on:
-      - Node
-      - redis
     volumes:
       - ./Trader:/arbie
     command: Arbie -f trader.yml
