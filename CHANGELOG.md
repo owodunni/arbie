@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.9.1 (2021-02-02)
+### Fix
+* **Arbitrage:** Make amount of processes configurable ([`e8809f7`](https://github.com/owodunni/arbie/commit/e8809f70487832763b9c74c7f53dbfdc329b8e73))
+
 ## v0.9.0 (2021-02-02)
 ### Feature
 * **ArbitrageFinder:** Process trades in parallel ([`6a047e7`](https://github.com/owodunni/arbie/commit/6a047e78767f4850ebf6acbf8ae5a4d26a0e182a))
