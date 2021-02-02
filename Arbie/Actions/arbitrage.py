@@ -1,6 +1,9 @@
 """arbitrage can be used to find to arbitrage opertunity between two Pools."""
 
 import logging
+from functools import partial
+from multiprocessing import Pool
+from operator import is_not
 from typing import Tuple
 
 from sympy import nsolve, symbols
@@ -72,24 +75,11 @@ class ArbitrageFinder(object):
         return pool.out_given_in_expr(trade_in, trade_out)
 
 
-def _update_oportunity(raw_trades, nmb_trades):
-    trades = []
-    for index, arb in enumerate(raw_trades):
-        try:
-            ArbitrageFinder(arb).find_arbitrage_and_update_trade()
-        except (AssertionError, ValueError, TypeError) as e:
-            logger.warning(f"No arbitrage found {e}")
-            continue
-
-        trades.append(arb)
-        logger.info(
-            f"Found opportunity {index}:{len(raw_trades)}"
-            + " with profit {arb.profit} for {arb.amount_in} eth"
-        )
-        if index > nmb_trades:
-            break
-
-    return trades
+def _check_oportunity(trade):
+    try:
+        return ArbitrageFinder(trade).find_arbitrage_and_update_trade()
+    except (AssertionError, ValueError, TypeError):
+        return None
 
 
 class Arbitrage(Action):
@@ -100,16 +90,21 @@ class Arbitrage(Action):
     [Settings]
     input:
         trades: all_trades
-        nmb_trades: 100
+        process_trades: 10000
+        top_trades: 10
     output:
         out_trades: filtered_trades
     """
 
     async def on_next(self, data):
-        trades = _update_oportunity(data.trades(), data.nmb_trades())
+        raw_trades = data.trades()[: data.process_trades()]
 
+        with Pool(20) as p:  # noqa: WPS432
+            trades = p.map(_check_oportunity, raw_trades)
+
+        trades = list(filter(partial(is_not, None), trades))
         sorted_trade = sorted(
             trades, key=lambda trade: trade.profit / trade.amount_in, reverse=True
         )
         logger.info(f"Top trade has {sorted_trade[0].profit}")
-        data.out_trades(sorted_trade)
+        data.out_trades(sorted_trade[: data.top_trades()])
