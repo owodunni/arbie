@@ -78,9 +78,9 @@ class UniswapFactory(Contract):
     name = "UniswapV2Factory"
     protocol = "uniswap"
 
-    def __init__(self, w3, contract, **kwargs):
+    def __init__(self, w3, contract, timeout, **kwargs):
         self.cf = ContractFactory(w3, UniswapPair)
-        super().__init__(w3, contract, **kwargs)
+        super().__init__(w3, contract, timeout, **kwargs)
 
     async def all_pairs_length(self) -> int:
         return await self._call_async(self.contract.functions.allPairsLength())

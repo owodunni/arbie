@@ -35,6 +35,5 @@ class UniswapV2Router(Contract):
             BigNumber(trade.amount_in).value,
             path,
             self._get_account(),
-            # Require trades to be executed in 120 seconds
-            self.w3.eth.getBlock("latest").timestamp + 120,  # noqa: WPS432
+            self.w3.eth.getBlock("latest").timestamp + self.timeout,
         )

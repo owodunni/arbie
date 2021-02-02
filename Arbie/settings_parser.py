@@ -7,7 +7,7 @@ from eth_account import Account
 from requests import Session
 from requests.adapters import HTTPAdapter
 from web3 import Web3, middleware
-from web3.gas_strategies.time_based import fast_gas_price_strategy
+from web3.gas_strategies.time_based import construct_time_based_gas_price_strategy
 
 from Arbie.Actions import ActionTree, RedisState, Store
 from Arbie.Contracts import (
@@ -44,10 +44,13 @@ class Keys(object):
     account = "account"
     key = "key"
     path = "path"
+    transaction_wait = "transaction_wait"
 
 
-def setup_gas_strategy(w3):
-    w3.eth.setGasPriceStrategy(fast_gas_price_strategy)
+def setup_gas_strategy(w3, transaction_wait):
+    w3.eth.setGasPriceStrategy(
+        construct_time_based_gas_price_strategy(transaction_wait)
+    )
 
     w3.middleware_onion.add(middleware.time_based_cache_middleware)
     w3.middleware_onion.add(middleware.latest_block_based_cache_middleware)
@@ -59,6 +62,7 @@ class VariableParser(object):
 
     def __init__(self, config, w3_config, account_config):
         self.config = config
+        self.transaction_wait = w3_config.get(Keys.transaction_wait, 60)
         self.w3 = self.set_up_web3(w3_config)
         if account_config is None:
             self.account = None
@@ -83,7 +87,7 @@ class VariableParser(object):
         session.mount("https://", adapter)
 
         w3 = Web3(Web3.HTTPProvider(address, session=session))
-        setup_gas_strategy(w3)
+        setup_gas_strategy(w3, self.transaction_wait)
         if not w3.isConnected():
             raise ConnectionError("Web3 is not connected")
 
@@ -122,7 +126,7 @@ class VariableParser(object):
         raise TypeError(f"No rule for creating variable if type {variable_type}")
 
     def _set_up_contracts(self, config, contract, *kwargs):
-        factory = ContractFactory(self.w3, contract)
+        factory = ContractFactory(self.w3, contract, self.transaction_wait * 2)
         if Keys.network in config:
             return factory.load_contract(
                 network=to_network(config[Keys.network]), account=self.account

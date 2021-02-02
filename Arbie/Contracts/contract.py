@@ -30,37 +30,45 @@ def _get_tx_params(w3, address, value=None, gas=None):
     return params
 
 
-def _wait_for_tx(w3, tx_hash):
-    return w3.eth.waitForTransactionReceipt(tx_hash, 120)  # noqa: WPS432
+def _wait_for_tx(w3, tx_hash, timeout):
+    return w3.eth.waitForTransactionReceipt(tx_hash, timeout)  # noqa: WPS432
 
 
-def transact(w3, address: str, transaction, value=None, gas=48814000):  # noqa: WPS432
+def transact(
+    w3, address: str, transaction, timeout, value=None, gas=48814000
+):  # noqa: WPS432
     """Transact a transaction and return transaction receipt."""
     tx_params = _get_tx_params(w3, address, value, gas)
     tx_hash = transaction.transact(tx_params)
-    return _wait_for_tx(w3, tx_hash)
+    return _wait_for_tx(w3, tx_hash, timeout)
 
 
-def signed_transaction(w3, user_account: Account, transaction, value, gas):
+def signed_transaction(w3, user_account: Account, transaction, timeout, value, gas):
     tx_params = _get_tx_params(w3, user_account.address, value, gas)
 
     signed_txn = Account.sign_transaction(
         transaction.buildTransaction(tx_params), private_key=user_account.key
     )
     tx_hash = w3.eth.sendRawTransaction(signed_txn.rawTransaction)
-    return _wait_for_tx(w3, tx_hash)
+    return _wait_for_tx(w3, tx_hash, timeout)
 
 
 class Contract(object):
     """Base class for contracts."""
 
     def __init__(
-        self, w3, contract, owner_address: str = None, user_account: Account = None
+        self,
+        w3,
+        contract,
+        timeout,
+        owner_address: str = None,
+        user_account: Account = None,
     ):
         self.w3 = w3
         self.owner_address = owner_address
         self.contract = contract
         self.user_account = user_account
+        self.timeout = timeout
 
     def get_address(self) -> str:
         return self.contract.address
@@ -79,8 +87,22 @@ class Contract(object):
 
     def _transact(self, transaction, value=None, gas=None):
         if self.user_account is None:
-            return transact(self.w3, self.owner_address, transaction, value, gas)
-        return signed_transaction(self.w3, self.user_account, transaction, value, gas)
+            return transact(
+                w3=self.w3,
+                address=self.owner_address,
+                transaction=transaction,
+                timeout=self.timeout,
+                value=value,
+                gas=gas,
+            )
+        return signed_transaction(
+            w3=self.w3,
+            user_account=self.user_account,
+            transaction=transaction,
+            timeout=self.timeout,
+            value=value,
+            gas=gas,
+        )
 
     def _transact_info(
         self, transaction, value=None, gas=None, dry_run=False
@@ -120,8 +142,9 @@ class Contract(object):
 
 
 class ContractFactory(object):
-    def __init__(self, w3, factory_class: Contract):
+    def __init__(self, w3, factory_class: Contract, timeout=120):
         self.w3 = w3
+        self.timeout = timeout
 
         if factory_class.name is None or factory_class.protocol is None:
             raise ValueError(f"{factory_class} dose not contain default parameters")
@@ -134,6 +157,7 @@ class ContractFactory(object):
         user_account = self._read_account(**kwargs)
         return self.factory_class(
             self.w3,
+            timeout=self.timeout,
             owner_address=owner_address,
             user_account=user_account,
             contract=contract,
@@ -143,7 +167,10 @@ class ContractFactory(object):
         contract_address = self._deploy_contract(owner_address, *args)
         contract = self._load_contract(contract_address)
         return self.factory_class(
-            self.w3, owner_address=owner_address, contract=contract
+            self.w3,
+            timeout=self.timeout,
+            owner_address=owner_address,
+            contract=contract,
         )
 
     def _deploy_contract(self, deploy_address: str, *args) -> str:
@@ -153,7 +180,7 @@ class ContractFactory(object):
         )
 
         transaction = contract.constructor(*args)
-        tx_receipt = transact(self.w3, deploy_address, transaction)
+        tx_receipt = transact(self.w3, deploy_address, transaction, self.timeout)
 
         return tx_receipt.contractAddress
 

@@ -37,7 +37,7 @@ def w3(web3_server):
 @pytest.fixture
 def w3_with_gas_strategy(web3_server):
     w3 = Web3(Web3.HTTPProvider(web3_server))
-    setup_gas_strategy(w3)
+    setup_gas_strategy(w3, 60)
     return w3
 
 
