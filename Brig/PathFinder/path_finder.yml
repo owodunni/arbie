@@ -23,5 +23,8 @@ action_tree:
     Arbitrage:
         input:
             trades: trades
+            process_trades: 10000
+            processes: 20
+            top_trades: 20
         output:
           out_trades: 'Arbitrage.1.filtered_trades'
