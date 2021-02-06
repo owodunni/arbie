@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.10.1 (2021-02-06)
+### Performance
+* **Monitor:** Export prometheus ports ([`26b051a`](https://github.com/owodunni/arbie/commit/26b051a79ead9041421acae7ce8cac66c5d165d0))
+* **PathFinder:** Increase amount of threads used ([`2fa2c98`](https://github.com/owodunni/arbie/commit/2fa2c98a2c8163f886d9e7171b7cb7a61589ad29))
+
 ## v0.10.0 (2021-02-02)
 ### Feature
 * **Transactions:** Allow specifying mean transaction time ([`5adc88d`](https://github.com/owodunni/arbie/commit/5adc88df2ff4f10d78a50c4533792dfba2ef6b30))
