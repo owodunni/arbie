@@ -5,25 +5,25 @@ services:
     volumes:
       - ./PoolFinder:/arbie
     command: Arbie -f pool_finder.yml
-    port: 8001:8000
+    ports: 8001:8000
 
   PoolUpdater:
     image: arbie:prod
     volumes:
       - ./PoolUpdater:/arbie
     command: Arbie -f pool_updater.yml
-    port: 8002:8000
+    ports: 8002:8000
 
   PathFinder:
     image: arbie:prod
     volumes:
       - ./PathFinder:/arbie
     command: Arbie -f path_finder.yml
-    port: 8003:8000
+    ports: 8003:8000
 
   Trader:
     image: arbie:prod
     volumes:
       - ./Trader:/arbie
     command: Arbie -f trader.yml
-    port: 8004:8000
+    ports: 8004:8000
