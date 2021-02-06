@@ -25,6 +25,9 @@ class UniswapV2Router(Contract):
         ).call()
         return BigNumber.from_value(amount_out[-1]).to_number()
 
+    def safe_swap(self, trade, dry_run=False):
+        return self.swap(trade, dry_run)
+
     def swap(self, trade, dry_run=False):
         return self._transact_info(self._swap_transaction(trade), dry_run=dry_run)
 

@@ -109,8 +109,8 @@ class VariableParser(object):
         return self._set_up_contracts(config, UniswapV2Router)
 
     def set_up_arbie_router(self, config):
-        r = self.set_up_router(config)
-        ar = self._set_up_contracts(config, ArbieRouter, r.get_address())
+        r = self.set_up_router(config["router"])
+        ar = self._set_up_contracts(config, ArbieRouter, config)
         ar.router = r
         return ar
 

@@ -1,6 +1,7 @@
 """Help module for web3 tests."""
 import asyncio
 import json
+import time
 
 import pytest
 from eth_account import Account
@@ -275,6 +276,7 @@ def whitelist(  # noqa: WPS210, WPS217
 
 @pytest.fixture
 def router(w3_with_gas_strategy, deploy_address, weth, factory):
+    time.sleep(1)
     return ContractFactory(w3_with_gas_strategy, UniswapV2Router).deploy_contract(
         deploy_address, factory.get_address(), weth.get_address()
     )
@@ -282,6 +284,7 @@ def router(w3_with_gas_strategy, deploy_address, weth, factory):
 
 @pytest.fixture
 def arbie_router(w3_with_gas_strategy, router, deploy_address):
+    time.sleep(1)
     ar = ContractFactory(w3_with_gas_strategy, ArbieRouter).deploy_contract(
         deploy_address, router.get_address()
     )

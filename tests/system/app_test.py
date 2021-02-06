@@ -61,8 +61,8 @@ class TestApp(object):
         weth,
         pool_factory,
         pair_factory,
-        arbie_router,
         router,
+        arbie_router,
         deploy_address,
     ):
         return f"""
@@ -80,12 +80,12 @@ variables:
     balancer_factory:
         type: BalancerFactory
         address: '{pool_factory.get_address()}'
-    router:
-        type: UniswapV2Router
-        address: '{router.get_address()}'
     arbie_router:
         type: ArbieRouter
         address: '{arbie_router.get_address()}'
+        router:
+            type: UniswapV2Router
+            address: '{router.get_address()}'
         """  # noqa: WPS221
 
     @pytest.fixture
