@@ -8,6 +8,7 @@ from web3 import Web3
 
 from Arbie.async_helpers import async_map
 from Arbie.Contracts import (
+    ArbieRouter,
     BalancerFactory,
     ContractFactory,
     UniswapFactory,
@@ -276,6 +277,13 @@ def whitelist(  # noqa: WPS210, WPS217
 def router(w3_with_gas_strategy, deploy_address, weth, factory):
     return ContractFactory(w3_with_gas_strategy, UniswapV2Router).deploy_contract(
         deploy_address, factory.get_address(), weth.get_address()
+    )
+
+
+@pytest.fixture
+def arbie_router(w3_with_gas_strategy, deploy_address, router):
+    return ContractFactory(w3_with_gas_strategy, ArbieRouter).deploy_contract(
+        deploy_address, router.get_address()
     )
 
 

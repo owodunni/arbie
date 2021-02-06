@@ -1,4 +1,5 @@
 """Contracts enable interacton with ETH contracts."""
+from Arbie.Contracts.arbie_router import ArbieRouter  # noqa: F401
 from Arbie.Contracts.balancer import BalancerFactory, BalancerPool  # noqa: F401
 from Arbie.Contracts.contract import Contract, ContractFactory, Network  # noqa: F401
 from Arbie.Contracts.event_filter import EventFilter  # noqa: F401

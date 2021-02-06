@@ -1,4 +1,4 @@
-"""Utility functions for interacting with Arbie.sol."""
+"""Utility functions for interacting with Uniswap router."""
 
 import logging
 

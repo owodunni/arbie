@@ -3,7 +3,7 @@
 import pytest
 
 from Arbie.Actions.arbitrage import ArbitrageFinder
-from Arbie.Contracts import GenericToken, UniswapV2Router
+from Arbie.Contracts import GenericToken, UniswapV2Router, ArbieRouter
 from Arbie.Variables import BigNumber
 
 
@@ -39,3 +39,24 @@ class TestRouter(object):
             balance_after.to_number() - balance_before.to_number()
             > amount_out - trade.amount_in - 0.001
         )
+
+
+class TestArbieRouter(object):
+    @pytest.mark.asyncio
+    async def test_swap(
+        self, trade, arbie_router: ArbieRouter, weth: GenericToken, dummy_account
+    ):
+        trade.amount_in = 1
+        weth.transfer(dummy_account.address, BigNumber(2))
+        weth.set_account(dummy_account)
+        balance_before = await weth.balance_of(dummy_account.address)
+
+        assert balance_before > 1
+
+        weth.approve(arbie_router.get_address(), BigNumber(2))
+
+        arbie_router.set_account(dummy_account)
+        assert arbie_router.swap(trade)
+
+        balance_after = await weth.balance_of(dummy_account.address)
+        assert balance_after > balance_before
