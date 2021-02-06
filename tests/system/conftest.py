@@ -85,47 +85,47 @@ large_number = BigNumber(10e14)
 
 
 @pytest.fixture
-async def dai(deploy_address, token_factory) -> GenericToken:
+def dai(deploy_address, token_factory) -> GenericToken:
     token = token_factory.deploy_contract(
         deploy_address, "Dai", "DAI", large_number.value
     )
-    await token.approve_owner()
+    token.approve_owner()
     return token
 
 
 @pytest.fixture
-async def weth(deploy_address, token_factory) -> GenericToken:
+def weth(deploy_address, token_factory) -> GenericToken:
     token = token_factory.deploy_contract(
         deploy_address, "Weth", "WETH", large_number.value
     )
-    await token.approve_owner()
+    token.approve_owner()
     return token
 
 
 @pytest.fixture
-async def yam(deploy_address, token_factory) -> GenericToken:
+def yam(deploy_address, token_factory) -> GenericToken:
     token = token_factory.deploy_contract(
         deploy_address, "yam", "YAM", large_number.value
     )
-    await token.approve_owner()
+    token.approve_owner()
     return token
 
 
 @pytest.fixture
-async def paused_token(w3, deploy_address) -> GenericToken:
+def paused_token(w3, deploy_address) -> GenericToken:
     token = ContractFactory(w3, MaliciousToken).deploy_contract(
         deploy_address, "paused", "PAU", large_number.value
     )
-    await token.approve_owner()
+    token.approve_owner()
     return token
 
 
 @pytest.fixture
-async def wbtc(deploy_address, token_factory) -> GenericToken:
+def wbtc(deploy_address, token_factory) -> GenericToken:
     token = token_factory.deploy_contract(
         deploy_address, "Wbtc", "WBTC", large_number.value
     )
-    await token.approve_owner()
+    token.approve_owner()
     return token
 
 

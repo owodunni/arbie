@@ -118,7 +118,7 @@ class BalancerFactory(Contract):
 
         for token, weight, amount in zip(tokens, weights, amounts):
             if approve_owner:
-                await token.approve_owner()
+                token.approve_owner()
             token.approve(pool.get_address(), amount)
             pool.bind(token.get_address(), amount, weight)
 
