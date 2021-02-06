@@ -13,6 +13,12 @@ class ArbieRouter(Contract):
     name = "ArbieRouter"
     protocol = "arbie"
 
+    def check_out_given_in(self, trade: Trade):
+        return self.router.check_out_given_in(trade)
+
+    def safe_swap(self, trade, dry_run=False):
+        return self.router.swap(trade, dry_run)
+
     def approve(self, weth: GenericToken):
         if weth.allowance(self.get_address()) < BigNumber(10e6):  # noqa: WPS432
             return weth.approve(self.get_address(), BigNumber(10e8))  # noqa: WPS432

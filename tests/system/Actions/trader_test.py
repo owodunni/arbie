@@ -31,18 +31,22 @@ def trade_conf(conf_dict):
 
 
 @pytest.fixture
-def trader_account(w3, weth: GenericToken, router, dummy_account):
+def trader_account(w3, weth: GenericToken, router, arbie_router, dummy_account):
+    arbie_router.set_account(dummy_account)
     router.set_account(dummy_account)
     weth.transfer(dummy_account.address, BigNumber(2))
     weth.set_account(dummy_account)
     weth.approve(router.get_address(), BigNumber(2))
+    weth.approve(arbie_router.get_address(), BigNumber(2))
     return dummy_account
 
 
 @pytest.fixture
-def trade_store(w3_with_gas_strategy, router, bad_trade, trade, weth, trader_account):
+def trade_store(
+    w3_with_gas_strategy, arbie_router, bad_trade, trade, weth, trader_account
+):
     store = Store()
-    store.add("router", router)
+    store.add("arbie_router", arbie_router)
     store.add("filtered_trades", [bad_trade, trade])
     store.add("weth", weth)
     store.add("web3", w3_with_gas_strategy)
@@ -89,13 +93,14 @@ class TestTrader(object):
 
 class TestSetUpTrader(object):
     @pytest.fixture
-    def trade_store(self, w3, router, real_weth, dummy_account):
+    def trade_store(self, w3, arbie_router, router, real_weth, dummy_account):
         real_weth.set_account(dummy_account)
         store = Store()
         store.add("weth", real_weth)
         store.add("web3", w3)
         store.add("account", dummy_account)
         store.add("router", router)
+        store.add("arbie_router", arbie_router)
         return store
 
     @pytest.mark.asyncio

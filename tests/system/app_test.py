@@ -61,6 +61,7 @@ class TestApp(object):
         weth,
         pool_factory,
         pair_factory,
+        arbie_router,
         router,
         deploy_address,
     ):
@@ -82,6 +83,9 @@ variables:
     router:
         type: UniswapV2Router
         address: '{router.get_address()}'
+    arbie_router:
+        type: ArbieRouter
+        address: '{arbie_router.get_address()}'
         """  # noqa: WPS221
 
     @pytest.fixture

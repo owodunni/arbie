@@ -3,7 +3,7 @@
 import pytest
 
 from Arbie.Actions.arbitrage import ArbitrageFinder
-from Arbie.Contracts import GenericToken, UniswapV2Router, ArbieRouter
+from Arbie.Contracts import ArbieRouter, GenericToken, UniswapV2Router
 from Arbie.Variables import BigNumber
 
 

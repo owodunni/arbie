@@ -281,10 +281,12 @@ def router(w3_with_gas_strategy, deploy_address, weth, factory):
 
 
 @pytest.fixture
-def arbie_router(w3_with_gas_strategy, deploy_address, router):
-    return ContractFactory(w3_with_gas_strategy, ArbieRouter).deploy_contract(
+def arbie_router(w3_with_gas_strategy, router, deploy_address):
+    ar = ContractFactory(w3_with_gas_strategy, ArbieRouter).deploy_contract(
         deploy_address, router.get_address()
     )
+    ar.router = router
+    return ar
 
 
 async def create_pool(pool):

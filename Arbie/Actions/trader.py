@@ -6,6 +6,7 @@ from web3.exceptions import ContractLogicError
 
 from Arbie import TransactionError
 from Arbie.Actions import Action
+from Arbie.Contracts import ArbieRouter
 from Arbie.Variables import BigNumber
 
 logger = logging.getLogger()
@@ -67,7 +68,7 @@ class SetUpTrader(Action):
     input:
         web3: web3
         weth: weth
-        router: router
+        arbie_router: arbie_router
         min_eth: 1
         min_weth: 2
         max_weth: 10
@@ -86,9 +87,12 @@ class SetUpTrader(Action):
             data.min_weth(),
             data.max_weth(),
         )
-        router = data.router()
+        router = data.arbie_router()
         if not router.approve(data.weth()):
-            raise Exception("Failed to authorize arbie to spend tokens.")
+            raise Exception("Failed to authorize uniswap arbie router to spend tokens.")
+
+        if not router.router.approve(data.weth()):
+            raise Exception("Failed to authorize uniswap router to spend tokens.")
 
         logger.info(
             f"Finished setting up trader, eth: {amount_eth}, weth: {amount_weth}"
@@ -98,13 +102,15 @@ class SetUpTrader(Action):
         data.balance_weth(amount_weth)
 
 
-def _perform_trade(trade, router, min_profit, dry_run):
+def _perform_trade(trade, router: ArbieRouter, min_profit, dry_run):
     amount_out = router.check_out_given_in(trade)
     try:
-        _, gas_cost = router.swap(trade, dry_run=True)
+        router.safe_swap(trade, dry_run=True)
     except ContractLogicError as e:
         logger.warning(e)
         return False
+
+    _, gas_cost = router.swap(trade, dry_run=True)
 
     profit = amount_out - trade.amount_in - gas_cost
 
@@ -139,7 +145,7 @@ class Trader(Action):
     [Settings]
     input:
         web3: web3
-        router: router
+        router: arbie_router
         trades: filtered_trades
         min_profit: 0.3
         weth: weth
