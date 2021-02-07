@@ -286,8 +286,7 @@ def router(w3_with_gas_strategy, deploy_address, weth, factory):
 def arbie_router(w3_with_gas_strategy, router, deploy_address):
     time.sleep(1)
     ar = ContractFactory(w3_with_gas_strategy, ArbieRouter).deploy_contract(
-        deploy_address, router.get_address()
-    )
+        deploy_address)
     ar.router = router
     return ar
 

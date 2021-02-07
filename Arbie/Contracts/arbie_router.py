@@ -24,14 +24,14 @@ class ArbieRouter(Contract):
             return weth.approve(self.get_address(), BigNumber(10e8))  # noqa: WPS432
         return True
 
-    def swap(self, trade, dry_run=False):
-        return self._transact_info(self._swap_transaction(trade), dry_run=dry_run)
+    def swap(self, trade, amounts, dry_run=False):
+        return self._transact_info(self._swap_transaction(trade, amounts), dry_run=dry_run)
 
-    def _swap_transaction(self, trade: Trade):
+    def _swap_transaction(self, trade: Trade, amounts):
         pools = list(map(lambda p: p.address, trade.pools))
         path = list(map(lambda t: t.address, trade.path))
         return self.contract.functions.swap(
-            BigNumber(trade.amount_in).value,
+            amounts,
             pools,
             path,
         )

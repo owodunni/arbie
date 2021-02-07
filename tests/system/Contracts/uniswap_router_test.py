@@ -31,7 +31,9 @@ class TestRouter(object):
         weth.approve(router.get_address(), BigNumber(2))
 
         router.set_account(dummy_account)
-        assert router.swap(trade)
+        success, gas = router.swap(trade)
+        assert success
+        assert gas == pytest.approx(0.00668, 1e-3)
         amount_out = router.check_out_given_in(trade)
 
         balance_after = await weth.balance_of(dummy_account.address)
@@ -56,7 +58,10 @@ class TestArbieRouter(object):
         weth.approve(arbie_router.get_address(), BigNumber(2))
 
         arbie_router.set_account(dummy_account)
-        assert arbie_router.swap(trade)
+        _, amounts = arbie_router.check_out_given_in(trade)
+        success, gas = arbie_router.swap(trade, amounts)
+        assert success
 
         balance_after = await weth.balance_of(dummy_account.address)
         assert balance_after > balance_before
+        assert gas == pytest.approx(0.00633, 1e-3)

@@ -1,6 +1,6 @@
 """Utility functions for interacting with Uniswap router."""
-
 import logging
+from typing import Tuple
 
 from Arbie.Contracts.contract import Contract
 from Arbie.Contracts.tokens import GenericToken
@@ -23,12 +23,12 @@ class UniswapV2Router(Contract):
         amount_out = self.contract.functions.getAmountsOut(
             BigNumber(trade.amount_in).value, path_address
         ).call()
-        return BigNumber.from_value(amount_out[-1]).to_number()
+        return BigNumber.from_value(amount_out[-1]).to_number(), amount_out
 
     def safe_swap(self, trade, dry_run=False):
         return self.swap(trade, dry_run)
 
-    def swap(self, trade, dry_run=False):
+    def swap(self, trade, dry_run=False) -> Tuple[bool, float]:
         return self._transact_info(self._swap_transaction(trade), dry_run=dry_run)
 
     def _swap_transaction(self, trade):
