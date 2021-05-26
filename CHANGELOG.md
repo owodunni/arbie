@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!--next-version-placeholder-->
 
+## v0.10.2 (2021-05-26)
+### Fix
+* **lint:** Fix lint issues ([`3af3f8f`](https://github.com/owodunni/arbie/commit/3af3f8f2ce426c54ad54d1cbe23f171ec1218d18))
+
 ## v0.10.1 (2021-02-06)
 ### Performance
 * **Monitor:** Export prometheus ports ([`26b051a`](https://github.com/owodunni/arbie/commit/26b051a79ead9041421acae7ce8cac66c5d165d0))
