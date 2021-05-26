@@ -77,7 +77,7 @@ class TestBalanceChecker(object):
 
         eth, weth = await checker.check_and_convert(some_address, 1, 2, 10)
         assert eth == 1
-        assert weth == 9.5
+        assert weth == pytest.approx(9.5)
 
         weth_mock.withdraw.assert_called_once_with(0.5)
 

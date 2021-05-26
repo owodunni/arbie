@@ -162,4 +162,4 @@ variables:
         assert len(pool_finder.store.get(Result.whitelist_addresses)) == 4
         assert len(pool_updater.store.get(Result.pool_updater_pools)) == 4
         assert len(path_finder.store.get(Result.arbitrage_filtered_trades)) == 1
-        assert trader.store.get(Result.trader_profit) > 3.278
+        assert trader.store.get(Result.trader_profit) > 3.278  # noqa: WPS459

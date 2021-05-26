@@ -1,7 +1,7 @@
 """Trades contain variables for trading."""
 
 from Arbie.Variables.pool import Pools
-from Arbie.Variables.token import Balance, Tokens
+from Arbie.Variables.token import Tokens
 
 
 class Trade(object):
@@ -31,9 +31,6 @@ Trade(
 
     def __getitem__(self, i):
         return self.pools[i], self.path[i], self.path[i + 1]  # noqa: WPS221
-
-    def set_balance(self, balance: Balance):
-        self.balance = balance
 
     def _generator(self):
         yield from (self[i] for i, _ in enumerate(self.pools))

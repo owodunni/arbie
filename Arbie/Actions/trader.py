@@ -88,7 +88,7 @@ class SetUpTrader(Action):
         )
         router = data.router()
         if not router.approve(data.weth()):
-            raise Exception("Failed to authorize arbie to spend tokens.")
+            raise RuntimeError("Failed to authorize arbie to spend tokens.")
 
         logger.info(
             f"Finished setting up trader, eth: {amount_eth}, weth: {amount_weth}"
