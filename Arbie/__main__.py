@@ -18,7 +18,7 @@ Options:
 """
 import asyncio
 import logging
-from logging import handlers
+from logging.handlers import RotatingFileHandler
 
 import yaml
 from docopt import docopt
@@ -37,9 +37,7 @@ def setup_logging(log_file: str, severity=logging.INFO):
 
     root_logger = logging.getLogger()
 
-    file_handler = handlers.RotatingFileHandler(
-        log_file, maxBytes=max_log_size, backupCount=5
-    )
+    file_handler = RotatingFileHandler(log_file, maxBytes=max_log_size, backupCount=5)
     file_handler.setFormatter(logging.Formatter(formater))
     file_handler.setLevel(severity)
     root_logger.addHandler(file_handler)

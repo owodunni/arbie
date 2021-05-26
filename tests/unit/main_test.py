@@ -30,7 +30,7 @@ def store() -> Store:
 
 
 def setup_mocks(mocker, config_file):
-    mocker.patch("Arbie.__main__.handlers.RotatingFileHandler")
+    mocker.patch("Arbie.__main__.RotatingFileHandler")
     mocker.patch("Arbie.__main__.logging.getLogger")
     if config_file is not None:
         mocker.patch("builtins.open", mocker.mock_open(read_data=config_file))
